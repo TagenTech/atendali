@@ -58,6 +58,7 @@ export default defineConfig({
         SIGNUP_ENABLED: 'true',
         THROTTLE_LIMIT: '5000',
         REGISTER_THROTTLE_LIMIT: '1000',
+        PUBLIC_BOOKING_THROTTLE_LIMIT: '1000',
         CRON_SECRET: 'playwright-cron-secret-playwright-0001',
       },
     },

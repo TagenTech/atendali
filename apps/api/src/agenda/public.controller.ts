@@ -6,6 +6,9 @@ import { BookingService } from './booking.service';
 import { CancelGroupDto, PortalCodeDto, PortalVerifyDto, PublicBookingDto, PublicGroupBookingDto, PublicSlotsQueryDto, RescheduleDto, SequenceQueryDto } from './dto/agenda.dto';
 import { bearer, PortalService } from './portal.service';
 
+/** Reservas por hora e por IP (os testes de navegador marcam muito: lá a variável é alta). */
+const BOOKING_LIMIT_PER_HOUR = Number(process.env.PUBLIC_BOOKING_THROTTLE_LIMIT ?? 10);
+
 /** Agendamento online: página do negócio, horários livres e reserva — sem login. */
 @ApiTags('agendamento online')
 @Public()
@@ -35,7 +38,7 @@ export class PublicBookingController {
   }
 
   @Post('orgs/:slug/bookings/group')
-  @Throttle({ default: { ttl: 3_600_000, limit: 10 } })
+  @Throttle({ default: { ttl: 3_600_000, limit: BOOKING_LIMIT_PER_HOUR } })
   bookGroup(@Param('slug') slug: string, @Body() dto: PublicGroupBookingDto) {
     return this.booking.bookGroup(slug, dto);
   }
@@ -68,7 +71,7 @@ export class PublicBookingController {
   }
 
   @Post('orgs/:slug/bookings')
-  @Throttle({ default: { ttl: 3_600_000, limit: 10 } })
+  @Throttle({ default: { ttl: 3_600_000, limit: BOOKING_LIMIT_PER_HOUR } })
   book(@Param('slug') slug: string, @Body() dto: PublicBookingDto) {
     return this.booking.book(slug, dto);
   }

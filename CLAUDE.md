@@ -44,7 +44,7 @@ Monorepo pnpm + Turbo, nascido do Turmei (`../gestao-aulas`). Leia o [README](RE
 
 ## Personalização e demo
 - Página pública: logo e fundo em `organization_images` (bytea; o navegador reduz antes de enviar; a API confere os bytes — PNG/JPG/WebP, nunca SVG), cor da paleta `BRAND_COLORS` e frase. Endereços `/public/orgs/<slug>/brand/{logo,cover}?v=` (cache longo, versão = data da troca).
-- Limites de cadastro/criação de negócio (10/h por IP) vêm de `REGISTER_THROTTLE_LIMIT` (o Playwright usa 1000).
+- Limites de cadastro/criação de negócio (10/h por IP) vêm de `REGISTER_THROTTLE_LIMIT` e o de reservas pela página pública (10/h por IP) de `PUBLIC_BOOKING_THROTTLE_LIMIT` (o Playwright usa 1000 nos dois).
 - `node apps/api/scripts/seed-demo.js` cria um usuário demo por segmento (`demo-<segmento>@skedulei.test`, senha `senha-forte-123`), com todos os módulos ligados. Só dev. `node apps/api/scripts/seed-demo-data.js` enche essas contas com ~30 dias de movimento (equipe, clientes, agenda, caixa, comandas, comissões, contas, estoque, pacotes, clube, vale, pontos, avaliações); só roda em negócio sem comandas.
 - **Regressão**: `pnpm verify` (tipos, lint, regras, API e2e, build, Playwright). `apps/web/e2e/regressao-telas.spec.ts` abre toda tela como dono e como cada perfil (recepção, profissional, financeiro, gerente), no celular e no desktop, e falha com erro de console, resposta 5xx ou rolagem lateral. Mudou tela, rota ou permissão → rode antes de encerrar.
 
