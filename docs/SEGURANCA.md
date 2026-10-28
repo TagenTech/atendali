@@ -56,6 +56,12 @@ Prontuário, anamnese e termo (`apps/api/src/clinico`, testes em `clinico.e2e-sp
 - **Aceite do termo**: nome digitado + data/hora + IP (assinatura simples, **não** ICP-Brasil).
 - **Isolamento**: RLS e filtro por negócio; testes de que outro negócio não lê nem altera.
 
+### Novo: lembretes e job interno (28/10/2026)
+- **Link do lembrete**: assinado com HMAC-SHA256 (`JWT_SECRET`), preso a **um** agendamento, vence 24 h depois do horário; não dá acesso a outros horários da pessoa. O código de reserva continua só como hash.
+- **Confirmar presença é um clique na página** (não no e-mail): robôs de antivírus que "abrem" links não confirmam nada.
+- **Job interno** `POST /v1/internal/jobs/reminders`: exige `x-cron-secret` (comparação em tempo constante) e responde 404 se `CRON_SECRET` não estiver configurado ou tiver menos de 32 caracteres. Os envios são idempotentes (reserva a vez no banco antes de mandar).
+- **Privacidade do e-mail**: o lembrete cita só procedimento, profissional, dia, hora e endereço — sem dado de saúde. O nome do paciente aparece só na saudação.
+
 ### Em aberto (decisão ou infraestrutura)
 
 | # | OWASP | Achado | Sev. | O que fazer |

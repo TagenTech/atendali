@@ -35,6 +35,10 @@ export class Organization {
   @Column({ name: 'payment_methods', type: 'jsonb', nullable: true })
   paymentMethods: PaymentMethodConfig[] | null;
 
+  /** Lembretes automáticos por e-mail (24 h e 2 h antes). */
+  @Column({ name: 'reminders_enabled', type: 'boolean', default: true })
+  remindersEnabled: boolean;
+
   /** Regras de fidelidade (null = padrão, desligado). */
   @Column({ type: 'jsonb', nullable: true })
   loyalty: LoyaltyRule | null;

@@ -592,6 +592,11 @@ export class UpdateOrganizationDto implements UpdateOrganizationRequest {
   @Type(() => LoyaltyRuleDto)
   loyalty?: LoyaltyRuleDto;
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  remindersEnabled?: boolean;
+
   @ApiPropertyOptional({ description: 'Chave de BRAND_COLORS; null volta ao padrão' })
   @EmptyToNull()
   @IsOptional()

@@ -22,3 +22,4 @@ export * from './branding';
 export * from './password';
 export * from './guardian';
 export * from './clinical';
+export * from './reminders';

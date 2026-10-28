@@ -49,6 +49,8 @@ export interface OrganizationDto {
   commissionBase: CommissionBase;
   /** Regras do programa de fidelidade (vale quando o módulo está ligado). */
   loyalty: LoyaltyRule;
+  /** Lembretes por e-mail 24 h e 2 h antes (para quem deixou e-mail). */
+  remindersEnabled: boolean;
   /** Logo, fundo, cor e frase da página pública. */
   branding: import('./branding').BrandingDto;
   createdAt: string;
@@ -161,6 +163,7 @@ export interface UpdateOrganizationRequest {
   paymentMethods?: PaymentMethodConfig[];
   commissionBase?: CommissionBase;
   loyalty?: LoyaltyRule;
+  remindersEnabled?: boolean;
   brandColor?: import('./branding').BrandColor | null;
   tagline?: string | null;
 }

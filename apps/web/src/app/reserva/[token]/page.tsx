@@ -2,7 +2,7 @@
 
 import { APPOINTMENT_STATUS_LABEL, formatDateLong, ONLINE_BOOKING, whatsappLink, zonedParts, type PublicBookingItemDto } from '@skedulei/contracts';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { CalendarCheck2, CalendarPlus, CalendarX2, MapPin, MessageCircle, Repeat } from 'lucide-react';
+import { CalendarCheck2, CalendarPlus, CalendarX2, CheckCircle2, MapPin, MessageCircle, Repeat } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import * as React from 'react';
@@ -41,6 +41,7 @@ export default function ReservaPage() {
   const active = g.items.filter((i) => i.status !== 'CANCELADO');
   const cancelled = active.length === 0;
   const changeable = active.filter((i) => i.canCancel);
+  const toConfirm = active.filter((i) => i.canConfirm);
   const set = (next: typeof g) => qc.setQueryData(['booking-group', token], next);
 
   const cancel = async (key: string, itemId?: string) => {
@@ -56,6 +57,18 @@ export default function ReservaPage() {
     } finally {
       setBusy(null);
       setConfirming(null);
+    }
+  };
+
+  const confirm = async () => {
+    setBusy('confirm');
+    try {
+      set(await agendaApi.publicGroupConfirm(token));
+      toast.success('Presença confirmada ✓');
+    } catch (err) {
+      toast.error(errorText(err));
+    } finally {
+      setBusy(null);
     }
   };
 
@@ -142,6 +155,12 @@ export default function ReservaPage() {
               <CalendarPlus /> Adicionar ao calendário
             </Button>
           </>
+        ) : null}
+
+        {toConfirm.length ? (
+          <Button size="lg" block loading={busy === 'confirm'} onClick={confirm}>
+            <CheckCircle2 /> {many ? 'Confirmar presença em todos' : 'Confirmar presença'}
+          </Button>
         ) : null}
 
         {!many && changeable[0] ? (

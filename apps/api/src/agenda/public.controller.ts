@@ -53,6 +53,13 @@ export class PublicBookingController {
     return this.booking.cancelGroup(token, dto.itemId);
   }
 
+  @Post('bookings/:token/group/confirm')
+  @HttpCode(200)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  confirmGroup(@Param('token') token: string, @Body() dto: CancelGroupDto) {
+    return this.booking.confirmGroup(token, dto.itemId);
+  }
+
   @Post('bookings/:token/group/reschedule')
   @HttpCode(200)
   @Throttle({ default: { ttl: 60_000, limit: 10 } })

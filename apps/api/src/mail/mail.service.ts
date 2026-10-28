@@ -140,6 +140,31 @@ export class MailService {
     });
   }
 
+  /** Lembrete 24 h / 2 h antes: texto do negócio e do paciente escapado; o link leva a confirmar, remarcar ou cancelar. */
+  sendReminder(to: string, p: { patientName: string; orgName: string; serviceName: string; professionalName: string; when: string; address: string | null; kind: 'H24' | 'H2'; url: string }) {
+    const first = escapeHtml(p.patientName.split(' ')[0]);
+    return this.send({
+      to,
+      link: p.url,
+      subject: `${p.kind === 'H24' ? 'Lembrete: amanhã' : 'Daqui a pouco'} em ${p.orgName.replace(/[\r\n]/g, ' ')}`,
+      html: layout(
+        p.kind === 'H24' ? `${first}, seu horário é amanhã 💜` : `${first}, falta pouco! ⏰`,
+        `<strong>${escapeHtml(p.serviceName)}</strong> com ${escapeHtml(p.professionalName)} em <strong>${escapeHtml(p.orgName)}</strong>, ${escapeHtml(p.when)}.${p.address ? `<br/>${escapeHtml(p.address)}` : ''}<br/><br/>Confirme sua presença — ou, se não der, remarque ou cancele para liberar o horário para outra pessoa.`,
+        { label: 'Confirmar, remarcar ou cancelar', url: p.url },
+      ),
+    });
+  }
+
+  /** Aviso à equipe: o cliente marcou, remarcou ou cancelou pela página online. */
+  sendStaffBookingNotice(to: string, p: { what: 'created' | 'cancelled' | 'rescheduled'; orgName: string; lines: string[] }) {
+    const title = { created: 'Nova reserva online', cancelled: 'Reserva cancelada pelo cliente', rescheduled: 'Reserva remarcada pelo cliente' }[p.what];
+    return this.send({
+      to,
+      subject: `${title} · ${p.orgName.replace(/[\r\n]/g, ' ')}`,
+      html: layout(`${title} 📅`, p.lines.map((l) => escapeHtml(l)).join('<br/>')),
+    });
+  }
+
   /** Código de 6 dígitos para a pessoa ver as próprias reservas. O nome do negócio é escapado. */
   sendPortalCode(to: string, p: { orgName: string; code: string; ttlMinutes: number }) {
     return this.send({

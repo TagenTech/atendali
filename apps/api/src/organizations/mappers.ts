@@ -24,6 +24,7 @@ export function toOrganizationDto(o: Organization, me: Pick<Member, 'id' | 'role
     paymentMethods: paymentMethodsOf(o.paymentMethods),
     commissionBase: o.commissionBase,
     loyalty: loyaltyOf(o.loyalty),
+    remindersEnabled: o.remindersEnabled,
     branding: brandingOf(o),
     createdAt: o.createdAt.toISOString(),
     me: { memberId: me.id, role: me.role, permissions: permissionsOf(me.role) },

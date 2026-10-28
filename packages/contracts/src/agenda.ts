@@ -357,6 +357,8 @@ export interface PublicBookingItemDto {
   endsAt: string;
   status: AppointmentStatus;
   canCancel: boolean;
+  /** Ainda não confirmou a presença (agendado, antes do horário). */
+  canConfirm: boolean;
 }
 
 /** A reserva (um ou mais procedimentos) que o link `/reserva/<token>` mostra. */

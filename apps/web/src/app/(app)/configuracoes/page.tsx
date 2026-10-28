@@ -124,6 +124,30 @@ function BookingFee() {
   );
 }
 
+/** Lembretes automáticos por e-mail (24 h e 2 h antes) para quem deixou e-mail ao marcar. */
+function Reminders() {
+  const { org } = useOrg();
+  const update = useUpdateOrganization();
+  return (
+    <Card>
+      <SwitchRow
+        id="reminders-on"
+        checked={org.remindersEnabled}
+        onCheckedChange={async (v) => {
+          try {
+            await update.mutateAsync({ remindersEnabled: v });
+            toast.success(v ? 'Lembretes ligados' : 'Lembretes desligados');
+          } catch (err) {
+            toast.error(errorText(err));
+          }
+        }}
+        title="Lembretes por e-mail"
+        description="Um e-mail 24 h e outro 2 h antes do horário, com botão para confirmar, remarcar ou cancelar. Só para quem deixou e-mail. Você também recebe um aviso a cada reserva online, remarcação ou cancelamento."
+      />
+    </Card>
+  );
+}
+
 function Loyalty() {
   const { org } = useOrg();
   const update = useUpdateOrganization();
@@ -368,6 +392,9 @@ export default function ConfiguracoesPage() {
         </Section>
         <Section title="Aparência da página" description="Logo, imagem de fundo e cor que o cliente vê ao agendar online.">
           <BrandingEditor />
+        </Section>
+        <Section title="Lembretes" description="Reduzem faltas: o cliente confirma ou libera o horário sozinho.">
+          <Reminders />
         </Section>
         <Section title="Taxa de agendamento" description="Cobrança de sinal ao marcar online, para reduzir faltas. Ainda não está disponível.">
           <BookingFee />

@@ -73,6 +73,13 @@ export class Appointment {
   @Column({ name: 'manage_token_hash', type: 'varchar', length: 64, nullable: true, unique: true, select: false })
   manageTokenHash: string | null;
 
+  /** Lembretes já enviados (cada um sai uma vez; o job "reserva" a vez antes de mandar). */
+  @Column({ name: 'reminded_24_at', type: 'timestamptz', nullable: true })
+  reminded24At: Date | null;
+
+  @Column({ name: 'reminded_2_at', type: 'timestamptz', nullable: true })
+  reminded2At: Date | null;
+
   /** Reserva online com vários procedimentos: todos compartilham o grupo e o mesmo link (hash em `groupTokenHash`). */
   @Index()
   @Column({ name: 'booking_group_id', type: 'uuid', nullable: true })

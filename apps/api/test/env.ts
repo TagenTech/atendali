@@ -4,5 +4,6 @@ process.env.DATABASE_URL = process.env.E2E_DATABASE_URL ?? 'postgres://postgres:
 process.env.TYPEORM_SYNC = 'true';
 process.env.JWT_SECRET = 'e2e-secret-e2e-secret-e2e-secret-e2e-secret';
 process.env.DATA_ENCRYPTION_KEY = Buffer.alloc(32, 9).toString('base64');
+process.env.CRON_SECRET = 'e2e-cron-secret-e2e-cron-secret-0001';
 process.env.VAPID_PUBLIC_KEY = '';
 process.env.VAPID_PRIVATE_KEY = '';

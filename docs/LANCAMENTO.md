@@ -89,6 +89,13 @@ Regras de segurança já aplicadas (testadas):
   depois por um provedor que garante o e-mail, a conta passa ao dono e **senha, logins sociais e sessões antigas são
   apagados**.
 
+## 3b. Lembretes e jobs agendados
+
+- **VPS/Docker (1 instância)**: nada a fazer — a API roda o job sozinha a cada 5 minutos (`SCHEDULER_ENABLED` ligado). Precisa do e-mail configurado ([§2](#2-e-mail-e-recuperação-de-senha)); sem `RESEND_API_KEY` os lembretes não saem (o erro vai para o log).
+- **Vercel + Supabase (serverless)**: a API não fica ligada entre as chamadas. Defina `SCHEDULER_ENABLED=false` e `CRON_SECRET` (32+ caracteres, `openssl rand -base64 48`) na API, habilite `pg_cron` e `pg_net` e rode [`deploy/supabase/cron.sql`](../deploy/supabase/cron.sql) trocando `API_URL`. Teste uma vez: `curl -X POST -H "x-cron-secret: $CRON_SECRET" https://API_URL/v1/internal/jobs/reminders` deve devolver `{"checked":…,"sent":{…}}`.
+- **Teste em homologação**: marque um horário com seu e-mail para daqui a ~23 h (ou ajuste a data no banco), espere o job e confira o e-mail; clique em "Confirmar, remarcar ou cancelar" e confirme a presença.
+- **Aviso à equipe**: cada reserva online, remarcação e cancelamento manda e-mail ao profissional (ou ao dono, se o profissional não tem e-mail). Hoje não há opção para desligar só esse aviso.
+
 ## 4. Limite de tentativas e bloqueio de login
 
 Hoje o limite de requisições por IP (`@nestjs/throttler`) e o **bloqueio por e-mail** (5 senhas erradas → 15 min) vivem

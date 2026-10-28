@@ -1,5 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { createHash, randomBytes, randomUUID } from 'crypto';
 import { DataSource, EntityManager, In, IsNull, MoreThan, Not } from 'typeorm';
 import {
@@ -30,6 +31,8 @@ import { Organization } from '../organizations/entities/organization.entity';
 import { brandingOf } from '../organizations/mappers';
 import { ServiceItem } from '../organizations/entities/service-item.entity';
 import type { Unit } from '../organizations/entities/unit.entity';
+import { Events, type BookingChangedEvent } from '../common/events';
+import { readReminderLink } from './reminder-link';
 import { PublicBookingDto, PublicGroupBookingDto, PublicSlotsQueryDto, RescheduleDto } from './dto/agenda.dto';
 import { Appointment } from './entities/appointment.entity';
 import { Client } from './entities/client.entity';
@@ -57,6 +60,7 @@ export class BookingService {
     private readonly waitlist: WaitlistService,
     private readonly mail: MailService,
     private readonly config: ConfigService,
+    private readonly emitter: EventEmitter2,
   ) {}
 
   async page(slug: string): Promise<PublicOrgDto> {
@@ -157,6 +161,7 @@ export class BookingService {
       );
       return saved.id;
     });
+    this.emitter.emit(Events.BOOKING_CREATED, { appointmentIds: [id] } satisfies BookingChangedEvent);
     const booking = await this.toDto(id, token);
     if (dto.email) {
       const when = `${new Date(booking.startsAt).toLocaleDateString('pt-BR', { timeZone: booking.timezone, weekday: 'long', day: 'numeric', month: 'long' })} às ${zonedParts(new Date(booking.startsAt), booking.timezone).time}`;
@@ -201,6 +206,7 @@ export class BookingService {
       const unit = await this.scheduling.resolveUnit(em, a.organizationId, a.unitId);
       await this.waitlist.onSlotFreed(em, a, unit.timezone);
     });
+    this.emitter.emit(Events.BOOKING_CANCELLED, { appointmentIds: [id] } satisfies BookingChangedEvent);
   }
 
   /** Muda o horário (e, se pedido, o profissional) de um agendamento já autorizado. O horário precisa estar entre os oferecidos. */
@@ -222,10 +228,12 @@ export class BookingService {
       const start = new Date(slot.startsAt);
       const end = new Date(start.getTime() + service.durationMinutes * 60_000);
       await this.scheduling.assertFree(em, { organizationId: a.organizationId, unitId: unit.id, memberId, start, end, excludeAppointmentId: a.id });
-      await em.getRepository(Appointment).update(a.id, { startsAt: start, endsAt: end, memberId });
+      // Mudou o horário: os lembretes valem de novo para o novo horário.
+      await em.getRepository(Appointment).update(a.id, { startsAt: start, endsAt: end, memberId, reminded24At: null, reminded2At: null });
       // O horário antigo vagou: avisa a lista de espera.
       await this.waitlist.onSlotFreed(em, a, unit.timezone);
     });
+    this.emitter.emit(Events.BOOKING_RESCHEDULED, { appointmentIds: [id] } satisfies BookingChangedEvent);
   }
 
   // ---------------------------------------------------------------- vários procedimentos (carrinho)
@@ -370,6 +378,7 @@ export class BookingService {
       }
     });
     const group = await this.getGroup(token);
+    this.emitter.emit(Events.BOOKING_CREATED, { appointmentIds: group.items.map((i) => i.id) } satisfies BookingChangedEvent);
     if (dto.email) {
       const lines = group.items.map((i) => `${i.serviceName} com ${i.professionalName}, ${this.whenText(i.startsAt, group.timezone)}`);
       await this.mail.sendBookingConfirmation(dto.email, {
@@ -410,6 +419,7 @@ export class BookingService {
         endsAt: a.endsAt.toISOString(),
         status: a.status,
         canCancel: canClientCancel(a.status, a.startsAt.toISOString()),
+        canConfirm: a.status === AppointmentStatus.AGENDADO && a.startsAt.getTime() > Date.now(),
       })),
     };
   }
@@ -425,6 +435,19 @@ export class BookingService {
       throw new BadRequestException(`Pelo link só dá para cancelar até ${ONLINE_BOOKING.cancelUntilHours}h antes. Fale com o estabelecimento.`);
     }
     for (const a of open) await this.cancelById(a.id);
+    return this.getGroup(token);
+  }
+
+  /** O cliente confirma presença (agendado → confirmado). Sem `itemId`, confirma todos os que estão por vir. */
+  async confirmGroup(token: string, itemId?: string | null): Promise<PublicGroupBookingResponse> {
+    const ids = await this.idsByToken(token);
+    if (itemId && !ids.includes(itemId)) throw new NotFoundException('Procedimento não encontrado nesta reserva');
+    const rows = await this.db.getRepository(Appointment).find({ where: { id: In(itemId ? [itemId] : ids) } });
+    const pending = rows.filter((a) => a.status === AppointmentStatus.AGENDADO && a.startsAt.getTime() > Date.now());
+    if (!pending.length && !rows.some((a) => a.status === AppointmentStatus.CONFIRMADO)) {
+      throw new BadRequestException('Esse horário não pode mais ser confirmado. Fale com o estabelecimento.');
+    }
+    if (pending.length) await this.db.getRepository(Appointment).update({ id: In(pending.map((a) => a.id)) }, { status: AppointmentStatus.CONFIRMADO });
     return this.getGroup(token);
   }
 
@@ -465,6 +488,12 @@ export class BookingService {
 
   /** Agendamentos do link: o próprio (reserva de um procedimento) ou todos do grupo, em ordem de horário. */
   private async idsByToken(token: string): Promise<string[]> {
+    // Link do lembrete (assinado): vale só para aquele agendamento.
+    const signed = readReminderLink(this.config.getOrThrow<string>('jwt.secret'), String(token));
+    if (signed) {
+      if (!(await this.db.getRepository(Appointment).exists({ where: { id: signed } }))) throw new NotFoundException('Agendamento não encontrado');
+      return [signed];
+    }
     const h = hashToken(String(token).slice(0, 100));
     const rows = await this.db
       .getRepository(Appointment)

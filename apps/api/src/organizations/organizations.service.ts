@@ -160,6 +160,7 @@ export class OrganizationsService {
     if (dto.brandColor !== undefined) o.brandColor = dto.brandColor;
     if (dto.tagline !== undefined) o.tagline = dto.tagline;
     if (dto.commissionBase !== undefined) o.commissionBase = dto.commissionBase;
+    if (dto.remindersEnabled !== undefined) o.remindersEnabled = dto.remindersEnabled;
     if (dto.loyalty !== undefined) {
       const rule = loyaltyOf(dto.loyalty);
       const problem = validateLoyalty(rule);

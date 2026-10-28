@@ -64,6 +64,8 @@ export const publicBookGroup = (slug: string, body: PublicGroupBookingRequest) =
 export const publicGroup = (token: string) => api<PublicGroupBookingDto>(`/public/bookings/${encodeURIComponent(token)}/group`);
 export const publicGroupCancel = (token: string, itemId?: string) =>
   api<PublicGroupBookingDto>(`/public/bookings/${encodeURIComponent(token)}/group/cancel`, { method: 'POST', ...json(itemId ? { itemId } : {}) });
+export const publicGroupConfirm = (token: string, itemId?: string) =>
+  api<PublicGroupBookingDto>(`/public/bookings/${encodeURIComponent(token)}/group/confirm`, { method: 'POST', ...json(itemId ? { itemId } : {}) });
 export const publicGroupReschedule = (token: string, body: RescheduleRequest) =>
   api<PublicGroupBookingDto>(`/public/bookings/${encodeURIComponent(token)}/group/reschedule`, { method: 'POST', ...json(body) });
 export const publicBooking = (token: string) => api<PublicBookingDto>(`/public/bookings/${encodeURIComponent(token)}`);
