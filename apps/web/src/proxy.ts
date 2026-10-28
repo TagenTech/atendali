@@ -4,7 +4,7 @@ const REFRESH_COOKIE = 'skedulei_refresh';
 /** Telas de entrada: com sessão, vai direto para o app. */
 const ENTRY = ['/login', '/cadastro', '/esqueci-senha'];
 /** Área logada. */
-const PROTECTED = ['/inicio', '/agenda', '/clientes', '/caixa', '/financeiro', '/comissoes', '/servicos', '/estoque', '/fidelidade', '/avaliacoes', '/tv', '/equipe', '/configuracoes', '/mais', '/onboarding'];
+const PROTECTED = ['/inicio', '/agenda', '/clientes', '/caixa', '/financeiro', '/relatorios', '/comissoes', '/servicos', '/estoque', '/fidelidade', '/avaliacoes', '/atividade', '/tv', '/equipe', '/configuracoes', '/mais', '/onboarding'];
 
 const isDev = process.env.NODE_ENV === 'development';
 

@@ -62,12 +62,17 @@ Prontuário, anamnese e termo (`apps/api/src/clinico`, testes em `clinico.e2e-sp
 - **Job interno** `POST /v1/internal/jobs/reminders`: exige `x-cron-secret` (comparação em tempo constante) e responde 404 se `CRON_SECRET` não estiver configurado ou tiver menos de 32 caracteres. Os envios são idempotentes (reserva a vez no banco antes de mandar).
 - **Privacidade do e-mail**: o lembrete cita só procedimento, profissional, dia, hora e endereço — sem dado de saúde. O nome do paciente aparece só na saudação.
 
+### Novo: trilha de auditoria do dinheiro (28/10/2026)
+- Cada ação sensível grava `quem` + `o quê` + valores **na mesma transação** (se a ação falha e desfaz, o registro desfaz junto; se acontece, o registro existe). Nenhuma rota edita ou apaga.
+- Só o **dono** lê (`AUDIT_VIEW`): quem mexe no dinheiro (gerente, financeiro, recepção) não audita a si mesmo. Sob RLS por negócio.
+- O texto é pensado para LGPD: exclusão de cliente registra o fato sem o nome.
+
 ### Em aberto (decisão ou infraestrutura)
 
 | # | OWASP | Achado | Sev. | O que fazer |
 |---|---|---|---|---|
 | P1 | A07 · API4 | **Limites de tentativa na memória do processo.** O `ThrottlerModule` e o bloqueio por e-mail (`LoginAttempts`) não são compartilhados entre instâncias. Com uma instância (VPS/Docker) está ok; em **Vercel serverless** a proteção contra força bruta quase não funciona | **Crítica se serverless** | Opção A: 1 instância. Opção B: storage compartilhado (Redis/Postgres) + regras de rate limit no Cloudflare. Ver [LANCAMENTO.md §4](LANCAMENTO.md#4-limite-de-tentativas-e-bloqueio-de-login) |
-| P2 | A09 | **Sem trilha de auditoria financeira por negócio.** Estorno, sangria, fechamento de caixa, desconto e pagamento de comissão não deixam registro de *quem* fez | Média | Tabela `audit_log` no mesmo `TenantDb` + tela de atividade (proposta em [LANCAMENTO.md §6](LANCAMENTO.md#6-recomendações-de-segurança-pós-lançamento-imediato)) |
+| ~~P2~~ | A09 | ~~Sem trilha de auditoria financeira por negócio~~ — **resolvido em 28/10/2026**: `audit_log` gravado na mesma transação (estorno, desconto, itens/pagamentos removidos, caixa, comissões, contas, exclusão de cliente), tela **Atividade** só para o dono (`AUDIT_VIEW`), sem dado pessoal no texto; testes em `auditoria.e2e-spec.ts` | — | Evolução: alertas (ex.: muitos estornos de uma pessoa) e exportação |
 | P3 | A04 | **Sem captcha** na página pública, no cadastro e no contato | Média | Cloudflare Turnstile |
 
 ### Situação por categoria (Skedulei)

@@ -17,7 +17,7 @@ Repositório: <https://github.com/TagenTech/skedulei> (ainda **sem push**; só h
 | 5 | 🔴 Banco: migrations + papel de RLS em produção | a validar em homologação | [§5](#5-banco-de-dados) |
 | 6 | 🔴 Textos legais (termos, privacidade) para clínica/paciente e dado de saúde | revisão jurídica | [§7](#7-lgpd-e-textos-legais) |
 | 7 | 🔴 Contato de segurança no `SECURITY.md` | a preencher | [§8](#8-operação) |
-| 8 | 🟡 Trilha de auditoria financeira por negócio | a construir | [§6](#6-recomendações-de-segurança-pós-lançamento-imediato) |
+| 8 | ✅ Trilha de auditoria financeira por negócio (tela **Atividade**, só o dono) | pronto | [SEGURANCA.md](SEGURANCA.md#novo-trilha-de-auditoria-do-dinheiro-28102026) |
 | 9 | 🟡 Captcha (Cloudflare Turnstile) na página pública e no cadastro | a construir | [§6](#6-recomendações-de-segurança-pós-lançamento-imediato) |
 | 10 | 🟡 Monitoramento (Sentry, uptime), backups e teste de restauração | a configurar | [§8](#8-operação) |
 | 11 | 🟡 Teste de invasão leve (OWASP ZAP) em homologação | a fazer | [§6](#6-recomendações-de-segurança-pós-lançamento-imediato) |
@@ -128,7 +128,7 @@ Em qualquer opção, ative no Cloudflare: *Bot Fight Mode* e a regra gerenciada 
 
 ## 6. Recomendações de segurança (pós-lançamento imediato)
 
-1. **Trilha de auditoria financeira por negócio** (🟡). Hoje eventos de segurança cobrem login, senha, 2FA, sessões e
+1. ~~**Trilha de auditoria financeira por negócio**~~ — **feito** (tela Atividade, só o dono). Antes disso, os eventos de segurança cobrem login, senha, 2FA, sessões e
    equipe (convite/perfil/remoção), mas **não** estorno de comanda, sangria, fechamento de caixa, desconto, pagamento de
    comissão nem exclusão de conta a pagar. Proposta: tabela `audit_log` (`organization_id`, `member_id`, `action`,
    `entity`, `entity_id`, `meta`, `created_at`) gravada na mesma transação (`TenantDb`), entra no RLS sozinha, tela

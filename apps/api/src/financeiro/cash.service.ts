@@ -1,9 +1,10 @@
 import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { EntityManager, In, IsNull } from 'typeorm';
-import { cashExpected, OrderStatus, type CashSessionDto } from '@skedulei/contracts';
+import { cashExpected, formatBRL, OrderStatus, type CashSessionDto } from '@skedulei/contracts';
 import { Member } from '../organizations/entities/member.entity';
 import { Unit } from '../organizations/entities/unit.entity';
 import type { OrgContext } from '../organizations/org-context';
+import { AuditService } from '../auditoria/audit.service';
 import { TenantDb } from '../tenancy/tenant-db';
 import { CashMovementDto, CloseCashDto, OpenCashDto } from './dto/finance.dto';
 import { CashMovement } from './entities/cash-movement.entity';
@@ -25,7 +26,10 @@ export function openSession(em: EntityManager, organizationId: string, unitId: s
 
 @Injectable()
 export class CashService {
-  constructor(private readonly tenant: TenantDb) {}
+  constructor(
+    private readonly tenant: TenantDb,
+    private readonly audit: AuditService,
+  ) {}
 
   async current(org: OrgContext): Promise<CashSessionDto | null> {
     return this.tenant.transaction(async (em) => {
@@ -60,6 +64,7 @@ export class CashService {
           countedCents: null,
         }),
       );
+      await this.audit.log(em, org, { action: 'CASH_OPENED', entity: 'cash', entityId: s.id, summary: `Caixa aberto com ${formatBRL(dto.openingCents)} de troco inicial`, meta: { openingCents: dto.openingCents } });
       return this.toDto(em, s);
     });
   }
@@ -81,6 +86,7 @@ export class CashService {
           memberId: org.memberId,
         }),
       );
+      await this.audit.log(em, org, { action: 'CASH_MOVEMENT', entity: 'cash', entityId: s.id, summary: `${dto.kind === 'SANGRIA' ? 'Sangria' : 'Suprimento'} de ${formatBRL(dto.amountCents)}${dto.note ? ` — ${dto.note}` : ''}`, meta: { kind: dto.kind, amountCents: dto.amountCents } });
       return this.toDto(em, s);
     });
   }
@@ -98,7 +104,10 @@ export class CashService {
       if (pending) throw new BadRequestException('Há comandas abertas com pagamento neste caixa. Feche-as antes.');
       Object.assign(s, { closedAt: new Date(), closedByMemberId: org.memberId, countedCents: dto.countedCents, notes: dto.notes ?? null });
       await em.getRepository(CashSession).save(s);
-      return this.toDto(em, s);
+      const closed = await this.toDto(em, s);
+      const diff = dto.countedCents - closed.expected.drawerCents;
+      await this.audit.log(em, org, { action: 'CASH_CLOSED', entity: 'cash', entityId: s.id, summary: `Caixa fechado: esperado ${formatBRL(closed.expected.drawerCents)}, contado ${formatBRL(dto.countedCents)} (${diff === 0 ? 'bateu' : diff > 0 ? `sobra de ${formatBRL(diff)}` : `falta de ${formatBRL(-diff)}`})`, meta: { expectedCents: closed.expected.drawerCents, countedCents: dto.countedCents, diffCents: diff } });
+      return closed;
     });
   }
 

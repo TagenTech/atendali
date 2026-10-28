@@ -1,18 +1,20 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 import { disableSupabaseRls, lockdownSupabaseTables } from "../database/supabase-lockdown";
 
-export class Inicial1793221246548 implements MigrationInterface {
-    name = 'Inicial1793221246548'
+export class Inicial1793222031091 implements MigrationInterface {
+    name = 'Inicial1793222031091'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`CREATE TABLE "skedulei_users" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "name" character varying(120) NOT NULL, "email" character varying(180) NOT NULL, "password_hash" character varying, "email_verified_at" TIMESTAMP WITH TIME ZONE, "cpf_encrypted" text, "cpf_hash" character varying(64), "cpf_masked" character varying(14), "phone" character varying(16), "city" character varying(80), "state" character varying(2), "terms_accepted_at" TIMESTAMP WITH TIME ZONE, "profile_completed_at" TIMESTAMP WITH TIME ZONE, "tokens_valid_after" TIMESTAMP WITH TIME ZONE, "mfa_secret_encrypted" text, "mfa_pending_secret_encrypted" text, "mfa_enabled_at" TIMESTAMP WITH TIME ZONE, "mfa_last_step" bigint, "timezone" character varying(64) NOT NULL DEFAULT 'America/Sao_Paulo', "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "UQ_b1fee4a19825d15180c5ded27f0" UNIQUE ("email"), CONSTRAINT "UQ_9b52678f67ed53e62ecc55ac1dc" UNIQUE ("cpf_hash"), CONSTRAINT "PK_de296f4c2a1ea4d3fc0c3fc2b8d" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "skedulei_security_events" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "user_id" uuid, "type" character varying(32) NOT NULL, "ip" character varying(64), "user_agent" character varying(255), "meta" jsonb, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_d1c89a5dc9ba51782f790a3f366" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE INDEX "IDX_9a8a7736b99d563a2077f5c568" ON "skedulei_security_events" ("user_id", "created_at") `);
         await queryRunner.query(`CREATE TABLE "skedulei_organizations" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "name" character varying(120) NOT NULL, "slug" character varying(48) NOT NULL, "segment" character varying(24) NOT NULL, "features" text array NOT NULL DEFAULT '{}', "phone" character varying(16), "document" character varying(14), "timezone" character varying(64) NOT NULL DEFAULT 'America/Sao_Paulo', "payment_methods" jsonb, "reminders_enabled" boolean NOT NULL DEFAULT true, "loyalty" jsonb, "brand_color" character varying(12), "tagline" character varying(160), "logo_updated_at" TIMESTAMP WITH TIME ZONE, "cover_updated_at" TIMESTAMP WITH TIME ZONE, "commission_base" character varying(8) NOT NULL DEFAULT 'BRUTO', "order_seq" integer NOT NULL DEFAULT '0', "created_by" uuid, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "UQ_024e25b3c0ce5b8448e474dd28e" UNIQUE ("slug"), CONSTRAINT "PK_68a720a12b9e729f7f065729936" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "skedulei_audit_log" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "organization_id" uuid NOT NULL, "member_id" uuid NOT NULL, "action" character varying(30) NOT NULL, "entity" character varying(30) NOT NULL, "entity_id" uuid, "summary" character varying(300) NOT NULL, "meta" jsonb, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_0ececb5ac24bae10b0d22305993" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE INDEX "IDX_0af275e20cb722463cf36d549c" ON "skedulei_audit_log" ("organization_id", "created_at") `);
+        await queryRunner.query(`CREATE TABLE "skedulei_users" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "name" character varying(120) NOT NULL, "email" character varying(180) NOT NULL, "password_hash" character varying, "email_verified_at" TIMESTAMP WITH TIME ZONE, "cpf_encrypted" text, "cpf_hash" character varying(64), "cpf_masked" character varying(14), "phone" character varying(16), "city" character varying(80), "state" character varying(2), "terms_accepted_at" TIMESTAMP WITH TIME ZONE, "profile_completed_at" TIMESTAMP WITH TIME ZONE, "tokens_valid_after" TIMESTAMP WITH TIME ZONE, "mfa_secret_encrypted" text, "mfa_pending_secret_encrypted" text, "mfa_enabled_at" TIMESTAMP WITH TIME ZONE, "mfa_last_step" bigint, "timezone" character varying(64) NOT NULL DEFAULT 'America/Sao_Paulo', "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "UQ_b1fee4a19825d15180c5ded27f0" UNIQUE ("email"), CONSTRAINT "UQ_9b52678f67ed53e62ecc55ac1dc" UNIQUE ("cpf_hash"), CONSTRAINT "PK_de296f4c2a1ea4d3fc0c3fc2b8d" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "skedulei_units" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "organization_id" uuid NOT NULL, "name" character varying(80) NOT NULL, "phone" character varying(16), "zip_code" character varying(8), "street" character varying(120), "number" character varying(20), "district" character varying(80), "city" character varying(80), "state" character varying(2), "timezone" character varying(64) NOT NULL DEFAULT 'America/Sao_Paulo', "business_hours" jsonb NOT NULL, "active" boolean NOT NULL DEFAULT true, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_a8a39e1ecfff8d1667ad16bc870" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE INDEX "IDX_0476672eedf2a1bfa3430786f2" ON "skedulei_units" ("organization_id") `);
         await queryRunner.query(`CREATE TABLE "skedulei_services" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "organization_id" uuid NOT NULL, "name" character varying(120) NOT NULL, "category" character varying(60), "description" character varying(600), "duration_minutes" smallint NOT NULL, "price_cents" integer NOT NULL, "online_booking" boolean NOT NULL DEFAULT true, "commission_bps" integer, "active" boolean NOT NULL DEFAULT true, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_dbd9d501df2e67798af2d1a3546" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE INDEX "IDX_f4dceaf34359ebbce24e29ff4b" ON "skedulei_services" ("organization_id") `);
+        await queryRunner.query(`CREATE TABLE "skedulei_security_events" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "user_id" uuid, "type" character varying(32) NOT NULL, "ip" character varying(64), "user_agent" character varying(255), "meta" jsonb, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_d1c89a5dc9ba51782f790a3f366" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE INDEX "IDX_9a8a7736b99d563a2077f5c568" ON "skedulei_security_events" ("user_id", "created_at") `);
         await queryRunner.query(`CREATE TABLE "skedulei_organization_images" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "organization_id" uuid NOT NULL, "kind" character varying(8) NOT NULL, "mime" character varying(16) NOT NULL, "data" bytea NOT NULL, "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_393f1847f93fec79c78594d9966" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE UNIQUE INDEX "IDX_b0d43cb7477d5941f71210e488" ON "skedulei_organization_images" ("organization_id", "kind") `);
         await queryRunner.query(`CREATE TABLE "skedulei_members" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "organization_id" uuid NOT NULL, "user_id" uuid, "name" character varying(120) NOT NULL, "email" character varying(180), "phone" character varying(16), "role" character varying(16) NOT NULL, "status" character varying(16) NOT NULL, "bookable" boolean NOT NULL DEFAULT false, "working_hours" jsonb, "commission_bps" integer, "color" smallint NOT NULL DEFAULT '1', "invite_token_hash" character varying(64), "invite_expires_at" TIMESTAMP WITH TIME ZONE, "invited_at" TIMESTAMP WITH TIME ZONE, "joined_at" TIMESTAMP WITH TIME ZONE, "archived_at" TIMESTAMP WITH TIME ZONE, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "UQ_183c4e99d2e066ef00859e4e127" UNIQUE ("invite_token_hash"), CONSTRAINT "PK_87ae0b14c8fd3038c3714b0834a" PRIMARY KEY ("id"))`);
@@ -94,12 +96,12 @@ export class Inicial1793221246548 implements MigrationInterface {
         await queryRunner.query(`CREATE INDEX "IDX_d5e241c0d454f089829a7469e4" ON "skedulei_stock_movements" ("organization_id") `);
         await queryRunner.query(`CREATE INDEX "IDX_91fed81745d2f7e26fbf618847" ON "skedulei_stock_movements" ("order_id") `);
         await queryRunner.query(`CREATE INDEX "IDX_4ff9987ceed59c01ad59217507" ON "skedulei_stock_movements" ("organization_id", "product_id", "created_at") `);
-        await queryRunner.query(`CREATE TABLE "skedulei_service_supplies" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "organization_id" uuid NOT NULL, "service_id" uuid NOT NULL, "product_id" uuid NOT NULL, "quantity" integer NOT NULL, CONSTRAINT "PK_41167e2ecc58af524340702d4f8" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE INDEX "IDX_7c93dafd013ef00733f9f42fcd" ON "skedulei_service_supplies" ("organization_id") `);
-        await queryRunner.query(`CREATE UNIQUE INDEX "IDX_0cadbd4328b2654a430cbbb4b1" ON "skedulei_service_supplies" ("service_id", "product_id") `);
         await queryRunner.query(`CREATE TABLE "skedulei_patient_documents" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "organization_id" uuid NOT NULL, "client_id" uuid NOT NULL, "template_id" uuid, "kind" character varying(10) NOT NULL, "title" character varying(120) NOT NULL, "questions" jsonb NOT NULL DEFAULT '[]', "body" text, "token_hash" character varying(64) NOT NULL, "expires_at" TIMESTAMP WITH TIME ZONE, "status" character varying(10) NOT NULL DEFAULT 'PENDENTE', "answers_encrypted" text, "signed_name" character varying(120), "completed_at" TIMESTAMP WITH TIME ZONE, "completed_via" character varying(6), "completed_ip" character varying(45), "sent_by_member_id" uuid, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_4902b68715dc9eddd03ca7f353e" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE UNIQUE INDEX "IDX_36e5c432b6e8269f8a6b76fcc7" ON "skedulei_patient_documents" ("token_hash") `);
         await queryRunner.query(`CREATE INDEX "IDX_59d6faf815449a04a6841411bb" ON "skedulei_patient_documents" ("organization_id", "client_id", "created_at") `);
+        await queryRunner.query(`CREATE TABLE "skedulei_service_supplies" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "organization_id" uuid NOT NULL, "service_id" uuid NOT NULL, "product_id" uuid NOT NULL, "quantity" integer NOT NULL, CONSTRAINT "PK_41167e2ecc58af524340702d4f8" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE INDEX "IDX_7c93dafd013ef00733f9f42fcd" ON "skedulei_service_supplies" ("organization_id") `);
+        await queryRunner.query(`CREATE UNIQUE INDEX "IDX_0cadbd4328b2654a430cbbb4b1" ON "skedulei_service_supplies" ("service_id", "product_id") `);
         await queryRunner.query(`CREATE TABLE "skedulei_document_templates" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "organization_id" uuid NOT NULL, "kind" character varying(10) NOT NULL, "title" character varying(120) NOT NULL, "questions" jsonb NOT NULL DEFAULT '[]', "body" text, "active" boolean NOT NULL DEFAULT true, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_fb0743b0a493a145e8b57363404" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE INDEX "IDX_dc04c7b42a7d6bb94fa7301d16" ON "skedulei_document_templates" ("organization_id", "kind") `);
         await queryRunner.query(`CREATE TABLE "skedulei_clinical_records" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "organization_id" uuid NOT NULL, "client_id" uuid NOT NULL, "appointment_id" uuid, "member_id" uuid NOT NULL, "kind" character varying(12) NOT NULL, "title" character varying(120), "content_encrypted" text NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_ebf4bb086a58e18f28b3f6008ad" PRIMARY KEY ("id"))`);
@@ -131,6 +133,7 @@ export class Inicial1793221246548 implements MigrationInterface {
         await queryRunner.query(`CREATE INDEX "IDX_aacfdcabad6fd7c86a69339811" ON "skedulei_appointments" ("group_token_hash") `);
         await queryRunner.query(`CREATE INDEX "IDX_b317444e8a9ce1a8a7a2d17b7d" ON "skedulei_appointments" ("member_id", "starts_at") `);
         await queryRunner.query(`CREATE INDEX "IDX_3d069af18d6b157c25511cfe05" ON "skedulei_appointments" ("organization_id", "starts_at") `);
+        await queryRunner.query(`ALTER TABLE "skedulei_audit_log" ADD CONSTRAINT "FK_c991cd5d4ab2c659c6e6229593d" FOREIGN KEY ("organization_id") REFERENCES "skedulei_organizations"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "skedulei_units" ADD CONSTRAINT "FK_0476672eedf2a1bfa3430786f2e" FOREIGN KEY ("organization_id") REFERENCES "skedulei_organizations"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "skedulei_services" ADD CONSTRAINT "FK_f4dceaf34359ebbce24e29ff4be" FOREIGN KEY ("organization_id") REFERENCES "skedulei_organizations"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "skedulei_organization_images" ADD CONSTRAINT "FK_e03d8cf19ca98e1c1f20b9bcd69" FOREIGN KEY ("organization_id") REFERENCES "skedulei_organizations"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
@@ -185,11 +188,11 @@ export class Inicial1793221246548 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "skedulei_products" ADD CONSTRAINT "FK_7e992f5dc6a402ac6214f82c942" FOREIGN KEY ("organization_id") REFERENCES "skedulei_organizations"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "skedulei_stock_movements" ADD CONSTRAINT "FK_d5e241c0d454f089829a7469e43" FOREIGN KEY ("organization_id") REFERENCES "skedulei_organizations"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "skedulei_stock_movements" ADD CONSTRAINT "FK_aca4da3cdb16c1a0a2b430631b7" FOREIGN KEY ("product_id") REFERENCES "skedulei_products"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "skedulei_patient_documents" ADD CONSTRAINT "FK_880abc027019aa6079ea85a0fcc" FOREIGN KEY ("organization_id") REFERENCES "skedulei_organizations"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "skedulei_patient_documents" ADD CONSTRAINT "FK_7d10a387adb4c629b9800d5d79c" FOREIGN KEY ("client_id") REFERENCES "skedulei_clients"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "skedulei_service_supplies" ADD CONSTRAINT "FK_7c93dafd013ef00733f9f42fcdd" FOREIGN KEY ("organization_id") REFERENCES "skedulei_organizations"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "skedulei_service_supplies" ADD CONSTRAINT "FK_a8c3a398402006e86f22a03845b" FOREIGN KEY ("service_id") REFERENCES "skedulei_services"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "skedulei_service_supplies" ADD CONSTRAINT "FK_381abfa634e526b959e15637dd5" FOREIGN KEY ("product_id") REFERENCES "skedulei_products"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "skedulei_patient_documents" ADD CONSTRAINT "FK_880abc027019aa6079ea85a0fcc" FOREIGN KEY ("organization_id") REFERENCES "skedulei_organizations"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "skedulei_patient_documents" ADD CONSTRAINT "FK_7d10a387adb4c629b9800d5d79c" FOREIGN KEY ("client_id") REFERENCES "skedulei_clients"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "skedulei_document_templates" ADD CONSTRAINT "FK_aede744d9c9d113450c226c38ff" FOREIGN KEY ("organization_id") REFERENCES "skedulei_organizations"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "skedulei_clinical_records" ADD CONSTRAINT "FK_f1816ac4d7d128cb92f7800db3e" FOREIGN KEY ("organization_id") REFERENCES "skedulei_organizations"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "skedulei_clinical_records" ADD CONSTRAINT "FK_8a5644ef3d24f120bdac519b92f" FOREIGN KEY ("client_id") REFERENCES "skedulei_clients"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
@@ -226,11 +229,11 @@ export class Inicial1793221246548 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "skedulei_clinical_records" DROP CONSTRAINT "FK_8a5644ef3d24f120bdac519b92f"`);
         await queryRunner.query(`ALTER TABLE "skedulei_clinical_records" DROP CONSTRAINT "FK_f1816ac4d7d128cb92f7800db3e"`);
         await queryRunner.query(`ALTER TABLE "skedulei_document_templates" DROP CONSTRAINT "FK_aede744d9c9d113450c226c38ff"`);
-        await queryRunner.query(`ALTER TABLE "skedulei_patient_documents" DROP CONSTRAINT "FK_7d10a387adb4c629b9800d5d79c"`);
-        await queryRunner.query(`ALTER TABLE "skedulei_patient_documents" DROP CONSTRAINT "FK_880abc027019aa6079ea85a0fcc"`);
         await queryRunner.query(`ALTER TABLE "skedulei_service_supplies" DROP CONSTRAINT "FK_381abfa634e526b959e15637dd5"`);
         await queryRunner.query(`ALTER TABLE "skedulei_service_supplies" DROP CONSTRAINT "FK_a8c3a398402006e86f22a03845b"`);
         await queryRunner.query(`ALTER TABLE "skedulei_service_supplies" DROP CONSTRAINT "FK_7c93dafd013ef00733f9f42fcdd"`);
+        await queryRunner.query(`ALTER TABLE "skedulei_patient_documents" DROP CONSTRAINT "FK_7d10a387adb4c629b9800d5d79c"`);
+        await queryRunner.query(`ALTER TABLE "skedulei_patient_documents" DROP CONSTRAINT "FK_880abc027019aa6079ea85a0fcc"`);
         await queryRunner.query(`ALTER TABLE "skedulei_stock_movements" DROP CONSTRAINT "FK_aca4da3cdb16c1a0a2b430631b7"`);
         await queryRunner.query(`ALTER TABLE "skedulei_stock_movements" DROP CONSTRAINT "FK_d5e241c0d454f089829a7469e43"`);
         await queryRunner.query(`ALTER TABLE "skedulei_products" DROP CONSTRAINT "FK_7e992f5dc6a402ac6214f82c942"`);
@@ -285,6 +288,7 @@ export class Inicial1793221246548 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "skedulei_organization_images" DROP CONSTRAINT "FK_e03d8cf19ca98e1c1f20b9bcd69"`);
         await queryRunner.query(`ALTER TABLE "skedulei_services" DROP CONSTRAINT "FK_f4dceaf34359ebbce24e29ff4be"`);
         await queryRunner.query(`ALTER TABLE "skedulei_units" DROP CONSTRAINT "FK_0476672eedf2a1bfa3430786f2e"`);
+        await queryRunner.query(`ALTER TABLE "skedulei_audit_log" DROP CONSTRAINT "FK_c991cd5d4ab2c659c6e6229593d"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_3d069af18d6b157c25511cfe05"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_b317444e8a9ce1a8a7a2d17b7d"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_aacfdcabad6fd7c86a69339811"`);
@@ -316,12 +320,12 @@ export class Inicial1793221246548 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE "skedulei_clinical_records"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_dc04c7b42a7d6bb94fa7301d16"`);
         await queryRunner.query(`DROP TABLE "skedulei_document_templates"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_59d6faf815449a04a6841411bb"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_36e5c432b6e8269f8a6b76fcc7"`);
-        await queryRunner.query(`DROP TABLE "skedulei_patient_documents"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_0cadbd4328b2654a430cbbb4b1"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_7c93dafd013ef00733f9f42fcd"`);
         await queryRunner.query(`DROP TABLE "skedulei_service_supplies"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_59d6faf815449a04a6841411bb"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_36e5c432b6e8269f8a6b76fcc7"`);
+        await queryRunner.query(`DROP TABLE "skedulei_patient_documents"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_4ff9987ceed59c01ad59217507"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_91fed81745d2f7e26fbf618847"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_d5e241c0d454f089829a7469e4"`);
@@ -403,14 +407,16 @@ export class Inicial1793221246548 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE "skedulei_members"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_b0d43cb7477d5941f71210e488"`);
         await queryRunner.query(`DROP TABLE "skedulei_organization_images"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_9a8a7736b99d563a2077f5c568"`);
+        await queryRunner.query(`DROP TABLE "skedulei_security_events"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_f4dceaf34359ebbce24e29ff4b"`);
         await queryRunner.query(`DROP TABLE "skedulei_services"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_0476672eedf2a1bfa3430786f2"`);
         await queryRunner.query(`DROP TABLE "skedulei_units"`);
-        await queryRunner.query(`DROP TABLE "skedulei_organizations"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_9a8a7736b99d563a2077f5c568"`);
-        await queryRunner.query(`DROP TABLE "skedulei_security_events"`);
         await queryRunner.query(`DROP TABLE "skedulei_users"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_0af275e20cb722463cf36d549c"`);
+        await queryRunner.query(`DROP TABLE "skedulei_audit_log"`);
+        await queryRunner.query(`DROP TABLE "skedulei_organizations"`);
         await disableSupabaseRls(queryRunner);
     }
 

@@ -24,6 +24,9 @@ describe('perfis de acesso', () => {
     expect(can(Role.GERENTE, P.TEAM_MANAGE)).toBe(true);
     expect(can(Role.GERENTE, P.ORG_DELETE)).toBe(false);
     expect(can(Role.GERENTE, P.CLINICAL_RECORDS)).toBe(false);
+    expect(can(Role.GERENTE, P.AUDIT_VIEW)).toBe(false);
+    for (const r of [Role.RECEPCAO, Role.PROFISSIONAL, Role.FINANCEIRO]) expect(can(r, P.AUDIT_VIEW)).toBe(false);
+    expect(can(Role.DONO, P.AUDIT_VIEW)).toBe(true);
   });
 
   it('nenhum perfil tem permissão repetida', () => {

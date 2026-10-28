@@ -41,6 +41,8 @@ export const Permission = {
   REPORTS_VIEW: 'reports.view',
   COMMISSIONS_OWN: 'commissions.own',
   CLINICAL_RECORDS: 'clinical.records',
+  /** Trilha de auditoria do dinheiro (só o dono: quem mexe no dinheiro não audita a si mesmo). */
+  AUDIT_VIEW: 'audit.view',
 } as const;
 export type Permission = (typeof Permission)[keyof typeof Permission];
 
@@ -49,7 +51,7 @@ const ALL = Object.values(P);
 
 export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
   DONO: ALL,
-  GERENTE: ALL.filter((p) => p !== P.ORG_DELETE && p !== P.CLINICAL_RECORDS),
+  GERENTE: ALL.filter((p) => p !== P.ORG_DELETE && p !== P.CLINICAL_RECORDS && p !== P.AUDIT_VIEW),
   RECEPCAO: [
     P.TEAM_VIEW,
     P.SERVICES_VIEW,

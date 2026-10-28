@@ -14,6 +14,8 @@ import { MailModule } from './mail/mail.module';
 import { SecurityModule } from './security/security.module';
 import { UsersModule } from './users/users.module';
 import { getDatabaseOptions } from './database/db-options';
+import { RelatoriosModule } from './relatorios/relatorios.module';
+import { AuditModule } from './auditoria/audit.module';
 import { LembretesModule } from './lembretes/lembretes.module';
 import { ClinicoModule } from './clinico/clinico.module';
 import { ContactModule } from './contact/contact.module';
@@ -57,6 +59,8 @@ import { FidelizacaoModule } from './fidelizacao/fidelizacao.module';
     FidelizacaoModule,
     ClinicoModule,
     LembretesModule,
+    AuditModule,
+    RelatoriosModule,
     FinanceModule,
     ContactModule,
   ],

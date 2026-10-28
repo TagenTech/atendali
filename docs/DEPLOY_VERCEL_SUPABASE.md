@@ -1,6 +1,6 @@
 # Deploy: Cloudflare + Vercel (free) + Supabase
 
-> Herdado do Turmei. Os jobs agendados (pg_cron → `/v1/internal/jobs/*`) ainda não existem no Skedulei — voltam com os lembretes da Fase 1; ignore a seção 6 até lá.
+> Os jobs agendados (pg_cron → `/v1/internal/jobs/reminders`) já existem: são os **lembretes por e-mail**. A seção 6 é obrigatória neste deploy (a API na Vercel não fica ligada entre as chamadas).
 
 Alternativa ao deploy em VPS ([LANCAMENTO.md](LANCAMENTO.md)). Topologia:
 
@@ -52,12 +52,13 @@ Importe o repositório **duas vezes** (Add New → Project), uma por app. A Verc
 3. Espere a Vercel marcar os dois como **Valid Configuration**.
 
 ## 6. Jobs agendados (pg_cron)
-1. Supabase → SQL Editor → cole [deploy/supabase/cron.sql](../deploy/supabase/cron.sql), troque a URL da API e o `CRON_SECRET` (o mesmo da Vercel) e rode. Pode rodar de novo para trocar valores.
+0. Na API (Vercel): `SCHEDULER_ENABLED=false` e `CRON_SECRET` (32+ caracteres; `openssl rand -base64 48`).
+1. Supabase → Database → Extensions: habilite `pg_cron` e `pg_net`. Depois SQL Editor → cole [deploy/supabase/cron.sql](../deploy/supabase/cron.sql): guarde o segredo no Vault (`vault.create_secret`, o mesmo valor do `CRON_SECRET`), troque `API_URL` e rode.
 2. Depois de 1–2 minutos, no SQL Editor:
    ```sql
    select status_code, content, created from net._http_response order by created desc limit 5;
    ```
-   Esperado: `200` com `{"job":"reminders","ok":true,...}`. `401` = segredo diferente; `404` = URL errada ou `CRON_SECRET` não configurado na API.
+   Esperado: `200` com `{"checked":…,"sent":{"H24":…,"H2":…}}`. `401` = segredo diferente; `404` = URL errada ou `CRON_SECRET` não configurado na API.
 
 ## 7. Conferência final
 - `https://skedulei.com.br` abre, cadastro e login funcionam, `https://skedulei.com.br/api/v1/health` responde.

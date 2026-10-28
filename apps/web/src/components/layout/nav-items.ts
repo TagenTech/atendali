@@ -1,5 +1,5 @@
 import { Feature, Permission, type Vocabulary } from '@skedulei/contracts';
-import { Boxes, CalendarDays, ChartNoAxesCombined, ContactRound, Gift, HandCoins, House, Monitor, Scissors, Settings2, Star, UsersRound, Wallet, type LucideIcon } from 'lucide-react';
+import { Boxes, CalendarDays, ChartPie, ShieldCheck, ChartNoAxesCombined, ContactRound, Gift, HandCoins, House, Monitor, Scissors, Settings2, Star, UsersRound, Wallet, type LucideIcon } from 'lucide-react';
 
 export interface NavItem {
   href: string;
@@ -22,6 +22,7 @@ export function navItems(vocab: Vocabulary): NavItem[] {
     { href: '/clientes', label: vocab.clients, icon: ContactRound, anyOf: [Permission.CLIENTS_VIEW] },
     { href: '/caixa', label: 'Caixa', icon: Wallet, anyOf: [Permission.CASH_OPERATE] },
     { href: '/financeiro', label: 'Financeiro', icon: ChartNoAxesCombined, anyOf: [Permission.FINANCE_VIEW] },
+    { href: '/relatorios', label: 'Relatórios', icon: ChartPie, anyOf: [Permission.REPORTS_VIEW] },
     { href: '/comissoes', label: 'Comissões', icon: HandCoins, anyOf: [Permission.FINANCE_VIEW, Permission.COMMISSIONS_OWN] },
     { href: '/servicos', label: vocab.services, icon: Scissors, anyOf: [Permission.SERVICES_VIEW] },
     { href: '/estoque', label: 'Estoque', icon: Boxes, anyOf: [Permission.SERVICES_VIEW], features: [Feature.ESTOQUE] },
@@ -34,6 +35,7 @@ export function navItems(vocab: Vocabulary): NavItem[] {
     },
     { href: '/tv', label: 'Painel de TV', icon: Monitor, anyOf: [Permission.AGENDA_VIEW_ALL] },
     { href: '/avaliacoes', label: 'Avaliações', icon: Star, anyOf: [Permission.CLIENTS_VIEW] },
+    { href: '/atividade', label: 'Atividade', icon: ShieldCheck, anyOf: [Permission.AUDIT_VIEW] },
     { href: '/equipe', label: 'Equipe', icon: UsersRound, anyOf: [Permission.TEAM_VIEW] },
     { href: '/configuracoes', label: 'Negócio', icon: Settings2, anyOf: [Permission.ORG_MANAGE] },
   ];

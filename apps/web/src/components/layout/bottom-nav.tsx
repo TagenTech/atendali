@@ -23,7 +23,7 @@ export function BottomNav() {
     >
       <ul className="mx-auto flex max-w-lg items-stretch justify-around px-2">
         {items.map(({ href, label, icon: Icon }) => {
-          const active = isActive(pathname, href) || (href === '/mais' && ['/configuracoes', '/servicos', '/equipe', '/caixa', '/financeiro', '/comissoes', '/estoque', '/fidelidade', '/avaliacoes', '/tv'].some((p) => isActive(pathname, p)));
+          const active = isActive(pathname, href) || (href === '/mais' && ['/configuracoes', '/servicos', '/equipe', '/caixa', '/financeiro', '/relatorios', '/comissoes', '/estoque', '/fidelidade', '/avaliacoes', '/atividade', '/tv'].some((p) => isActive(pathname, p)));
           return (
             <li key={href} className="flex-1">
               <Link

@@ -1,6 +1,6 @@
 # Autenticação e cadastro
 
-Status: **implementado** (23/10/2026). Cada professor tem sua conta; os dados são isolados por `user_id`.
+Status: **implementado**. Uma **conta** (`users`) pode estar em vários negócios, com um perfil em cada (`members`); os dados do negócio são isolados por `organization_id` (filtro no código + RLS). O cliente final que agenda **não tem conta**: usa o link da reserva, ou a área "Minhas reservas" (código no e-mail cadastrado no celular) — ver [SEGURANCA.md](SEGURANCA.md).
 
 ## Formas de entrar
 
@@ -21,7 +21,7 @@ Navegador ──GET /api/v1/auth/oauth/google──▶ API (gera state + PKCE, c
           ◀── 302 para o Google
 Google ──▶ /api/v1/auth/oauth/google/callback?code&state
           API confere state, troca o code, lê o perfil,
-          acha/liga/cria o professor, grava cookie de sessão
+          acha/liga/cria a conta, grava cookie de sessão
           ◀── 302 para /hoje  (ou /hoje?bemvindo=1 na primeira vez)
 ```
 
@@ -95,3 +95,12 @@ nome completo, **CPF** (validado pelos dígitos verificadores, único por conta)
 ## Pendências recomendadas
 - Revisar Termos e Política de privacidade com assessoria jurídica (as páginas `/termos` e `/privacidade` são rascunho).
 - Login com Apple (obrigatório se um dia houver app nativo na App Store com login social).
+
+## Regras de segurança do login (testadas)
+
+- **Senha**: mínimo de 8 caracteres e **sem senhas comuns** (`12345678`, `password123`, sequências) — a tela e a API recusam (`passwordProblem` em `packages/contracts/src/password.ts`). Cadastro, troca e redefinição pedem **confirmação** da senha; a redefinição vale por 1 hora, uma vez só, e encerra todas as sessões.
+- **Login social**: provedor que **garante o e-mail** (Google, Meta) liga a uma conta existente com o mesmo e-mail; a **Microsoft não garante**, então cria a conta como *não confirmada* e nunca liga a uma conta existente.
+- **Sequestro prévio**: se uma conta foi criada com o e-mail de outra pessoa (por senha ou pela Microsoft) e o dono real entra depois por um provedor que garante o e-mail, a conta passa ao dono e **senha, logins sociais e sessões antigas são apagados**.
+- **Força bruta**: 5 senhas erradas por e-mail → bloqueio de 15 min; 5 logins/min por IP. Os contadores ficam **na memória do processo** (só valem com uma instância — ver [LANCAMENTO.md §4](LANCAMENTO.md#4-limite-de-tentativas-e-bloqueio-de-login)).
+- **2FA** opcional (app autenticador + códigos de recuperação) vale também para o login social.
+- A recuperação de senha **só funciona em produção com e-mail configurado** (Resend) — [LANCAMENTO.md §2](LANCAMENTO.md#2-e-mail-e-recuperação-de-senha).

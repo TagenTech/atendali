@@ -3,6 +3,7 @@ import { EntityManager, IsNull } from 'typeorm';
 import {
   addDays,
   can,
+  formatBRL,
   OrderItemKind,
   OrderStatus,
   orderTotals,
@@ -16,6 +17,7 @@ import {
   type CommissionPayoutDto,
   type FinanceSummaryDto,
 } from '@skedulei/contracts';
+import { AuditService } from '../auditoria/audit.service';
 import { Member } from '../organizations/entities/member.entity';
 import type { OrgContext } from '../organizations/org-context';
 import { TenantDb } from '../tenancy/tenant-db';
@@ -28,7 +30,10 @@ import { Order } from './entities/order.entity';
 
 @Injectable()
 export class CommissionsService {
-  constructor(private readonly tenant: TenantDb) {}
+  constructor(
+    private readonly tenant: TenantDb,
+    private readonly audit: AuditService,
+  ) {}
 
   /** Quem vê tudo (financeiro) ou só a própria comissão (profissional). */
   private scope(org: OrgContext, memberId?: string): string | null {
@@ -115,6 +120,7 @@ export class CommissionsService {
           createdByMemberId: org.memberId,
         }),
       );
+      await this.audit.log(em, org, { action: 'ADVANCE_ADDED', entity: 'advance', entityId: a.id, summary: `Vale de ${formatBRL(a.amountCents)} para ${m.name}${a.note ? ` — ${a.note}` : ''}`, meta: { memberId: m.id, amountCents: a.amountCents } });
       return { id: a.id, memberId: a.memberId, memberName: m.name, amountCents: a.amountCents, note: a.note, date: a.date, payoutId: null };
     });
   }
@@ -157,6 +163,7 @@ export class CommissionsService {
       );
       if (entries.length) await em.getRepository(CommissionEntry).update(entries.map((e) => e.id), { payoutId: payout.id });
       if (advances.length) await em.getRepository(Advance).update(advances.map((a) => a.id), { payoutId: payout.id });
+      await this.audit.log(em, org, { action: 'COMMISSION_PAID', entity: 'payout', entityId: payout.id, summary: `Fechamento de ${m.name}: comissões ${formatBRL(commissionsCents)}${advancesCents ? ` − vales ${formatBRL(advancesCents)}` : ''} = ${formatBRL(commissionsCents - advancesCents)}`, meta: { memberId: m.id, commissionsCents, advancesCents, totalCents: commissionsCents - advancesCents, entries: entries.length } });
       return this.payoutDto(payout, m.name);
     });
   }

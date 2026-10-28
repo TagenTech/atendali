@@ -1,25 +1,7 @@
 'use client';
 
 import { Feature, initials, Permission } from '@skedulei/contracts';
-import {
-  Boxes,
-  Building2,
-  Gift,
-  Monitor,
-  Star,
-  ChevronRight,
-  ChartNoAxesCombined,
-  HandCoins,
-  Scissors,
-  UsersRound,
-  Wallet,
-  Download,
-  KeyRound,
-  LifeBuoy,
-  LogOut,
-  ShieldCheck,
-  type LucideIcon,
-} from 'lucide-react';
+import { Boxes, Building2, ChartNoAxesCombined, ChartPie, ChevronRight, Download, Gift, HandCoins, KeyRound, LifeBuoy, LogOut, Monitor, Scissors, ShieldCheck, Star, UsersRound, Wallet, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 import { OrgSwitcher } from '@/components/layout/org-switcher';
@@ -119,6 +101,7 @@ export default function MaisPage() {
           <OrgSwitcher />
           {can(Permission.CASH_OPERATE) ? <Row icon={Wallet} label="Caixa e comandas" href="/caixa" tone="bg-warning-soft text-warning-soft-foreground" /> : null}
           {can(Permission.FINANCE_VIEW) ? <Row icon={ChartNoAxesCombined} label="Financeiro" href="/financeiro" tone="bg-success-soft text-success-soft-foreground" /> : null}
+          {can(Permission.REPORTS_VIEW) ? <Row icon={ChartPie} label="Relatórios" href="/relatorios" tone="bg-sky-soft text-[var(--stu-ceu-fg)]" /> : null}
           {can(Permission.FINANCE_VIEW) || can(Permission.COMMISSIONS_OWN) ? <Row icon={HandCoins} label="Comissões" href="/comissoes" /> : null}
           {can(Permission.SERVICES_VIEW) ? <Row icon={Scissors} label={vocab.services} href="/servicos" tone="bg-pink-soft text-pink-soft-foreground" /> : null}
           {can(Permission.SERVICES_VIEW) && has(Feature.ESTOQUE) ? <Row icon={Boxes} label="Estoque" href="/estoque" tone="bg-warning-soft text-warning-soft-foreground" /> : null}
@@ -127,6 +110,7 @@ export default function MaisPage() {
           ) : null}
           {can(Permission.AGENDA_VIEW_ALL) ? <Row icon={Monitor} label="Painel de TV" href="/tv" tone="bg-sky-soft text-[var(--stu-ceu-fg)]" /> : null}
           {can(Permission.CLIENTS_VIEW) ? <Row icon={Star} label="Avaliações" href="/avaliacoes" tone="bg-warning-soft text-warning-soft-foreground" /> : null}
+          {can(Permission.AUDIT_VIEW) ? <Row icon={ShieldCheck} label="Atividade" href="/atividade" tone="bg-primary-soft text-primary-soft-foreground" /> : null}
           {can(Permission.TEAM_VIEW) ? <Row icon={UsersRound} label="Equipe" href="/equipe" tone="bg-success-soft text-success-soft-foreground" /> : null}
           {can(Permission.ORG_MANAGE) ? (
             <Row icon={Building2} label="Dados, unidades e módulos" href="/configuracoes" tone="bg-sky-soft text-[var(--stu-ceu-fg)]" />

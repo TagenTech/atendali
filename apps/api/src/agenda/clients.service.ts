@@ -9,6 +9,7 @@ import {
   type ClientImportPreview,
   type ClientImportReport,
 } from '@skedulei/contracts';
+import { AuditService } from '../auditoria/audit.service';
 import { encryptField } from '../common/crypto/field-crypto';
 import type { OrgContext } from '../organizations/org-context';
 import { TenantDb } from '../tenancy/tenant-db';
@@ -22,7 +23,10 @@ const cleanTags = (tags?: string[]) => (tags ? [...new Set(tags.map((t) => t.tri
 
 @Injectable()
 export class ClientsService {
-  constructor(private readonly tenant: TenantDb) {}
+  constructor(
+    private readonly tenant: TenantDb,
+    private readonly audit: AuditService,
+  ) {}
 
   private get repo() {
     return this.tenant.repo(Client);
@@ -162,12 +166,16 @@ export class ClientsService {
   /** Exclusão a pedido do titular (LGPD): apaga os dados pessoais, mantém os atendimentos sem identificação. */
   async anonymize(org: OrgContext, id: string): Promise<void> {
     const c = await this.find(org, id);
-    // Avaliações já feitas ficam, sem o nome.
-    await this.tenant.repo(Review).update({ clientId: c.id, organizationId: org.organizationId }, { clientName: null, clientId: null });
-    await this.repo.update(
-      { id: c.id, organizationId: org.organizationId },
-      { name: 'Cliente removido', phone: null, email: null, birthDate: null, guardianName: null, guardianRelationship: null, notesEncrypted: null, tags: [], anonymizedAt: new Date() },
-    );
+    await this.tenant.transaction(async (em) => {
+      // Avaliações já feitas ficam, sem o nome.
+      await em.getRepository(Review).update({ clientId: c.id, organizationId: org.organizationId }, { clientName: null, clientId: null });
+      await em.getRepository(Client).update(
+        { id: c.id, organizationId: org.organizationId },
+        { name: 'Cliente removido', phone: null, email: null, birthDate: null, guardianName: null, guardianRelationship: null, notesEncrypted: null, tags: [], anonymizedAt: new Date() },
+      );
+      // O registro não leva o nome: senão a exclusão a pedido do titular não apagaria nada de verdade.
+      await this.audit.log(em, org, { action: 'CLIENT_ANONYMIZED', entity: 'client', entityId: c.id, summary: 'Cliente excluído a pedido (dados pessoais apagados; o histórico segue sem identificação)' });
+    });
   }
 
   /** Mesmo telefone no mesmo negócio = mesma pessoa (agendamento online). */

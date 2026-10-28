@@ -10,6 +10,7 @@ import {
   PaymentMethod,
   orderTotals,
   paymentFee,
+  formatBRL,
   PAYMENT_METHOD_LABEL,
   paymentMethodsOf,
   settlementDate,
@@ -25,6 +26,7 @@ import { Organization } from '../organizations/entities/organization.entity';
 import { ServiceItem } from '../organizations/entities/service-item.entity';
 import type { OrgContext } from '../organizations/org-context';
 import { TenantDb } from '../tenancy/tenant-db';
+import { AuditService } from '../auditoria/audit.service';
 import { CashService, mainUnit } from './cash.service';
 import { AddPaymentDto, CreateOrderDto, OrderItemDto, OrdersQueryDto, UpdateOrderDto } from './dto/finance.dto';
 import { CommissionEntry } from './entities/commission.entity';
@@ -42,6 +44,7 @@ export class OrdersService {
     private readonly cash: CashService,
     private readonly ledger: LedgerService,
     private readonly extras: OrderExtrasService,
+    private readonly audit: AuditService,
   ) {}
 
   async list(org: OrgContext, q: OrdersQueryDto): Promise<OrderSummaryDto[]> {
@@ -192,9 +195,13 @@ export class OrdersService {
         }
         o.clientId = dto.clientId;
       }
+      const discountBefore = o.discountCents;
       if (dto.discountCents !== undefined) o.discountCents = dto.discountCents;
       if (dto.notes !== undefined) o.notes = dto.notes;
       await em.getRepository(Order).save(o);
+      if (dto.discountCents !== undefined && dto.discountCents !== discountBefore) {
+        await this.audit.log(em, org, { action: 'ORDER_DISCOUNT', entity: 'order', entityId: o.id, summary: `Desconto da comanda #${o.number}: de ${formatBRL(discountBefore)} para ${formatBRL(dto.discountCents)}`, meta: { from: discountBefore, to: dto.discountCents } });
+      }
       await this.extras.reconcileRedeem(em, org, o);
       await this.assertNotOverpaid(em, org, o);
     });
@@ -229,8 +236,10 @@ export class OrdersService {
   async removeItem(org: OrgContext, id: string, itemId: string): Promise<OrderDto> {
     await this.tenant.transaction(async (em) => {
       const o = await this.findOpen(em, org, id);
-      const res = await em.getRepository(OrderItem).delete({ id: itemId, orderId: o.id, organizationId: org.organizationId });
-      if (!res.affected) throw new NotFoundException('Item não encontrado');
+      const item = await em.getRepository(OrderItem).findOne({ where: { id: itemId, orderId: o.id, organizationId: org.organizationId } });
+      if (!item) throw new NotFoundException('Item não encontrado');
+      await em.getRepository(OrderItem).delete({ id: itemId, orderId: o.id, organizationId: org.organizationId });
+      await this.audit.log(em, org, { action: 'ORDER_ITEM_REMOVED', entity: 'order', entityId: o.id, summary: `Item "${item.description}" (${formatBRL(item.unitPriceCents * item.quantity)}) removido da comanda #${o.number}`, meta: { itemId } });
       await this.extras.reconcileRedeem(em, org, o);
       await this.assertNotOverpaid(em, org, o);
     });
@@ -287,6 +296,7 @@ export class OrdersService {
       await this.assertSessionOpen(em, org, [p.cashSessionId]);
       if (p.method === PaymentMethod.VALE_PRESENTE) await this.extras.restoreGiftCard(em, org.organizationId, p.refId, p.amountCents);
       await em.getRepository(OrderPayment).delete({ id: p.id, organizationId: org.organizationId });
+      await this.audit.log(em, org, { action: 'PAYMENT_REMOVED', entity: 'order', entityId: o.id, summary: `Pagamento de ${formatBRL(p.amountCents)} (${PAYMENT_METHOD_LABEL[p.method]}) desfeito na comanda #${o.number}`, meta: { paymentId: p.id, method: p.method, amountCents: p.amountCents } });
     });
     return this.get(org, id);
   }
@@ -373,8 +383,10 @@ export class OrdersService {
       if (paidOut) throw new BadRequestException('A comissão desta comanda já foi paga. Ajuste no próximo fechamento.');
       await em.getRepository(CommissionEntry).delete({ orderId: o.id, organizationId: org.organizationId });
       await em.getRepository(OrderPayment).delete({ orderId: o.id, organizationId: org.organizationId });
+      const paidCents = payments.reduce((t, p) => t + p.amountCents, 0);
       Object.assign(o, { status: OrderStatus.CANCELADA, cancelledAt: new Date(), pointsRedeemed: 0, pointsDiscountCents: 0 });
       await em.getRepository(Order).save(o);
+      await this.audit.log(em, org, { action: 'ORDER_CANCELLED', entity: 'order', entityId: o.id, summary: wasClosed ? `Comanda #${o.number} estornada (fechada, ${formatBRL(paidCents)} devolvidos)` : paidCents ? `Comanda #${o.number} cancelada (${formatBRL(paidCents)} já recebidos devolvidos)` : `Comanda #${o.number} cancelada (sem pagamento)`, meta: { paidCents, wasClosed } });
     });
     return this.get(org, id);
   }

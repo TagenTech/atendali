@@ -1,9 +1,11 @@
 import { randomUUID } from 'crypto';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager, IsNull, LessThan, Not } from 'typeorm';
+import { AuditService } from '../auditoria/audit.service';
 import {
   defaultChartOfAccounts,
   DEFAULT_ACCOUNT_NAME,
+  formatBRL,
   monthlyDates,
   payableStatus,
   receivableStatus,
@@ -39,7 +41,10 @@ const accDto = (a: FinanceAccount): FinanceAccountDto => ({ id: a.id, name: a.na
 
 @Injectable()
 export class LedgerService {
-  constructor(private readonly tenant: TenantDb) {}
+  constructor(
+    private readonly tenant: TenantDb,
+    private readonly audit: AuditService,
+  ) {}
 
   /** "Hoje" no fuso da unidade. */
   private async today(em: EntityManager, org: OrgContext) {
@@ -243,6 +248,7 @@ export class LedgerService {
       if (dto.paidDate > (await this.today(em, org))) throw new BadRequestException('A data do pagamento não pode ser no futuro');
       const accountId = await this.accountFor(em, org, dto.accountId);
       await em.getRepository(Payable).update({ id: p.id, organizationId: org.organizationId }, { paidDate: dto.paidDate, paidMethod: dto.method, accountId });
+      await this.audit.log(em, org, { action: 'PAYABLE_PAID', entity: 'payable', entityId: p.id, summary: `Conta "${p.description}" (${formatBRL(p.amountCents)}) paga em ${dto.paidDate}`, meta: { amountCents: p.amountCents, paidDate: dto.paidDate } });
       return this.reloadPayable(em, org, id);
     });
   }
@@ -252,6 +258,7 @@ export class LedgerService {
       const p = await this.findPayable(em, org, id);
       if (!p.paidDate) throw new BadRequestException('Essa conta não está paga');
       await em.getRepository(Payable).update({ id: p.id, organizationId: org.organizationId }, { paidDate: null, paidMethod: null, accountId: null });
+      await this.audit.log(em, org, { action: 'PAYABLE_REOPENED', entity: 'payable', entityId: p.id, summary: `Conta "${p.description}" (${formatBRL(p.amountCents)}) reaberta (estava paga em ${p.paidDate})`, meta: { amountCents: p.amountCents } });
       return this.reloadPayable(em, org, id);
     });
   }
@@ -260,11 +267,14 @@ export class LedgerService {
     await this.tenant.transaction(async (em) => {
       const p = await this.findPayable(em, org, id);
       const repo = em.getRepository(Payable);
+      let count = 1;
       if (futuras && p.recurrenceId) {
-        await repo.delete({ organizationId: org.organizationId, recurrenceId: p.recurrenceId, paidDate: IsNull(), dueDate: Not(LessThan(p.dueDate)) });
+        const res = await repo.delete({ organizationId: org.organizationId, recurrenceId: p.recurrenceId, paidDate: IsNull(), dueDate: Not(LessThan(p.dueDate)) });
+        count = res.affected ?? 0;
       } else {
         await repo.delete({ id: p.id, organizationId: org.organizationId });
       }
+      await this.audit.log(em, org, { action: 'PAYABLE_REMOVED', entity: 'payable', entityId: p.id, summary: `Conta "${p.description}" (${formatBRL(p.amountCents)}) apagada${count > 1 ? ` — e mais ${count - 1} das próximas` : ''}${p.paidDate ? ' (já estava paga)' : ''}`, meta: { amountCents: p.amountCents, count, wasPaid: !!p.paidDate } });
     });
   }
 
@@ -367,6 +377,7 @@ export class LedgerService {
       if (dto.receivedDate > (await this.today(em, org))) throw new BadRequestException('A data do recebimento não pode ser no futuro');
       const accountId = await this.accountFor(em, org, dto.accountId);
       await em.getRepository(Receivable).update({ id: r.id, organizationId: org.organizationId }, { receivedDate: dto.receivedDate, accountId });
+      await this.audit.log(em, org, { action: 'RECEIVABLE_SETTLED', entity: 'receivable', entityId: r.id, summary: `"${r.description}" (${formatBRL(r.amountCents)}) dado como recebido em ${dto.receivedDate}`, meta: { amountCents: r.amountCents } });
       return this.reloadReceivable(em, org, id);
     });
   }
@@ -376,6 +387,7 @@ export class LedgerService {
       const r = await this.findReceivable(em, org, id);
       if (!r.receivedDate) throw new BadRequestException('Esse valor ainda não foi recebido');
       await em.getRepository(Receivable).update({ id: r.id, organizationId: org.organizationId }, { receivedDate: null, accountId: null });
+      await this.audit.log(em, org, { action: 'RECEIVABLE_REOPENED', entity: 'receivable', entityId: r.id, summary: `"${r.description}" (${formatBRL(r.amountCents)}) reaberto (estava recebido em ${r.receivedDate})`, meta: { amountCents: r.amountCents } });
       return this.reloadReceivable(em, org, id);
     });
   }
@@ -386,6 +398,7 @@ export class LedgerService {
       const r = await this.findReceivable(em, org, id);
       if (r.source !== 'AVULSO') throw new BadRequestException('Esse recebível vem de uma comanda. Estorne o pagamento na comanda.');
       await em.getRepository(Receivable).delete({ id: r.id, organizationId: org.organizationId });
+      await this.audit.log(em, org, { action: 'RECEIVABLE_REMOVED', entity: 'receivable', entityId: r.id, summary: `Receita "${r.description}" (${formatBRL(r.amountCents)}) apagada${r.receivedDate ? ' (já estava recebida)' : ''}`, meta: { amountCents: r.amountCents, wasReceived: !!r.receivedDate } });
     });
   }
 

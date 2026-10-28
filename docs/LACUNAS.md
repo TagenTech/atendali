@@ -15,7 +15,8 @@ existe hoje (com a evidência no código), o impacto e o que propor. Prioridade:
 | #2 Vários procedimentos (carrinho) | ✅ **feito**: escolher até 5 procedimentos; "um logo após o outro" (encaixe automático, mesma pessoa se estiver livre) ou "horário de cada um" (sem sobreposição); tudo ou nada; um link para ver, remarcar um item e cancelar um ou tudo. ⏳ combos com preço fechado e escolha de profissional por item |
 | #5 Módulos de saúde | ✅ **feito (mínimo)**: módulos sem tela viram "Em breve" e não ligam; **prontuário** (evolução, prescrição, atestado), **anamnese** e **termo de consentimento** com modelos editáveis, link para o paciente preencher no celular e preenchimento no balcão, tudo cifrado e com acesso registrado. ⏳ Fase 5 completa: assinatura digital (ICP-Brasil), fotos antes/depois, convênios/TISS, teleconsulta, adendo em vez de apagar |
 | #4 Lembretes | ✅ **feito (e-mail)**: lembrete 24 h e 2 h antes com botão para confirmar presença, remarcar ou cancelar; aviso à equipe a cada reserva online, remarcação e cancelamento; liga/desliga em Configurações. ⏳ WhatsApp oficial (Fase 4) e lembrete para quem não deixou e-mail |
-| #7 sinal, #8 gestão | ⏳ pendentes |
+| #8 Gestão | ✅ **relatórios** (faltas, ocupação, ticket, retorno, ranking de serviços e equipe), **clientes sem voltar** e **aniversariantes** com mensagem pronta no WhatsApp; ✅ **trilha de auditoria** do dinheiro (tela Atividade). ⏳ agenda recorrente, intervalo entre atendimentos, perfil do profissional, férias/ausências, recibo, divulgar a agenda (QR) |
+| #7 sinal | ⏳ depende do gateway (Fase 4) |
 
 ## Resumo
 

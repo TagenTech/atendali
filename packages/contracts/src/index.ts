@@ -23,3 +23,5 @@ export * from './password';
 export * from './guardian';
 export * from './clinical';
 export * from './reminders';
+export * from './audit';
+export * from './reports';

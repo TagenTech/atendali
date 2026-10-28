@@ -5,9 +5,9 @@ estética, clínicas médicas, odontologia e terapias. Um núcleo comum (agenda,
 **módulos por segmento** (comissão, estoque, pacotes, anamnese, prontuário, convênios…).
 Nasceu do monorepo do [Turmei](../gestao-aulas) (mesma stack e convenções).
 
-Documentos: [Plano de produto e arquitetura](docs/PLANO.md) · [Autenticação](docs/AUTENTICACAO.md) · [Segurança](docs/SEGURANCA.md) · [Lançamento: o que falta](docs/LANCAMENTO.md)
+Documentos: [Plano de produto e arquitetura](docs/PLANO.md) · [Autenticação](docs/AUTENTICACAO.md) · [Segurança](docs/SEGURANCA.md) · [Lançamento: o que falta](docs/LANCAMENTO.md) · [Lacunas e andamento](docs/LACUNAS.md)
 
-## O que já tem (Fases 0, 1 e 2)
+## O que já tem
 
 | Área | Recursos |
 |---|---|
@@ -35,7 +35,27 @@ Documentos: [Plano de produto e arquitetura](docs/PLANO.md) · [Autenticação](
 | **Segurança de dados** | Além do filtro no código, **RLS no Postgres**: rotas de negócio rodam com papel restrito e só enxergam o negócio ativo |
 | **Layout** | Celular: barra inferior e bottom sheets. Desktop (≥ 1024 px): barra lateral, tabelas e painel lateral à direita |
 
-**Fase 3 concluída**: estoque e ficha técnica, pacotes de sessões, clube (mensalidade), vale-presente, pontos de fidelidade, avaliações e painel de TV. Próximo: Fase 4 — WhatsApp oficial, lembretes e cobrança recorrente do clube ([plano](docs/PLANO.md#8-roadmap-por-fases)).
+### Reserva online e relacionamento (o que o cliente vê)
+
+| Área | Recursos |
+|---|---|
+| **Página pública** `/<slug>` | Logo, fundo, cor e frase do negócio; avaliações; escolha de **vários procedimentos** (até 5) **um logo após o outro** ou **cada um no seu horário**; reserva **para outra pessoa** (filho, mãe…) com responsável e parentesco; sem login |
+| **Minha reserva** `/reserva/<link>` | Ver, **remarcar** e cancelar um procedimento ou tudo; confirmar presença; adicionar ao calendário (.ics); reservas guardadas neste aparelho |
+| **Minhas reservas** `/<slug>/minhas-reservas` | Código de 6 dígitos no e-mail cadastrado no celular → ver, remarcar e cancelar a família toda |
+| **Lembretes** | E-mail 24 h e 2 h antes com botão de confirmar/remarcar/cancelar; aviso à equipe a cada reserva online, remarcação e cancelamento; liga/desliga em Configurações |
+| **Taxa de agendamento** | Opção visível e **desligada** ("Em breve"): depende do pagamento online (Fase 4) |
+
+### Retenção, clínica, gestão e controle
+
+| Área | Recursos |
+|---|---|
+| **Retenção (Fase 3)** | Estoque e ficha técnica, pacotes de sessões, clube (mensalidade), vale-presente, pontos de fidelidade, avaliações e painel de TV |
+| **Módulo clínico** | Prontuário (evolução, prescrição, atestado), fichas de **anamnese** e **termos** com modelo editável, envio por link para o paciente preencher no celular ou preenchimento no balcão; tudo cifrado e com acesso registrado. Salas, equipamentos, fotos, teleconsulta e convênios aparecem como "Em breve" |
+| **Relatórios** | Faltas, cancelamentos, ocupação da agenda, ticket médio, retorno de clientes, mais feitos e equipe; clientes sem voltar e aniversariantes com mensagem pronta no WhatsApp |
+| **Atividade (auditoria)** | Quem estornou, deu desconto, desfez pagamento, mexeu no caixa, nas comissões e nas contas — só o dono vê; ninguém edita nem apaga |
+| **Demo** | `node apps/api/scripts/seed-demo.js` cria um usuário por segmento (`demo-<segmento>@skedulei.test`, senha `senha-forte-123`) e `seed-demo-data.js` enche com ~30 dias de movimento — só em `localhost` |
+
+**Próximo (Fase 4)**: pagamento online (sinal, link de pagamento, assinatura recorrente do clube), WhatsApp oficial, NFS-e. O que ainda falta para lançar e as lacunas conhecidas: [docs/LANCAMENTO.md](docs/LANCAMENTO.md) e [docs/LACUNAS.md](docs/LACUNAS.md).
 
 ## Estrutura
 
@@ -74,10 +94,12 @@ Sem `RESEND_API_KEY`, os links de confirmação e de senha aparecem no log da AP
 |---|---|
 | `pnpm dev` | Tudo em modo watch |
 | `pnpm build` / `pnpm typecheck` / `pnpm lint` | Build e qualidade |
+| `pnpm verify` | **Tudo antes de encerrar uma mudança**: tipos, lint, regras, API e2e, build e Playwright (celular e desktop) |
 | `pnpm test` | Testes de unidade (contracts + API) |
-| `pnpm --filter @skedulei/api test:e2e` | API inteira contra Postgres real (banco `skedulei_test`): `organizations` (onboarding, equipe, convites, perfis, isolamento, RLS), `agenda` (clientes, agenda, conflitos, bloqueios, permissões, agendamento online), `finance` (caixa, comandas, taxas, comissões, resumo), `ledger` (contas a pagar/receber, DRE, fluxo, importação de clientes), `app` (login, cadastro, 2FA, exclusão de conta) e `conta` (sessões, senha, exportação) |
-| `pnpm --filter @skedulei/web test:e2e` | Fluxos principais no navegador (Playwright, celular **e** desktop): cadastro, onboarding, serviços, equipe, login, agenda, ficha do cliente, agendamento online e cancelamento, caixa de ponta a ponta, contas/DRE/fluxo/importação de clientes. Sobe API/web próprios nas portas 3210/3211 com o banco `skedulei_e2e_web` zerado. `E2E_SKIP_BUILD=1` reaproveita o último build. Primeira vez: `pnpm --filter @skedulei/web exec playwright install chromium` |
-| `pnpm --filter @skedulei/api migration:generate src/migrations/Nome` | Nova migration a partir das entidades |
+| `pnpm --filter @skedulei/api test:e2e` | API inteira contra Postgres real (banco `skedulei_test`): `organizations`, `agenda` (inclui agendamento online), `finance`, `ledger`, `retention` (estoque, pacotes, clube, vale, pontos, avaliações), `branding`, `responsavel-reservas` (responsável × paciente, Minhas reservas), `carrinho`, `clinico`, `lembretes`, `auditoria`, `relatorios`, `app` (login, cadastro, 2FA, exclusão de conta) e `conta` (sessões, senha, exportação) |
+| `pnpm --filter @skedulei/web test:e2e` | Fluxos no navegador (Playwright, celular **e** desktop): cadastro e senhas, onboarding, agenda, agendamento online, carrinho, Minhas reservas, caixa, contas/DRE, fidelização, personalização, módulo clínico, lembretes, atividade, relatórios e a **regressão de telas** (toda tela abre limpa, sem erro de console, 5xx ou rolagem lateral, com cada perfil). Sobe API/web próprios nas portas 3210/3211 com o banco `skedulei_e2e_web` zerado. `E2E_SKIP_BUILD=1` reaproveita o último build. Primeira vez: `pnpm --filter @skedulei/web exec playwright install chromium` |
+| `pnpm --filter @skedulei/web video` | Grava o vídeo do fluxo completo de uma clínica pediátrica (3 atos, com legendas) em `apps/web/videos/` |
+| `pnpm --filter @skedulei/api migration:generate src/migrations/Nome` | Nova migration a partir das entidades (hoje há uma única migration inicial; gere contra um banco limpo e acrescente `lockdownSupabaseTables`) |
 
 Em dev o schema sincroniza sozinho (`TYPEORM_SYNC=true`); em produção só por migrations, aplicadas na subida da API.
 

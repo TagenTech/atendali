@@ -16,8 +16,8 @@ let orderId = '';
 const roles: Record<string, { ctx: BrowserContext; page: Page }> = {};
 
 const ALL_ROUTES = [
-  '/inicio', '/agenda', '/clientes', '/clientes/importar', '/caixa', '/financeiro', '/financeiro/contas', '/financeiro/dre', '/financeiro/fluxo',
-  '/comissoes', '/servicos', '/estoque', '/fidelidade', '/avaliacoes', '/tv', '/equipe', '/configuracoes', '/mais', '/mais/perfil', '/mais/seguranca',
+  '/inicio', '/agenda', '/clientes', '/clientes/importar', '/caixa', '/financeiro', '/relatorios', '/financeiro/contas', '/financeiro/dre', '/financeiro/fluxo',
+  '/comissoes', '/servicos', '/estoque', '/fidelidade', '/avaliacoes', '/atividade', '/tv', '/equipe', '/configuracoes', '/mais', '/mais/perfil', '/mais/seguranca',
 ];
 
 test.beforeAll(async ({ browser }, info) => {
@@ -85,10 +85,10 @@ test('páginas públicas abrem limpas: agendar, reserva inexistente, avaliar inv
 });
 
 const MENU: Record<string, { sees: string[]; hidden: string[] }> = {
-  RECEPCAO: { sees: ['Agenda', 'Caixa', 'Equipe'], hidden: ['Financeiro', 'Comissões', 'Negócio'] },
-  PROFISSIONAL: { sees: ['Agenda', 'Comissões'], hidden: ['Caixa', 'Financeiro', 'Equipe', 'Negócio'] },
-  FINANCEIRO: { sees: ['Financeiro', 'Caixa', 'Comissões'], hidden: ['Negócio'] },
-  GERENTE: { sees: ['Agenda', 'Caixa', 'Financeiro', 'Equipe'], hidden: [] },
+  RECEPCAO: { sees: ['Agenda', 'Caixa', 'Equipe'], hidden: ['Financeiro', 'Comissões', 'Negócio', 'Atividade', 'Relatórios'] },
+  PROFISSIONAL: { sees: ['Agenda', 'Comissões'], hidden: ['Caixa', 'Financeiro', 'Equipe', 'Negócio', 'Atividade', 'Relatórios'] },
+  FINANCEIRO: { sees: ['Financeiro', 'Caixa', 'Comissões', 'Relatórios'], hidden: ['Negócio', 'Atividade'] },
+  GERENTE: { sees: ['Agenda', 'Caixa', 'Financeiro', 'Relatórios', 'Equipe'], hidden: ['Atividade'] },
 };
 
 for (const [role, expected] of Object.entries(MENU)) {
