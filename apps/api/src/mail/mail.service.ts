@@ -6,6 +6,8 @@ export interface OutboxMail {
   subject: string;
   html: string;
   link?: string;
+  /** Código de uso único (só aparece na caixa de saída de desenvolvimento). */
+  code?: string;
   replyTo?: string;
   at: string;
 }
@@ -52,7 +54,7 @@ export class MailService {
     return [...this.outbox].reverse();
   }
 
-  async send(mail: { to: string; subject: string; html: string; link?: string; replyTo?: string }): Promise<boolean> {
+  async send(mail: { to: string; subject: string; html: string; link?: string; code?: string; replyTo?: string }): Promise<boolean> {
     if (!this.enabled) {
       // O link carrega um token de uso único: só aparece fora de produção.
       if (isDevEnv()) {
@@ -134,6 +136,19 @@ export class MailService {
         `Tudo certo, ${escapeHtml(p.clientName.split(' ')[0])}! ✨`,
         `<strong>${escapeHtml(p.serviceName)}</strong> com ${escapeHtml(p.professionalName)} em <strong>${escapeHtml(p.orgName)}</strong>, ${escapeHtml(p.when)}.`,
         { label: 'Ver ou cancelar', url: p.url },
+      ),
+    });
+  }
+
+  /** Código de 6 dígitos para a pessoa ver as próprias reservas. O nome do negócio é escapado. */
+  sendPortalCode(to: string, p: { orgName: string; code: string; ttlMinutes: number }) {
+    return this.send({
+      to,
+      code: p.code,
+      subject: `Seu código para ver suas reservas em ${p.orgName.replace(/[\r\n]/g, ' ')}`,
+      html: layout(
+        'Seu código de acesso 🔐',
+        `Use o código <strong style="font-size:24px;letter-spacing:4px">${escapeHtml(p.code)}</strong> para ver e mudar suas reservas em <strong>${escapeHtml(p.orgName)}</strong>. Ele vale por ${p.ttlMinutes} minutos. Se não foi você, ignore este e-mail.`,
       ),
     });
   }

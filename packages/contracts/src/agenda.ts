@@ -4,6 +4,7 @@
  */
 import type { BusinessHours } from './business-hours';
 import type { IsoDate } from './dates';
+import type { GuardianRelationship } from './guardian';
 import { formatBRL } from './money';
 import { formatDuration, zonedParts, zonedToUtc } from './time';
 
@@ -60,9 +61,14 @@ export const ONLINE_BOOKING = {
   maxDaysAhead: 60,
   /** Até quantas horas antes o cliente cancela sozinho. */
   cancelUntilHours: 2,
-  /** Horários futuros que um mesmo telefone mantém marcados pela página pública (evita travar a agenda). */
-  maxActivePerClient: 3,
+  /** Horários futuros que um mesmo telefone (a família toda) mantém marcados pela página pública. */
+  maxActivePerPhone: 5,
   stepMinutes: 15,
+  /** "Minhas reservas": código de 6 dígitos enviado ao e-mail cadastrado no telefone. */
+  codeTtlMinutes: 10,
+  codeMaxAttempts: 5,
+  codeMaxPerHour: 5,
+  portalSessionMinutes: 60,
 } as const;
 
 // ------------------------------------------------------------------ disponibilidade
@@ -155,6 +161,9 @@ export interface ClientDto {
   phone: string | null;
   email: string | null;
   birthDate: IsoDate | null;
+  /** Quem responde pelo paciente (criança, idoso): o telefone costuma ser dele. */
+  guardianName: string | null;
+  guardianRelationship: GuardianRelationship | null;
   notes: string | null;
   tags: string[];
   createdAt: string;
@@ -165,11 +174,15 @@ export interface ClientInput {
   phone?: string | null;
   email?: string | null;
   birthDate?: IsoDate | null;
+  guardianName?: string | null;
+  guardianRelationship?: GuardianRelationship | null;
   notes?: string | null;
   tags?: string[];
 }
 
 export interface ClientDetailDto extends ClientDto {
+  /** Outros pacientes do mesmo negócio com o mesmo telefone (irmãos, pais e filhos). */
+  relatives: { id: string; name: string; birthDate: IsoDate | null }[];
   appointments: AppointmentDto[];
   stats: { total: number; done: number; noShows: number; spentCents: number; lastVisit: string | null };
 }
@@ -283,9 +296,14 @@ export interface PublicBookingRequest {
   /** Omitido = qualquer profissional livre. */
   memberId?: string | null;
   startsAt: string;
+  /** Quem está marcando (a pessoa que tem o telefone). */
   name: string;
   phone: string;
   email?: string | null;
+  /** Preenchidos quando a reserva é para outra pessoa (filho, mãe…): o paciente passa a ser ele. */
+  patientName?: string | null;
+  patientBirthDate?: IsoDate | null;
+  relationship?: GuardianRelationship | null;
 }
 
 export interface PublicBookingDto {
@@ -294,8 +312,10 @@ export interface PublicBookingDto {
   organizationName: string;
   organizationSlug: string;
   organizationPhone: string | null;
+  serviceId: string;
   serviceName: string;
   professionalName: string;
+  /** Quem será atendido (pode ser outra pessoa, não quem marcou). */
   clientName: string;
   startsAt: string;
   endsAt: string;
@@ -303,6 +323,43 @@ export interface PublicBookingDto {
   status: AppointmentStatus;
   address: string | null;
   canCancel: boolean;
+}
+
+/** Uma reserva na área "Minhas reservas" (todas as pessoas do mesmo telefone naquele negócio). */
+export interface PortalBookingDto {
+  id: string;
+  patientName: string;
+  serviceId: string;
+  serviceName: string;
+  memberId: string;
+  professionalName: string;
+  startsAt: string;
+  endsAt: string;
+  timezone: string;
+  status: AppointmentStatus;
+  address: string | null;
+  /** Cancelar e remarcar valem a mesma antecedência mínima. */
+  canChange: boolean;
+}
+
+export interface PortalCodeRequest {
+  phone: string;
+}
+
+export interface PortalVerifyRequest {
+  phone: string;
+  code: string;
+}
+
+export interface PortalSessionDto {
+  token: string;
+  expiresIn: number;
+}
+
+export interface RescheduleRequest {
+  startsAt: string;
+  /** Omitido = qualquer profissional livre. */
+  memberId?: string | null;
 }
 
 /** Até quando o cliente pode cancelar online. */

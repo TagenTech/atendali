@@ -39,7 +39,9 @@ export class ClientsService {
       const digits = term.replace(/\D/g, '');
       qb.andWhere(
         new Brackets((w) => {
-          w.where('c.name ILIKE :like', { like: `%${term}%` }).orWhere('c.email ILIKE :like', { like: `%${term}%` });
+          w.where('c.name ILIKE :like', { like: `%${term}%` })
+            .orWhere('c.guardianName ILIKE :like', { like: `%${term}%` })
+            .orWhere('c.email ILIKE :like', { like: `%${term}%` });
           if (digits.length >= 3) w.orWhere('c.phone LIKE :digits', { digits: `%${digits}%` });
         }),
       );
@@ -61,8 +63,18 @@ export class ClientsService {
     const now = Date.now();
     const done = appts.filter((a) => a.status === AppointmentStatus.CONCLUIDO);
     const past = appts.filter((a) => a.startsAt.getTime() <= now && a.status !== AppointmentStatus.CANCELADO);
+    // Irmãos, pais e filhos dividem o telefone: a ficha mostra os outros pacientes do mesmo número.
+    const relatives = c.phone
+      ? await this.repo
+          .createQueryBuilder('r')
+          .where('r.organizationId = :org AND r.phone = :phone AND r.id != :id AND r.anonymizedAt IS NULL', { org: org.organizationId, phone: c.phone, id: c.id })
+          .orderBy('r.name', 'ASC')
+          .take(20)
+          .getMany()
+      : [];
     return {
       ...toClientDto(c),
+      relatives: relatives.map((r) => ({ id: r.id, name: r.name, birthDate: r.birthDate })),
       appointments: appts.map((a) => toAppointmentDto(a)),
       stats: {
         total: appts.filter((a) => a.status !== AppointmentStatus.CANCELADO).length,
@@ -81,6 +93,8 @@ export class ClientsService {
       phone: dto.phone ?? null,
       email: dto.email ?? null,
       birthDate: dto.birthDate ?? null,
+      guardianName: dto.guardianName ?? null,
+      guardianRelationship: dto.guardianName ? (dto.guardianRelationship ?? null) : null,
       notesEncrypted: dto.notes ? encryptField(dto.notes) : null,
       tags: cleanTags(dto.tags) ?? [],
     });
@@ -93,6 +107,9 @@ export class ClientsService {
     if (dto.phone !== undefined) c.phone = dto.phone;
     if (dto.email !== undefined) c.email = dto.email;
     if (dto.birthDate !== undefined) c.birthDate = dto.birthDate;
+    if (dto.guardianName !== undefined) c.guardianName = dto.guardianName;
+    if (dto.guardianRelationship !== undefined) c.guardianRelationship = dto.guardianRelationship;
+    if (!c.guardianName) c.guardianRelationship = null;
     if (dto.notes !== undefined) c.notesEncrypted = dto.notes ? encryptField(dto.notes) : null;
     if (dto.tags !== undefined) c.tags = cleanTags(dto.tags)!;
     return toClientDto(await this.repo.save(c));
@@ -102,11 +119,11 @@ export class ClientsService {
   private async existingKeys(org: OrgContext) {
     const rows = await this.repo
       .createQueryBuilder('c')
-      .select(['c.phone', 'c.email'])
+      .select(['c.phone', 'c.email', 'c.name'])
       .where('c.organizationId = :org AND c.anonymizedAt IS NULL', { org: org.organizationId })
       .getMany();
     return {
-      phones: rows.map((r) => r.phone).filter((x): x is string => !!x),
+      people: rows.filter((r) => !!r.phone).map((r) => ({ phone: r.phone!, name: r.name })),
       emails: rows.map((r) => r.email?.toLowerCase()).filter((x): x is string => !!x),
     };
   }
@@ -149,7 +166,7 @@ export class ClientsService {
     await this.tenant.repo(Review).update({ clientId: c.id, organizationId: org.organizationId }, { clientName: null, clientId: null });
     await this.repo.update(
       { id: c.id, organizationId: org.organizationId },
-      { name: 'Cliente removido', phone: null, email: null, birthDate: null, notesEncrypted: null, tags: [], anonymizedAt: new Date() },
+      { name: 'Cliente removido', phone: null, email: null, birthDate: null, guardianName: null, guardianRelationship: null, notesEncrypted: null, tags: [], anonymizedAt: new Date() },
     );
   }
 

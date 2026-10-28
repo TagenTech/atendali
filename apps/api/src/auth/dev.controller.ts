@@ -12,6 +12,6 @@ export class DevController {
   @Public()
   @Get('outbox')
   outbox() {
-    return this.mail.recent().map(({ to, subject, link, at }) => ({ to, subject, link, at }));
+    return this.mail.recent().map(({ to, subject, link, code, at }) => ({ to, subject, link, code, at }));
   }
 }

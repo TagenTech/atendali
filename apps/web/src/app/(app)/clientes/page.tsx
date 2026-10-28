@@ -90,6 +90,7 @@ export default function ClientesPage() {
                         <Link href={`/clientes/${c.id}`} onClick={(e) => e.stopPropagation()} className="hover:underline">
                           {c.name}
                         </Link>
+                        {c.guardianName ? <span className="block text-xs font-normal text-muted-foreground">Resp.: {c.guardianName}</span> : null}
                       </td>
                       <td className="px-5 py-3 tabular">{c.phone ? formatPhone(c.phone) : '—'}</td>
                       <td className="px-5 py-3 text-muted-foreground">{c.email ?? '—'}</td>
@@ -115,7 +116,7 @@ export default function ClientesPage() {
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-semibold">{c.name}</span>
-                    <span className="block truncate text-sm text-muted-foreground">{c.phone ? formatPhone(c.phone) : (c.email ?? 'Sem contato')}</span>
+                    <span className="block truncate text-sm text-muted-foreground">{c.guardianName ? `Resp.: ${c.guardianName} · ` : ''}{c.phone ? formatPhone(c.phone) : (c.email ?? 'Sem contato')}</span>
                   </span>
                   <ChevronRight className="size-5 text-muted-foreground" />
                 </Link>

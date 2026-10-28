@@ -2,17 +2,20 @@
 
 import { APPOINTMENT_STATUS_LABEL, formatDateLong, ONLINE_BOOKING, whatsappLink, zonedParts } from '@skedulei/contracts';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { CalendarCheck2, CalendarX2, MapPin, MessageCircle } from 'lucide-react';
+import { CalendarCheck2, CalendarPlus, CalendarX2, MapPin, MessageCircle, Repeat } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { AuthLayout } from '@/components/auth/auth-layout';
 import { Button } from '@/components/ui/button';
+import { ReschedulePicker } from '@/components/public/reschedule-picker';
 import { Card } from '@/components/ui/card';
 import * as agendaApi from '@/lib/api/agenda';
 import { errorText } from '@/lib/api/client';
 import { capitalize } from '@/lib/format';
+import { buildIcs, downloadIcs } from '@/lib/ics';
+import { forgetBooking } from '@/lib/my-bookings-device';
 
 /** "Minha reserva": o link que o cliente recebe para ver e cancelar, sem login. */
 export default function ReservaPage() {
@@ -21,6 +24,8 @@ export default function ReservaPage() {
   const { data: b, isError } = useQuery({ queryKey: ['booking', token], queryFn: () => agendaApi.publicBooking(token), retry: false });
   const [confirming, setConfirming] = React.useState(false);
   const [cancelling, setCancelling] = React.useState(false);
+  const [moving, setMoving] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
 
   if (isError) {
     return (
@@ -44,6 +49,7 @@ export default function ReservaPage() {
             {capitalize(formatDateLong(p.date, false))} às <strong>{p.time}</strong>
           </p>
           <p className="text-sm text-muted-foreground">com {b.professionalName}</p>
+          <p className="text-sm text-muted-foreground">Atendimento de <strong>{b.clientName}</strong></p>
           {b.address ? (
             <p className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground">
               <MapPin className="size-4" /> {b.address}
@@ -52,7 +58,52 @@ export default function ReservaPage() {
           <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{APPOINTMENT_STATUS_LABEL[b.status]}</p>
         </Card>
 
-        {!cancelled ? <p className="text-center text-sm text-muted-foreground">Guarde este link: é por ele que você vê ou cancela o horário.</p> : null}
+        {!cancelled ? (
+          <>
+            <p className="text-center text-sm text-muted-foreground">Guarde este link: é por ele que você vê, muda ou cancela o horário.</p>
+            <Button
+              variant="outline"
+              block
+              onClick={() =>
+                downloadIcs(
+                  'reserva.ics',
+                  buildIcs({ uid: token, title: `${b.serviceName} · ${b.organizationName}`, startsAt: b.startsAt, endsAt: b.endsAt, location: b.address, description: `Com ${b.professionalName}. Ver ou mudar: ${window.location.href}` }),
+                )
+              }
+            >
+              <CalendarPlus /> Adicionar ao calendário
+            </Button>
+          </>
+        ) : null}
+
+        {b.canCancel && moving ? (
+          <Card className="space-y-3">
+            <p className="font-display text-lg font-extrabold">Remarcar</p>
+            <ReschedulePicker
+              slug={b.organizationSlug}
+              serviceId={b.serviceId}
+              timezone={b.timezone}
+              loading={saving}
+              onCancel={() => setMoving(false)}
+              onConfirm={async (startsAt) => {
+                setSaving(true);
+                try {
+                  qc.setQueryData(['booking', token], await agendaApi.publicReschedule(token, { startsAt }));
+                  toast.success('Horário remarcado ✓');
+                  setMoving(false);
+                } catch (err) {
+                  toast.error(errorText(err));
+                } finally {
+                  setSaving(false);
+                }
+              }}
+            />
+          </Card>
+        ) : b.canCancel ? (
+          <Button variant="soft" block onClick={() => setMoving(true)}>
+            <Repeat /> Remarcar
+          </Button>
+        ) : null}
 
         {b.canCancel ? (
           <Button
@@ -64,6 +115,7 @@ export default function ReservaPage() {
               setCancelling(true);
               try {
                 qc.setQueryData(['booking', token], await agendaApi.publicCancel(token));
+                forgetBooking(token);
                 toast.success('Horário cancelado');
               } catch (err) {
                 toast.error(errorText(err));

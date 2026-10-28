@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { PHONE_MAX_LENGTH } from '@skedulei/contracts';
+import { PHONE_MAX_LENGTH, type GuardianRelationship } from '@skedulei/contracts';
 import { Organization } from '../../organizations/entities/organization.entity';
 
 /** Cliente/paciente de um negócio. Observações podem ter dado de saúde: ficam cifradas. */
@@ -28,6 +28,13 @@ export class Client {
 
   @Column({ name: 'birth_date', type: 'date', nullable: true })
   birthDate: string | null;
+
+  /** Quem responde pelo paciente (criança, idoso): o telefone costuma ser dele; vários pacientes podem dividir o mesmo número. */
+  @Column({ name: 'guardian_name', type: 'varchar', length: 120, nullable: true })
+  guardianName: string | null;
+
+  @Column({ name: 'guardian_relationship', type: 'varchar', length: 12, nullable: true })
+  guardianRelationship: GuardianRelationship | null;
 
   /** AES-256-GCM (`encryptField`): pode conter alergias, condições de saúde etc. */
   @Column({ name: 'notes_encrypted', type: 'text', nullable: true })

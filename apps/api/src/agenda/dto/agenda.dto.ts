@@ -10,6 +10,7 @@ import {
   IsISO8601,
   IsNotEmpty,
   IsOptional,
+  Matches,
   IsString,
   IsUUID,
   Max,
@@ -19,7 +20,12 @@ import {
 } from 'class-validator';
 import {
   AppointmentStatus,
+  GUARDIAN_RELATIONSHIPS,
   type ClientInput,
+  type GuardianRelationship,
+  type PortalCodeRequest,
+  type PortalVerifyRequest,
+  type RescheduleRequest,
   type CreateAppointmentRequest,
   type CreateBlockRequest,
   type CreateWaitlistRequest,
@@ -61,6 +67,20 @@ export class ClientDto implements ClientInput {
   @IsOptional()
   @IsIsoDate()
   birthDate?: string | null;
+
+  @ApiPropertyOptional({ description: 'Quem responde pelo paciente (criança, idoso)' })
+  @trim()
+  @EmptyToNull()
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  guardianName?: string | null;
+
+  @ApiPropertyOptional({ enum: GUARDIAN_RELATIONSHIPS })
+  @EmptyToNull()
+  @IsOptional()
+  @IsIn([...GUARDIAN_RELATIONSHIPS], { message: 'Parentesco inválido' })
+  guardianRelationship?: GuardianRelationship | null;
 
   @ApiPropertyOptional()
   @trim()
@@ -107,6 +127,20 @@ export class UpdateClientDto implements Partial<ClientInput> {
   @IsOptional()
   @IsIsoDate()
   birthDate?: string | null;
+
+  @ApiPropertyOptional({ description: 'Quem responde pelo paciente (criança, idoso)' })
+  @trim()
+  @EmptyToNull()
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  guardianName?: string | null;
+
+  @ApiPropertyOptional({ enum: GUARDIAN_RELATIONSHIPS })
+  @EmptyToNull()
+  @IsOptional()
+  @IsIn([...GUARDIAN_RELATIONSHIPS], { message: 'Parentesco inválido' })
+  guardianRelationship?: GuardianRelationship | null;
 
   @ApiPropertyOptional()
   @trim()
@@ -386,6 +420,27 @@ export class PublicBookingDto implements PublicBookingRequest {
   @IsEmail({}, { message: 'E-mail inválido' })
   @MaxLength(180)
   email?: string | null;
+
+  @ApiPropertyOptional({ description: 'Preenchido quando a reserva é para outra pessoa (filho, mãe…)' })
+  @trim()
+  @EmptyToNull()
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  patientName?: string | null;
+
+  @ApiPropertyOptional({ example: '2019-04-02' })
+  @EmptyToNull()
+  @IsOptional()
+  @IsIsoDate()
+  patientBirthDate?: string | null;
+
+  @ApiPropertyOptional({ enum: GUARDIAN_RELATIONSHIPS })
+  @EmptyToNull()
+  @IsOptional()
+  @IsIn([...GUARDIAN_RELATIONSHIPS], { message: 'Parentesco inválido' })
+  relationship?: GuardianRelationship | null;
+
 }
 
 export class ClientImportDto {
@@ -393,4 +448,37 @@ export class ClientImportDto {
   @IsString()
   @MaxLength(400_000)
   csv: string;
+}
+
+
+// ------------------------------------------------------------------ minhas reservas (cliente)
+
+export class PortalCodeDto implements PortalCodeRequest {
+  @ApiProperty()
+  @IsPhone()
+  phone: string;
+}
+
+export class PortalVerifyDto implements PortalVerifyRequest {
+  @ApiProperty()
+  @IsPhone()
+  phone: string;
+
+  @ApiProperty({ example: '482913' })
+  @trim()
+  @IsString()
+  @Matches(/^\d{6}$/, { message: 'O código tem 6 números' })
+  code: string;
+}
+
+export class RescheduleDto implements RescheduleRequest {
+  @ApiProperty()
+  @IsISO8601({ strict: true }, { message: 'Horário inválido' })
+  startsAt: string;
+
+  @ApiPropertyOptional()
+  @EmptyToNull()
+  @IsOptional()
+  @IsUUID()
+  memberId?: string | null;
 }

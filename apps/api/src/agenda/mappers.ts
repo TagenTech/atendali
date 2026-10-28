@@ -37,6 +37,8 @@ export function toClientDto(c: Client): ClientDto {
     phone: c.phone,
     email: c.email,
     birthDate: c.birthDate,
+    guardianName: c.guardianName,
+    guardianRelationship: c.guardianRelationship,
     notes: c.notesEncrypted ? decryptField(c.notesEncrypted) : null,
     tags: c.tags,
     createdAt: c.createdAt.toISOString(),

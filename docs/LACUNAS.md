@@ -4,6 +4,17 @@ Visão de quem **usa o produto de verdade**: o cliente/paciente que agenda e a c
 existe hoje (com a evidência no código), o impacto e o que propor. Prioridade: 🔴 antes de lançar · 🟡 logo depois ·
 🟢 roadmap. O plano de fases está em [PLANO.md](PLANO.md); o que falta de segurança/infra está em [LANCAMENTO.md](LANCAMENTO.md).
 
+## Andamento (atualizado em 28/10/2026)
+
+| Lacuna | Situação |
+|---|---|
+| #3 Responsável × paciente | ✅ **feito**: reserva "para outra pessoa" (nome, nascimento, parentesco), vários pacientes por telefone, ficha com responsável e "mesmo telefone", importação por telefone + nome |
+| #1 Rever/cancelar depois de marcar | ✅ **feito** (camadas 1 e 2): reservas neste aparelho, `.ics`, e **Minhas reservas** com código no e-mail cadastrado; ⏳ login rápido/conta de cliente e código por WhatsApp (Fase 4) |
+| #6 Remarcar | ✅ **feito**: pelo link da reserva e em Minhas reservas (mesma antecedência de 2 h; avisa a lista de espera) |
+| Taxa de agendamento (sinal) | ⏳ opção visível e **desligada** ("Em breve") em Configurações; liga com o pagamento online (Fase 4) |
+| #2 Vários procedimentos (carrinho) | ⏳ próximo |
+| #5 Módulos de saúde sem tela, #4 lembretes, #7 sinal, #8 gestão | ⏳ pendentes |
+
 ## Resumo
 
 | # | Lacuna | Quem sente | Prio. |

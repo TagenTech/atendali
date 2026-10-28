@@ -105,6 +105,23 @@ function BusinessInfo() {
   );
 }
 
+/** Opção futura: sinal/taxa ao agendar online. Fica visível, mas desligada, até existir o pagamento online (Fase 4). */
+function BookingFee() {
+  return (
+    <Card>
+      <SwitchRow
+        id="booking-fee"
+        checked={false}
+        onCheckedChange={() => undefined}
+        disabled
+        badge="Em breve"
+        title="Cobrar taxa de agendamento"
+        description="O cliente paga um sinal pelo Pix ao marcar na página online, e o valor abate na comanda. Disponível quando o pagamento online chegar."
+      />
+    </Card>
+  );
+}
+
 function Loyalty() {
   const { org } = useOrg();
   const update = useUpdateOrganization();
@@ -347,6 +364,9 @@ export default function ConfiguracoesPage() {
         </Section>
         <Section title="Aparência da página" description="Logo, imagem de fundo e cor que o cliente vê ao agendar online.">
           <BrandingEditor />
+        </Section>
+        <Section title="Taxa de agendamento" description="Cobrança de sinal ao marcar online, para reduzir faltas. Ainda não está disponível.">
+          <BookingFee />
         </Section>
         <Section title="Unidades" description="Endereço e horário de funcionamento de cada local.">
           <Units />

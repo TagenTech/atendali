@@ -8,8 +8,11 @@ import type {
   CreateAppointmentRequest,
   CreateBlockRequest,
   CreateWaitlistRequest,
+  PortalBookingDto,
+  PortalSessionDto,
   PublicBookingDto,
   PublicBookingRequest,
+  RescheduleRequest,
   PublicOrgDto,
   SlotsDto,
   UpdateAppointmentRequest,
@@ -53,6 +56,17 @@ export const publicBook = (slug: string, body: PublicBookingRequest) =>
   api<PublicBookingDto>(`/public/orgs/${encodeURIComponent(slug)}/bookings`, { method: 'POST', ...json(body) });
 export const publicBooking = (token: string) => api<PublicBookingDto>(`/public/bookings/${encodeURIComponent(token)}`);
 export const publicCancel = (token: string) => api<PublicBookingDto>(`/public/bookings/${encodeURIComponent(token)}/cancel`, { method: 'POST' });
+export const publicReschedule = (token: string, body: RescheduleRequest) =>
+  api<PublicBookingDto>(`/public/bookings/${encodeURIComponent(token)}/reschedule`, { method: 'POST', ...json(body) });
+
+// "Minhas reservas": código no e-mail cadastrado → sessão curta → ver, cancelar e remarcar
+const portal = (slug: string) => `/public/orgs/${encodeURIComponent(slug)}/my-bookings`;
+export const portalCode = (slug: string, phone: string) => api<{ sent: true }>(`${portal(slug)}/code`, { method: 'POST', ...json({ phone }) });
+export const portalVerify = (slug: string, phone: string, code: string) => api<PortalSessionDto>(`${portal(slug)}/verify`, { method: 'POST', ...json({ phone, code }) });
+export const portalList = (slug: string, portalToken: string) => api<PortalBookingDto[]>(portal(slug), { portalToken });
+export const portalCancel = (slug: string, portalToken: string, id: string) => api<{ ok: true }>(`${portal(slug)}/${id}/cancel`, { method: 'POST', portalToken });
+export const portalReschedule = (slug: string, portalToken: string, id: string, body: RescheduleRequest) =>
+  api<{ ok: true }>(`${portal(slug)}/${id}/reschedule`, { method: 'POST', portalToken, ...json(body) });
 
 export const listWaitlist = (orgId: string) => api<WaitlistEntryDto[]>('/org/waitlist', { headers: inOrg(orgId) });
 export const addWaitlist = (orgId: string, body: CreateWaitlistRequest) =>

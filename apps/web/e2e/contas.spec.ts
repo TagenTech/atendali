@@ -106,17 +106,20 @@ test('importa clientes por CSV: pré-visualiza, ignora duplicado e erro', async 
   const csv = [
     'Nome;Celular;E-mail;Nascimento;Etiquetas',
     'Ana Importada;(11) 98888-7777;ana@x.com;05/03/1990;vip',
-    'Ana repetida;11988887777;;;',
+    'ana  importada;11988887777;;;',
+    'Filha da Ana;11988887777;;;',
     'Beto Importado;11977776666;;;',
     'Sem celular válido;123;;;',
   ].join('\n');
   await page.getByLabel('Arquivo CSV').setInputFiles({ name: 'clientes.csv', mimeType: 'text/csv', buffer: Buffer.from(csv) });
-  await expect(page.getByRole('status').filter({ hasText: '2 para importar' })).toContainText('1 já existem');
-  await expect(page.getByRole('status').filter({ hasText: '2 para importar' })).toContainText('1 com erro');
-  await page.getByRole('button', { name: 'Importar 2' }).click();
+  await expect(page.getByRole('status').filter({ hasText: '3 para importar' })).toContainText('1 já existem');
+  await expect(page.getByRole('status').filter({ hasText: '3 para importar' })).toContainText('1 com erro');
+  await page.getByRole('button', { name: 'Importar 3' }).click();
   await expect(page.getByRole('heading', { name: 'Importação concluída' })).toBeVisible();
-  await expect(page.getByRole('status').filter({ hasText: 'Importação concluída' })).toContainText('2 importados');
+  await expect(page.getByRole('status').filter({ hasText: 'Importação concluída' })).toContainText('3 importados');
   await page.getByRole('link', { name: /Ver /i }).click();
   await expect(page.getByText('Ana Importada').filter({ visible: true }).first()).toBeVisible();
   await expect(page.getByText('Beto Importado').filter({ visible: true }).first()).toBeVisible();
+  // Mesmo celular com nome diferente é outro paciente (irmãos), não duplicado.
+  await expect(page.getByText('Filha da Ana').filter({ visible: true }).first()).toBeVisible();
 });

@@ -70,7 +70,10 @@ Monorepo pnpm + Turbo, nascido do Turmei (`../gestao-aulas`). Leia o [README](RE
 
 ## Segurança (ver docs/SEGURANCA.md e docs/LANCAMENTO.md)
 - Login social: provedor que **não garante o e-mail** (Microsoft) cria conta *não confirmada* e nunca liga a conta existente; ao ligar uma conta não confirmada por provedor que garante, apague senha, identidades e sessões (`signInWithProvider`). Não afrouxe.
-- Reserva pública: `ONLINE_BOOKING.maxActivePerClient` (3 horários futuros por telefone) no `BookingService.book`.
+- Reserva pública: `ONLINE_BOOKING.maxActivePerPhone` (5 horários futuros por telefone, a família toda) no `BookingService.book`.
+- **Responsável × paciente**: o telefone é de quem marca; o **paciente pode ser outra pessoa** (`patientName`, `relationship`). Vários clientes dividem o mesmo telefone (irmãos): identifique por telefone **+ nome** (`samePerson`/`personKey` em `contracts/src/guardian.ts`), nunca só pelo telefone. Importação CSV também deduplica por telefone + nome. `Client.guardianName/guardianRelationship`; a ficha traz `relatives` (mesmo telefone).
+- **Minhas reservas** (`PortalService`, rotas `public/orgs/:slug/my-bookings/*`): código de 6 dígitos (HMAC, 10 min, 5 tentativas, 5 pedidos/h) enviado **só ao e-mail já cadastrado no telefone**; resposta idêntica com ou sem cadastro; sessão assinada de 60 min (`Authorization: Bearer`, escopo = negócio + telefone). Cancelar/remarcar valem a mesma antecedência (`canClientCancel`, 2 h) e só alcançam pacientes do telefone da sessão. Em dev o código aparece em `/v1/dev/outbox` (`code`). O canal por WhatsApp/SMS entra na Fase 4 (`PortalService.requestCode` é o ponto de troca).
+- No web, rotas `/public/*` nunca renovam sessão nem deslogam (401 delas é do próprio fluxo); `api()` aceita `portalToken`.
 - Senha: `passwordProblem`/`isCommonPassword` (contracts) na tela **e** `NotCommonPassword` nos DTOs.
 - `seed-demo*.js` só rodam em `localhost` (`scripts/demo-guard.js`).
 - Limites de tentativa e bloqueio de login são **em memória**: só valem com 1 instância (ver LANCAMENTO.md §4).

@@ -20,3 +20,4 @@ export * from './stock';
 export * from './retention';
 export * from './branding';
 export * from './password';
+export * from './guardian';

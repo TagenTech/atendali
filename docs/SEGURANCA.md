@@ -27,13 +27,22 @@ teste em Supabase real (só Postgres local) — itens em [LANCAMENTO.md](LANCAME
 | # | OWASP | Achado | Sev. | Correção e teste |
 |---|---|---|---|---|
 | A1 | A07 · A04 | **Sequestro prévio de conta no login social.** `createFromProvider` marcava o e-mail como confirmado mesmo quando o provedor não o garante (Microsoft). Um atacante podia criar a conta com o e-mail da vítima via Microsoft (ou por cadastro com senha, sem confirmar) e, quando a vítima entrasse depois pelo Google, a conta era ligada **mantendo a senha e o login Microsoft do atacante** | Alta | Conta criada por provedor que não garante o e-mail nasce **não confirmada**; ao ligar uma conta não confirmada, **senha, logins sociais e sessões anteriores são apagados**. 2 testes novos em `auth.service.spec.ts` |
-| A2 | A04 · API6 | **Reserva online sem teto por pessoa.** Sem login, quem quisesse ocupava a agenda inteira (10 reservas/h por IP, mas IPs rotativos) | Média | Cada telefone mantém no máximo **3 horários futuros** pela página pública (`ONLINE_BOOKING.maxActivePerClient`); mensagem amigável; teste e2e novo |
+| A2 | A04 · API6 | **Reserva online sem teto por pessoa.** Sem login, quem quisesse ocupava a agenda inteira (10 reservas/h por IP, mas IPs rotativos) | Média | Cada telefone (a família toda) mantém no máximo **5 horários futuros** pela página pública (`ONLINE_BOOKING.maxActivePerPhone`); mensagem amigável; teste e2e novo |
 | A3 | A07 | **Senhas comuns aceitas** (`12345678`, `password123`, sequências) apesar do mínimo de 8 caracteres | Média | `isCommonPassword`/`passwordProblem` em `contracts` + validação `NotCommonPassword` na API (cadastro, redefinição e troca) e nas 3 telas; testes de unidade, API e Playwright (`senhas.spec.ts`) |
 | A4 | A05 | **Scripts de demonstração** (`seed-demo*.js`, senha pública `senha-forte-123`) podiam ser apontados para um banco/API de produção | Baixa | `demo-guard.js`: recusam qualquer destino fora de `localhost` e `NODE_ENV=production` (override só com `ALLOW_DEMO_SEED=1` em homologação) |
 
 Também nesta rodada (UX com efeito de segurança): erros de formulário agora aparecem **embaixo do campo** com foco no
 primeiro inválido (antes alguns botões ignoravam o clique em silêncio), "As senhas precisam ser iguais" aparece junto
 dos demais erros no cadastro e a troca de senha exige a senha atual na validação do formulário.
+
+### Novo: área "Minhas reservas" (28/10/2026)
+
+Permite ao cliente rever, remarcar e cancelar sem conta. Desenho de segurança (testado em `responsavel-reservas.e2e-spec.ts`):
+- **Prova de posse**: telefone sozinho nunca basta (revelaria dado de saúde). O código de 6 dígitos vai **somente para o e-mail já cadastrado naquele telefone**; quem digita o telefone de outra pessoa não recebe nada.
+- **Sem enumeração**: a resposta de "enviar código" é sempre `{ sent: true }`, com ou sem cadastro, e o envio não é esperado (tempo igual).
+- **Força bruta**: código só como HMAC no banco, vale 10 min, uso único, **5 tentativas** e no máximo 5 códigos/hora por telefone e negócio, além de 10 pedidos/h por IP.
+- **Sessão**: token assinado (HMAC-SHA256) de 60 min preso ao **negócio + telefone**; não serve em outro negócio nem com assinatura adulterada; cancelar/remarcar só alcançam pacientes daquele telefone (404 caso contrário).
+- **Limitação conhecida**: quem marcou **sem e-mail** não consegue usar o código; continua valendo o link da reserva, a lista neste aparelho e o WhatsApp da clínica. O canal por WhatsApp/SMS (Fase 4) fecha essa lacuna.
 
 ### Em aberto (decisão ou infraestrutura)
 

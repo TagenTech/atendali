@@ -11,6 +11,8 @@ import {
   publicName,
   ratingSummary,
   ONLINE_BOOKING,
+  samePerson,
+  normalizePersonName,
   todayIn,
   vocabularyFor,
   zonedParts,
@@ -24,7 +26,7 @@ import { Organization } from '../organizations/entities/organization.entity';
 import { brandingOf } from '../organizations/mappers';
 import { ServiceItem } from '../organizations/entities/service-item.entity';
 import type { Unit } from '../organizations/entities/unit.entity';
-import { PublicBookingDto, PublicSlotsQueryDto } from './dto/agenda.dto';
+import { PublicBookingDto, PublicSlotsQueryDto, RescheduleDto } from './dto/agenda.dto';
 import { Appointment } from './entities/appointment.entity';
 import { Client } from './entities/client.entity';
 import { SchedulingService } from './scheduling.service';
@@ -94,7 +96,7 @@ export class BookingService {
     };
   }
 
-  async slots(slug: string, q: PublicSlotsQueryDto): Promise<SlotsDto> {
+  async slots(slug: string, q: PublicSlotsQueryDto, excludeAppointmentId?: string): Promise<SlotsDto> {
     const org = await this.org(slug);
     const em = this.db.manager;
     const unit = await this.scheduling.resolveUnit(em, org.id);
@@ -109,6 +111,7 @@ export class BookingService {
       members,
       notBefore: Date.now() + ONLINE_BOOKING.minLeadMinutes * 60_000,
       stepMinutes: ONLINE_BOOKING.stepMinutes,
+      excludeAppointmentId,
     });
   }
 
@@ -118,12 +121,12 @@ export class BookingService {
     const id = await this.db.transaction(async (em) => {
       const phone = normalizePhone(dto.phone);
       // Sem login, quem quiser poderia ocupar a agenda toda: cada telefone mantém poucos horários futuros.
-      const known = await em.getRepository(Client).findOne({ where: { organizationId: org.id, phone } });
-      if (known) {
+      const family = await em.getRepository(Client).find({ where: { organizationId: org.id, phone } });
+      if (family.length) {
         const active = await em.getRepository(Appointment).count({
-          where: { organizationId: org.id, clientId: known.id, source: AppointmentSource.ONLINE, status: In([AppointmentStatus.AGENDADO, AppointmentStatus.CONFIRMADO]), startsAt: MoreThan(new Date()) },
+          where: { organizationId: org.id, clientId: In(family.map((c) => c.id)), source: AppointmentSource.ONLINE, status: In([AppointmentStatus.AGENDADO, AppointmentStatus.CONFIRMADO]), startsAt: MoreThan(new Date()) },
         });
-        if (active >= ONLINE_BOOKING.maxActivePerClient) {
+        if (active >= ONLINE_BOOKING.maxActivePerPhone) {
           throw new ConflictException(`Você já tem ${active} horários marcados. Cancele um para marcar outro ou fale com a clínica.`);
         }
       }
@@ -139,10 +142,30 @@ export class BookingService {
       const end = new Date(start.getTime() + service.durationMinutes * 60_000);
       await this.scheduling.assertFree(em, { organizationId: org.id, unitId: unit.id, memberId, start, end });
 
+      // O telefone é de quem marca (responsável); o paciente pode ser outra pessoa (filho, mãe…).
       const clients = em.getRepository(Client);
-      let client = await clients.findOne({ where: { organizationId: org.id, phone }, order: { createdAt: 'ASC' } });
-      if (!client) client = await clients.save(clients.create({ organizationId: org.id, name: dto.name, phone, email: dto.email ?? null }));
-      else if (!client.email && dto.email) await clients.update(client.id, { email: dto.email });
+      const patientName = dto.patientName?.trim() || dto.name;
+      const forOther = !samePerson(patientName, dto.name);
+      let client = pickPatient(family, patientName, forOther);
+      if (!client) {
+        client = await clients.save(
+          clients.create({
+            organizationId: org.id,
+            name: patientName,
+            phone,
+            email: dto.email ?? null,
+            birthDate: dto.patientBirthDate ?? null,
+            guardianName: forOther ? dto.name : null,
+            guardianRelationship: forOther ? (dto.relationship ?? null) : null,
+          }),
+        );
+      } else {
+        const patch: Partial<Client> = {};
+        if (!client.email && dto.email) patch.email = dto.email;
+        if (!client.birthDate && dto.patientBirthDate) patch.birthDate = dto.patientBirthDate;
+        if (forOther && !client.guardianName) Object.assign(patch, { guardianName: dto.name, guardianRelationship: dto.relationship ?? null });
+        if (Object.keys(patch).length) await clients.update(client.id, patch);
+      }
 
       const saved = await em.getRepository(Appointment).save(
         em.getRepository(Appointment).create({
@@ -183,6 +206,19 @@ export class BookingService {
 
   async cancel(token: string): Promise<PublicBookingResponse> {
     const id = await this.idByToken(token);
+    await this.cancelById(id);
+    return this.toDto(id, token);
+  }
+
+  /** Remarca pelo link da reserva (mesma regra de antecedência do cancelamento). */
+  async reschedule(token: string, dto: RescheduleDto): Promise<PublicBookingResponse> {
+    const id = await this.idByToken(token);
+    await this.rescheduleById(id, dto);
+    return this.toDto(id, token);
+  }
+
+  /** Cancela um agendamento já autorizado (pelo token da reserva ou pela área "Minhas reservas"). */
+  async cancelById(id: string): Promise<void> {
     const repo = this.db.getRepository(Appointment);
     const a = await repo.findOneByOrFail({ id });
     if (!canClientCancel(a.status, a.startsAt.toISOString())) {
@@ -193,7 +229,31 @@ export class BookingService {
       const unit = await this.scheduling.resolveUnit(em, a.organizationId, a.unitId);
       await this.waitlist.onSlotFreed(em, a, unit.timezone);
     });
-    return this.toDto(id, token);
+  }
+
+  /** Muda o horário (e, se pedido, o profissional) de um agendamento já autorizado. O horário precisa estar entre os oferecidos. */
+  async rescheduleById(id: string, dto: RescheduleDto): Promise<void> {
+    const a = await this.db.getRepository(Appointment).findOneOrFail({ where: { id }, relations: { organization: true } });
+    if (!canClientCancel(a.status, a.startsAt.toISOString())) {
+      throw new BadRequestException(`Só dá para remarcar até ${ONLINE_BOOKING.cancelUntilHours}h antes. Fale com o estabelecimento.`);
+    }
+    await this.db.transaction(async (em) => {
+      const unit = await this.scheduling.resolveUnit(em, a.organizationId, a.unitId);
+      const service = await this.onlineService(em, a.organizationId, a.serviceId);
+      const date = zonedParts(new Date(dto.startsAt), unit.timezone).date;
+      this.assertBookableDate(date, unit.timezone);
+      const offered = await this.slots(a.organization.slug, { date, serviceId: service.id, memberId: dto.memberId ?? undefined }, a.id);
+      const slot = offered.slots.find((s) => new Date(s.startsAt).getTime() === new Date(dto.startsAt).getTime());
+      if (!slot) throw new ConflictException('Esse horário acabou de ser ocupado. Escolha outro, por favor.');
+      // Sem preferência: fica com quem já atendia, se estiver livre.
+      const memberId = dto.memberId ?? (slot.memberIds.includes(a.memberId) ? a.memberId : slot.memberIds[0]);
+      const start = new Date(slot.startsAt);
+      const end = new Date(start.getTime() + service.durationMinutes * 60_000);
+      await this.scheduling.assertFree(em, { organizationId: a.organizationId, unitId: unit.id, memberId, start, end, excludeAppointmentId: a.id });
+      await em.getRepository(Appointment).update(a.id, { startsAt: start, endsAt: end, memberId });
+      // O horário antigo vagou: avisa a lista de espera.
+      await this.waitlist.onSlotFreed(em, a, unit.timezone);
+    });
   }
 
   // ---------------------------------------------------------------- utilitários
@@ -238,6 +298,7 @@ export class BookingService {
       organizationName: a.organization.name,
       organizationSlug: a.organization.slug,
       organizationPhone: a.organization.phone,
+      serviceId: a.serviceId,
       serviceName: a.service.name,
       professionalName: a.member.name,
       clientName: a.client.name,
@@ -249,4 +310,13 @@ export class BookingService {
       canCancel: canClientCancel(a.status, a.startsAt.toISOString()),
     };
   }
+}
+
+/** Quem já existe com este telefone: nome igual; para quem marca para si mesmo, vale também o primeiro nome (se só houver um). */
+function pickPatient(family: Client[], patientName: string, forOther: boolean): Client | null {
+  const exact = family.find((c) => samePerson(c.name, patientName));
+  if (exact || forOther) return exact ?? null;
+  const first = normalizePersonName(patientName).split(' ')[0];
+  const sameFirst = family.filter((c) => !c.guardianName && normalizePersonName(c.name).split(' ')[0] === first);
+  return sameFirst.length === 1 ? sameFirst[0] : null;
 }

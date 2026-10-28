@@ -3,6 +3,8 @@
 import {
   addDays,
   formatBRL,
+  GUARDIAN_RELATIONSHIPS,
+  GUARDIAN_RELATIONSHIP_LABEL,
   formatDuration,
   isValidPhone,
   ONLINE_BOOKING,
@@ -10,11 +12,13 @@ import {
   WEEKDAYS_SHORT,
   whatsappLink,
   zonedParts,
+  type GuardianRelationship,
   type PublicOrgDto,
 } from '@skedulei/contracts';
 import { BRAND_COLORS, formatRating, type BrandColor } from '@skedulei/contracts';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Check, Clock, MapPin, MessageCircle, UserRound, Users } from 'lucide-react';
+import { ArrowLeft, CalendarCheck2, Check, Clock, MapPin, MessageCircle, UserRound, Users } from 'lucide-react';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import * as React from 'react';
 import { LogoMark } from '@/components/brand/logo';
@@ -30,6 +34,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Stars } from '@/components/ui/stars';
 import * as agendaApi from '@/lib/api/agenda';
 import { apiAsset, errorText } from '@/lib/api/client';
+import { rememberBooking, useDeviceBookings } from '@/lib/my-bookings-device';
 import { useHydrated } from '@/lib/use-hydrated';
 import { cn } from '@/lib/utils';
 
@@ -60,11 +65,17 @@ export default function BookingPage() {
   const [name, setName] = React.useState('');
   const [phone, setPhone] = React.useState('');
   const [email, setEmail] = React.useState('');
+  // Reserva para outra pessoa (filho, mãe…): o paciente é ele; quem marca fica como responsável.
+  const [forOther, setForOther] = React.useState(false);
+  const [patientName, setPatientName] = React.useState('');
+  const [patientBirth, setPatientBirth] = React.useState('');
+  const [relationship, setRelationship] = React.useState<GuardianRelationship | ''>('');
   const [error, setError] = React.useState<string | null>(null);
   const [saving, setSaving] = React.useState(false);
 
   const tz = org?.unit?.timezone ?? 'America/Sao_Paulo';
   const today = hydrated ? todayIn(tz) : null;
+  const device = useDeviceBookings(slug);
   const memberId = pro && pro !== ANY ? pro : undefined;
   const slots = useQuery({
     queryKey: ['public', slug, 'slots', service?.id, memberId, date],
@@ -101,6 +112,7 @@ export default function BookingPage() {
 
   const book = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (forOther && patientName.trim().length < 2) return setError(`Informe o nome d${org.vocabulary.client === 'Paciente' ? 'o paciente' : 'a pessoa que será atendida'}`);
     if (name.trim().length < 2) return setError('Informe seu nome');
     if (!isValidPhone(phone)) return setError('Informe um celular válido, com DDD');
     setSaving(true);
@@ -113,7 +125,9 @@ export default function BookingPage() {
         name: name.trim(),
         phone,
         email: email.trim() || null,
+        ...(forOther ? { patientName: patientName.trim(), patientBirthDate: patientBirth || null, relationship: relationship || null } : {}),
       });
+      rememberBooking({ token: res.token, slug, serviceName: res.serviceName, patientName: res.clientName, startsAt: res.startsAt, timezone: res.timezone });
       router.push(`/reserva/${res.token}`);
     } catch (err) {
       setError(errorText(err, 'Não foi possível agendar agora'));
@@ -158,6 +172,11 @@ export default function BookingPage() {
               </p>
             ) : null}
           </div>
+          <Button asChild size="sm" variant="outline">
+            <Link href={`/${slug}/minhas-reservas`} aria-label="Minhas reservas">
+              <CalendarCheck2 /> <span className="hidden sm:inline">Minhas reservas</span>
+            </Link>
+          </Button>
           {org.phone ? (
             <Button asChild size="sm" variant="outline">
               <a href={whatsappLink(org.phone)} target="_blank" rel="noopener noreferrer">
@@ -170,6 +189,29 @@ export default function BookingPage() {
 
       <div className="mx-auto grid max-w-5xl grid-cols-[minmax(0,1fr)] gap-8 px-5 pt-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="space-y-8">
+          {device.length ? (
+            <section aria-label="Suas reservas neste aparelho">
+              <h2 className="mb-2 font-display text-lg font-extrabold">Suas reservas</h2>
+              <ul className="space-y-2">
+                {device.map((b) => {
+                  const p = zonedParts(new Date(b.startsAt), b.timezone);
+                  const [, m, dd] = p.date.split('-');
+                  return (
+                    <li key={b.token}>
+                      <Link href={`/reserva/${b.token}`} className="flex items-center justify-between gap-3 rounded-2xl border-2 border-border bg-card p-3 hover:border-primary/50">
+                        <span>
+                          <span className="block font-semibold">{b.serviceName}</span>
+                          <span className="block text-sm text-muted-foreground">{b.patientName} · {dd}/{m} às {p.time}</span>
+                        </span>
+                        <span className="text-sm font-semibold text-primary">Ver ou mudar</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ) : null}
+
           {/* 1. Serviço */}
           <section>
             <StepTitle n={1}>Escolha o {org.vocabulary.service.toLowerCase()}</StepTitle>
@@ -299,13 +341,52 @@ export default function BookingPage() {
             <section>
               <StepTitle n={4}>Seus dados</StepTitle>
               <form onSubmit={book} className="grid max-w-xl gap-4" noValidate>
-                <Field label="Seu nome" htmlFor="bk-name">
+                <div role="radiogroup" aria-label="Para quem é" className="grid grid-cols-2 gap-2">
+                  {[
+                    { other: false, label: 'Para mim' },
+                    { other: true, label: org.vocabulary.client === 'Paciente' ? 'Para outro paciente (filho, mãe…)' : 'Para outra pessoa' },
+                  ].map((o) => (
+                    <button
+                      key={String(o.other)}
+                      type="button"
+                      role="radio"
+                      aria-checked={forOther === o.other}
+                      onClick={() => setForOther(o.other)}
+                      className={cn('rounded-2xl border-2 px-3 py-3 text-sm font-semibold', forOther === o.other ? 'border-primary bg-primary-soft' : 'border-border bg-card')}
+                    >
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+                {forOther ? (
+                  <>
+                    <Field label={`Nome d${org.vocabulary.client === 'Paciente' ? 'o paciente' : 'a pessoa atendida'}`} htmlFor="bk-patient">
+                      <Input id="bk-patient" value={patientName} maxLength={120} onChange={(e) => setPatientName(e.target.value)} />
+                    </Field>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Field label="Nascimento (opcional)" htmlFor="bk-birth">
+                        <Input id="bk-birth" type="date" value={patientBirth} max={today ?? undefined} onChange={(e) => setPatientBirth(e.target.value)} />
+                      </Field>
+                      <Field label="Seu parentesco" htmlFor="bk-rel">
+                        <select id="bk-rel" value={relationship} onChange={(e) => setRelationship(e.target.value as GuardianRelationship | '')} className="h-13 w-full rounded-2xl border-2 border-input bg-card px-3">
+                          <option value="">Prefiro não informar</option>
+                          {GUARDIAN_RELATIONSHIPS.map((r) => (
+                            <option key={r} value={r}>
+                              {GUARDIAN_RELATIONSHIP_LABEL[r]}
+                            </option>
+                          ))}
+                        </select>
+                      </Field>
+                    </div>
+                  </>
+                ) : null}
+                <Field label={forOther ? 'Seu nome (quem está marcando)' : 'Seu nome'} htmlFor="bk-name">
                   <Input id="bk-name" autoComplete="name" value={name} maxLength={120} onChange={(e) => setName(e.target.value)} />
                 </Field>
                 <Field label="Celular (WhatsApp)" htmlFor="bk-phone" hint="Para confirmar o horário com você">
                   <PhoneInput id="bk-phone" value={phone} onChange={setPhone} />
                 </Field>
-                <Field label="E-mail (opcional)" htmlFor="bk-email" hint="Mandamos o comprovante e o link para cancelar">
+                <Field label="E-mail (recomendado)" htmlFor="bk-email" hint="Enviamos o comprovante e o código para ver, remarcar ou cancelar suas reservas depois">
                   <Input id="bk-email" type="email" autoComplete="email" value={email} maxLength={180} onChange={(e) => setEmail(e.target.value)} />
                 </Field>
                 {error ? (

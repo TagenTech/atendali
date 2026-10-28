@@ -83,10 +83,13 @@ export function refreshSession(): Promise<AuthResponse | null> {
   return refreshing;
 }
 
-export async function api<T>(path: string, init: RequestInit = {}, retry = true): Promise<T> {
+/** `portalToken`: sessão da área "Minhas reservas" (cliente, sem conta): vale no lugar do login e nunca derruba a sessão do app. */
+export async function api<T>(path: string, rawInit: RequestInit & { portalToken?: string } = {}, retry = true): Promise<T> {
+  const { portalToken, ...init } = rawInit;
   const headers = new Headers(init.headers);
   if (init.body && !headers.has('content-type')) headers.set('content-type', 'application/json');
-  if (accessToken) headers.set('authorization', `Bearer ${accessToken}`);
+  if (portalToken) headers.set('authorization', `Bearer ${portalToken}`);
+  else if (accessToken) headers.set('authorization', `Bearer ${accessToken}`);
   if (activeOrgId && !headers.has(ORG_HEADER)) headers.set(ORG_HEADER, activeOrgId);
 
   let res: Response;
@@ -96,9 +99,10 @@ export async function api<T>(path: string, init: RequestInit = {}, retry = true)
     throw new ApiError(0, 'Sem conexão. Confira sua internet.');
   }
 
-  if (res.status === 401 && retry && !path.startsWith('/auth/')) {
+  // Rotas públicas (agendamento, "Minhas reservas") têm 401 próprio: não é sessão do app vencida, então não renova nem desloga.
+  if (res.status === 401 && retry && !portalToken && !path.startsWith('/auth/') && !path.startsWith('/public/')) {
     const session = await refreshSession().catch(() => undefined);
-    if (session) return api<T>(path, init, false);
+    if (session) return api<T>(path, rawInit, false);
     // undefined = servidor indisponível: devolve o erro sem deslogar.
     if (session === null) {
       accessToken = null;

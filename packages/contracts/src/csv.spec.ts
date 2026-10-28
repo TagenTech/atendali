@@ -37,24 +37,26 @@ describe('parseBirthDate', () => {
 });
 
 describe('previewClientImport', () => {
-  const none = { phones: [] as string[], emails: [] as string[] };
-  it('valida linha a linha e deduplica por celular', () => {
+  const none = { people: [] as { phone: string; name: string }[], emails: [] as string[] };
+  it('valida linha a linha e deduplica por celular e nome (irmãos podem dividir o telefone)', () => {
     const csv = [
       'Nome;Celular;E-mail;Nascimento;Etiquetas;Observações',
       'Ana Souza;(11) 98888-7777;ANA@x.com;05/03/1990;vip|retorno;alergia a látex',
-      'Ana de novo;11988887777;;;;',
+      'ANA  souza;11988887777;;;;',
       'Beto;11977776666;beto@x.com;;;',
       ';11966665555;;;;',
       'Caio;123;;;;',
       'Duda;;duda@;;;',
       'Eva;;;31/02/2000;;',
       'Fábio;11955554444;;;;',
+      'Filha da Ana;11988887777;;;;',
     ].join('\n');
-    const p = previewClientImport(csv, { phones: ['11977776666'], emails: [] });
+    const p = previewClientImport(csv, { people: [{ phone: '11977776666', name: 'beto' }], emails: [] });
     expect(p.fatal).toBeNull();
-    expect(p.counts).toEqual({ ok: 2, duplicated: 2, errors: 4, total: 8 });
+    expect(p.counts).toEqual({ ok: 3, duplicated: 2, errors: 4, total: 9 });
+    expect(p.rows[8]).toMatchObject({ status: 'OK', label: 'Filha da Ana' });
     expect(p.rows[0].data).toMatchObject({ phone: '11988887777', email: 'ana@x.com', birthDate: '1990-03-05', tags: ['vip', 'retorno'], notes: 'alergia a látex' });
-    expect(p.rows[1]).toMatchObject({ status: 'DUPLICADO', reason: 'Celular já cadastrado', line: 3 });
+    expect(p.rows[1]).toMatchObject({ status: 'DUPLICADO', reason: 'Já cadastrado (mesmo celular e nome)', line: 3 });
     expect(p.rows[2].status).toBe('DUPLICADO');
     expect(p.rows.filter((r) => r.status === 'ERRO').map((r) => r.reason)).toEqual([
       'Falta o nome',
@@ -64,7 +66,7 @@ describe('previewClientImport', () => {
     ]);
   });
   it('sem celular, deduplica por e-mail', () => {
-    const p = previewClientImport('nome,email\nA,a@x.com\nB,A@x.com\nC,c@x.com', { phones: [], emails: ['c@x.com'] });
+    const p = previewClientImport('nome,email\nA,a@x.com\nB,A@x.com\nC,c@x.com', { people: [], emails: ['c@x.com'] });
     expect(p.rows.map((r) => r.status)).toEqual(['OK', 'DUPLICADO', 'DUPLICADO']);
   });
   it('erros gerais do arquivo', () => {

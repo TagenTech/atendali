@@ -2,6 +2,7 @@
  * CSV: leitura (importação de clientes) e escrita segura (planilha não executa fórmula).
  */
 import { isIsoDate } from './dates';
+import { personKey } from './guardian';
 import { isValidPhone, normalizePhone } from './phone';
 
 /** Detecta o separador (; , ou tab) pela primeira linha, ignorando o que está entre aspas. */
@@ -142,7 +143,7 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * Valida o arquivo linha a linha. `existingPhones`/`existingEmails` são do negócio (só dígitos / minúsculas);
  * quem repete um celular (no arquivo ou no negócio) é ignorado. Sem celular, repete-se pelo e-mail.
  */
-export function previewClientImport(csv: string, existing: { phones: Iterable<string>; emails: Iterable<string> }): ClientImportPreview {
+export function previewClientImport(csv: string, existing: { people: Iterable<{ phone: string; name: string }>; emails: Iterable<string> }): ClientImportPreview {
   const empty = (fatal: string): ClientImportPreview => ({ columns: [], rows: [], counts: { ok: 0, duplicated: 0, errors: 0, total: 0 }, fatal });
   if (csv.length > CLIENT_IMPORT_MAX_CHARS) return empty('Arquivo grande demais. Divida em partes menores.');
   const table = parseCsv(csv);
@@ -155,7 +156,8 @@ export function previewClientImport(csv: string, existing: { phones: Iterable<st
   if (table.length - 1 > CLIENT_IMPORT_MAX_ROWS) return empty(`Máximo de ${CLIENT_IMPORT_MAX_ROWS} linhas por arquivo.`);
   const columns = (Object.keys(col) as (keyof typeof col)[]).filter((k) => col[k] >= 0).sort((a, b) => col[a] - col[b]);
 
-  const phones = new Set(existing.phones);
+  // O mesmo telefone pode ser de mais de um paciente (irmãos): duplicado é telefone + nome.
+  const people = new Set([...existing.people].map((p) => personKey(p.phone, p.name)));
   const emails = new Set(existing.emails);
   const get = (r: string[], key: keyof typeof col) => (col[key] >= 0 ? (r[col[key]] ?? '').trim() : '');
 
@@ -178,12 +180,12 @@ export function previewClientImport(csv: string, existing: { phones: Iterable<st
     const tags = [...new Set(get(r, 'tags').split(/[|,;]/).map((t) => t.trim().slice(0, 30)).filter(Boolean))].slice(0, 10);
 
     const data: ClientImportData = { name, phone, email, birthDate, tags, notes };
-    const dupPhone = phone ? phones.has(phone) : false;
+    const dupPhone = phone ? people.has(personKey(phone, name)) : false;
     const dupEmail = !phone && email ? emails.has(email) : false;
     if (dupPhone || dupEmail) {
-      return { line, status: 'DUPLICADO', reason: dupPhone ? 'Celular já cadastrado' : 'E-mail já cadastrado', data, label: name };
+      return { line, status: 'DUPLICADO', reason: dupPhone ? 'Já cadastrado (mesmo celular e nome)' : 'E-mail já cadastrado', data, label: name };
     }
-    if (phone) phones.add(phone);
+    if (phone) people.add(personKey(phone, name));
     if (email) emails.add(email);
     return { line, status: 'OK', reason: null, data, label: name };
   });

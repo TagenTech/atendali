@@ -21,6 +21,7 @@ Repositório: <https://github.com/TagenTech/skedulei> (ainda **sem push**; só h
 | 9 | 🟡 Captcha (Cloudflare Turnstile) na página pública e no cadastro | a construir | [§6](#6-recomendações-de-segurança-pós-lançamento-imediato) |
 | 10 | 🟡 Monitoramento (Sentry, uptime), backups e teste de restauração | a configurar | [§8](#8-operação) |
 | 11 | 🟡 Teste de invasão leve (OWASP ZAP) em homologação | a fazer | [§6](#6-recomendações-de-segurança-pós-lançamento-imediato) |
+| 11b | 🟡 "Minhas reservas" por **WhatsApp/SMS** (hoje o código vai só por e-mail cadastrado); quem marca sem e-mail não consegue usar | Fase 4 | [LACUNAS.md](LACUNAS.md#1-não-sei-meus-horários-e-não-consigo-cancelar-) |
 | 12 | 🟢 Fase 4 do produto: cobrança/pagamento online, lembretes por WhatsApp, jobs agendados, recorrência do clube | roadmap | [PLANO.md](PLANO.md) |
 
 > Não existe hoje **agendamento a partir de uma cobrança** (link de pagamento/sinal): depende do gateway de

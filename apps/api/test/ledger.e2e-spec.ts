@@ -299,7 +299,7 @@ describe('Contas, DRE, fluxo de caixa e importação (e2e)', () => {
     const csv = [
       'Nome;Celular;E-mail;Nascimento;Etiquetas;Observações',
       'Ana Souza;(11) 98888-7777;ana@x.com;05/03/1990;vip|retorno;alergia a látex',
-      'Ana de novo;11988887777;;;;',
+      'ANA  Souza;11988887777;;;;',
       'Beto Lima;11977776666;;;;',
       ';11966665555;;;;',
       'Caio;123;;;;',
@@ -320,7 +320,7 @@ describe('Contas, DRE, fluxo de caixa e importação (e2e)', () => {
       const clients = (await http.get('/v1/org/clients').set(inOrg(dona)).expect(200)).body as { name: string; phone: string; tags: string[] }[];
       expect(clients).toHaveLength(3);
       expect(clients.find((c) => c.name === 'Ana Souza')).toMatchObject({ phone: '11988887777', tags: ['vip', 'retorno'] });
-      // Segunda importação do mesmo arquivo: ninguém novo (dedupe por celular dentro do negócio).
+      // Segunda importação do mesmo arquivo: ninguém novo (dedupe por celular + nome dentro do negócio).
       const again = await http.post('/v1/org/clients/import').set(inOrg(dona)).send({ csv }).expect(200);
       expect(again.body).toMatchObject({ imported: 0, duplicated: 4, errors: 2 });
       expect((await http.get('/v1/org/clients').set(inOrg(dona)).expect(200)).body).toHaveLength(3);

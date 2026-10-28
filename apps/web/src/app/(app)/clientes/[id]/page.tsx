@@ -9,8 +9,11 @@ import {
   todayIn,
   whatsappLink,
   zonedParts,
+  ageLabel,
+  GUARDIAN_RELATIONSHIP_LABEL,
 } from '@skedulei/contracts';
-import { CalendarPlus, Mail, MessageCircle, Pencil, Phone, Trash2 } from 'lucide-react';
+import { CalendarPlus, Mail, MessageCircle, Pencil, Phone, Trash2, Users } from 'lucide-react';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import * as React from 'react';
 import { toast } from 'sonner';
@@ -78,7 +81,33 @@ export default function ClientePage() {
                 <Mail className="size-4 text-muted-foreground" /> {c.email}
               </p>
             ) : null}
-            {c.birthDate ? <p className="text-sm text-muted-foreground">Nascimento: {formatDateShort(c.birthDate)}</p> : null}
+            {c.birthDate ? (
+              <p className="text-sm text-muted-foreground">
+                Nascimento: {formatDateShort(c.birthDate)}
+                {hydrated && ageLabel(c.birthDate, todayIn(org.timezone)) ? ` · ${ageLabel(c.birthDate, todayIn(org.timezone))}` : ''}
+              </p>
+            ) : null}
+            {c.guardianName ? (
+              <p className="flex items-center gap-2 text-sm">
+                <Users className="size-4 text-muted-foreground" />
+                <span>
+                  Responsável: <strong>{c.guardianName}</strong>
+                  {c.guardianRelationship ? ` (${GUARDIAN_RELATIONSHIP_LABEL[c.guardianRelationship].toLowerCase()})` : ''}
+                </span>
+              </p>
+            ) : null}
+            {c.relatives.length ? (
+              <div className="space-y-1">
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Mesmo telefone</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {c.relatives.map((r) => (
+                    <Link key={r.id} href={`/clientes/${r.id}`} className="rounded-full bg-muted px-3 py-1 text-sm font-semibold hover:bg-primary-soft">
+                      {r.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             {c.tags.length ? (
               <div className="flex flex-wrap gap-1">
                 {c.tags.map((t) => (

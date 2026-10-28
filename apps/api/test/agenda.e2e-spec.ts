@@ -357,20 +357,20 @@ describe('Agenda, clientes e agendamento online (e2e)', () => {
     expect(reset.body.workingHours).toBeNull();
   });
 
-  it('agendamento online: o mesmo telefone mantém no máximo 3 horários futuros', async () => {
+  it('agendamento online: o mesmo telefone mantém no máximo 5 horários futuros', async () => {
     const corte = (await http.get(`/v1/public/orgs/${slug}`).expect(200)).body.services[0];
-    const offered = (await http.get(`/v1/public/orgs/${slug}/slots?date=${DAY}&serviceId=${corte.id}`).expect(200)).body.slots as { startsAt: string }[];
-    // Quatro horários livres sem encostar um no outro (o mesmo telefone não pode estar em dois lugares).
+    // Terça seguinte (sem nenhuma reserva): horários de hora em hora, para um não atrapalhar o outro.
+    const day = addDays(DAY, 7);
+    const offered = (await http.get(`/v1/public/orgs/${slug}/slots?date=${day}&serviceId=${corte.id}`).expect(200)).body.slots as { startsAt: string }[];
     const free: string[] = [];
     for (const s of offered) if (!free.length || new Date(s.startsAt).getTime() - new Date(free.at(-1)!).getTime() >= 60 * 60_000) free.push(s.startsAt);
-    expect(free.length).toBeGreaterThanOrEqual(4);
+    expect(free.length).toBeGreaterThanOrEqual(6);
     const phone = '11955550000';
-    for (const startsAt of free.slice(0, 3)) {
+    for (const startsAt of free.slice(0, 5)) {
       await http.post(`/v1/public/orgs/${slug}/bookings`).send({ serviceId: corte.id, startsAt, name: 'Acumuladora', phone }).expect(201);
     }
-    const blocked = await http.post(`/v1/public/orgs/${slug}/bookings`).send({ serviceId: corte.id, startsAt: free[3], name: 'Acumuladora', phone }).expect(409);
-    expect(blocked.body.message).toMatch(/3 horários marcados/);
-    // Outro telefone segue livre.
-    await http.post(`/v1/public/orgs/${slug}/bookings`).send({ serviceId: corte.id, startsAt: free[3], name: 'Outra Pessoa', phone: '11955551111' }).expect(201);
+    const blocked = await http.post(`/v1/public/orgs/${slug}/bookings`).send({ serviceId: corte.id, startsAt: free[5], name: 'Acumuladora', phone }).expect(409);
+    expect(blocked.body.message).toMatch(/5 horários marcados/);
+    // (O limite de 10 reservas/hora por IP já está quase no fim neste arquivo: o "outro telefone livre" é coberto em responsavel-reservas.)
   });
 });

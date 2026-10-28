@@ -1,6 +1,6 @@
 'use client';
 
-import type { ClientDto } from '@skedulei/contracts';
+import { GUARDIAN_RELATIONSHIP_LABEL, GUARDIAN_RELATIONSHIPS, type ClientDto, type GuardianRelationship } from '@skedulei/contracts';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,8 @@ export function ClientSheet({ client, onOpenChange, onSaved }: { client: ClientD
   const [phone, setPhone] = React.useState(client?.phone ?? '');
   const [email, setEmail] = React.useState(client?.email ?? '');
   const [birthDate, setBirthDate] = React.useState(client?.birthDate ?? '');
+  const [guardianName, setGuardianName] = React.useState(client?.guardianName ?? '');
+  const [relationship, setRelationship] = React.useState<GuardianRelationship | ''>(client?.guardianRelationship ?? '');
   const [notes, setNotes] = React.useState(client?.notes ?? '');
   const [tags, setTags] = React.useState(client?.tags.join(', ') ?? '');
   const [nameError, setNameError] = React.useState<string>();
@@ -35,6 +37,8 @@ export function ClientSheet({ client, onOpenChange, onSaved }: { client: ClientD
           phone: phone || null,
           email: email.trim() || null,
           birthDate: birthDate || null,
+          guardianName: guardianName.trim() || null,
+          guardianRelationship: guardianName.trim() ? relationship || null : null,
           notes: notes.trim() || null,
           tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
         },
@@ -62,6 +66,21 @@ export function ClientSheet({ client, onOpenChange, onSaved }: { client: ClientD
           </Field>
           <Field label="Nascimento" htmlFor="cl-birth">
             <Input id="cl-birth" type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
+          </Field>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Responsável (opcional)" htmlFor="cl-guardian" hint="Para criança ou quem o responsável acompanha">
+            <Input id="cl-guardian" value={guardianName} maxLength={120} onChange={(e) => setGuardianName(e.target.value)} />
+          </Field>
+          <Field label="Parentesco" htmlFor="cl-rel">
+            <select id="cl-rel" value={relationship} disabled={!guardianName.trim()} onChange={(e) => setRelationship(e.target.value as GuardianRelationship | '')} className="h-13 w-full rounded-2xl border-2 border-input bg-card px-3 disabled:opacity-60">
+              <option value="">—</option>
+              {GUARDIAN_RELATIONSHIPS.map((r) => (
+                <option key={r} value={r}>
+                  {GUARDIAN_RELATIONSHIP_LABEL[r]}
+                </option>
+              ))}
+            </select>
           </Field>
         </div>
         <Field label="Etiquetas" htmlFor="cl-tags" hint="Separadas por vírgula (ex.: vip, indicação)">

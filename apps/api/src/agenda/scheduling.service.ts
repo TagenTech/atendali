@@ -119,10 +119,12 @@ export class SchedulingService {
       members: Pick<Member, 'id' | 'workingHours'>[];
       notBefore?: number;
       stepMinutes?: number;
+      /** Remarcação: o próprio agendamento não pode bloquear o novo horário. */
+      excludeAppointmentId?: string;
     },
   ): Promise<SlotsDto> {
     const { start, end } = dayRange(p.date, p.unit.timezone);
-    const busy = await this.busy(em, p.organizationId, p.unit.id, p.members.map((m) => m.id), start, end);
+    const busy = await this.busy(em, p.organizationId, p.unit.id, p.members.map((m) => m.id), start, end, p.excludeAppointmentId);
     const byStart = new Map<string, string[]>();
     for (const { id: memberId, workingHours } of p.members) {
       for (const s of availableSlots({

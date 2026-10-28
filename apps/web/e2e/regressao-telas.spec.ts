@@ -58,6 +58,15 @@ test('páginas públicas abrem limpas: agendar, reserva inexistente, avaliar inv
   const seen = watch(anon);
   await anon.goto(`/${org.slug}`);
   await expect(anon.getByRole('heading', { name: /Regressão/ })).toBeVisible();
+  await anon.goto(`/${org.slug}/minhas-reservas`);
+  await expect(anon.getByRole('heading', { name: 'Minhas reservas' })).toBeVisible();
+  // Código errado/sem cadastro não derruba nada nem manda para o login (a rota pública tem 401 próprio).
+  await anon.getByLabel('Celular (WhatsApp)').fill('11900001111');
+  await anon.getByRole('button', { name: 'Enviar código' }).click();
+  await anon.getByLabel('Código de 6 números').fill('123456');
+  await anon.getByRole('button', { name: 'Ver minhas reservas' }).click();
+  await expect(anon.getByText(/Código inválido ou expirado/)).toBeVisible();
+  await expect(anon).toHaveURL(/minhas-reservas/);
   await anon.goto('/reserva/token-inexistente');
   await expect(anon.getByRole('heading', { name: 'Reserva não encontrada' })).toBeVisible();
   await anon.goto('/avaliar/token-inexistente');
