@@ -46,6 +46,16 @@ Permite ao cliente rever, remarcar e cancelar sem conta. Desenho de segurança (
 
 **Carrinho** (`bookings/group`): limite de 10 reservas/h por IP, no máximo 5 itens, teto de 5 horários futuros por telefone contando cada item, tudo ou nada na mesma transação, e link de grupo só por hash (`group_token_hash`). Sem itens sobrepostos nem horários fora da grade.
 
+### Novo: módulo clínico — dado de saúde (28/10/2026)
+
+Prontuário, anamnese e termo (`apps/api/src/clinico`, testes em `clinico.e2e-spec.ts` e `clinico.spec.ts`):
+- **Cifra e mínimo acesso**: conteúdo e respostas em AES-256-GCM; só `CLINICAL_RECORDS` (dono e profissional) lê. Gerente e recepção não leem; recepção só envia o link do documento.
+- **Rastro de acesso (LGPD)**: abrir prontuário/documento, criar e apagar anotação e preencher documento gravam evento (negócio, quem, paciente, registro). Hoje ficam na trilha de segurança (consulta por banco); uma tela de consulta para o dono é a evolução (ver P2).
+- **Imutabilidade prática**: a anotação só pode ser apagada pelo autor em até 24 h (erro de digitação); depois fica. Falta o **adendo** (corrigir sem apagar).
+- **Link do paciente**: código de 192 bits só como hash, 7 dias, preenchimento único, limite de 20 envios/h por IP; depois de preenchido o link não mostra mais nada. O servidor guarda **cópia** do modelo no envio (mudar o modelo não altera o que o paciente viu/assinou).
+- **Aceite do termo**: nome digitado + data/hora + IP (assinatura simples, **não** ICP-Brasil).
+- **Isolamento**: RLS e filtro por negócio; testes de que outro negócio não lê nem altera.
+
 ### Em aberto (decisão ou infraestrutura)
 
 | # | OWASP | Achado | Sev. | O que fazer |

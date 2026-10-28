@@ -160,6 +160,12 @@ export const SecurityEventType = {
   MEMBER_JOINED: 'MEMBER_JOINED',
   MEMBER_ROLE_CHANGED: 'MEMBER_ROLE_CHANGED',
   MEMBER_REMOVED: 'MEMBER_REMOVED',
+  RECORD_VIEWED: 'RECORD_VIEWED',
+  RECORD_CREATED: 'RECORD_CREATED',
+  RECORD_DELETED: 'RECORD_DELETED',
+  DOCUMENT_SENT: 'DOCUMENT_SENT',
+  DOCUMENT_VIEWED: 'DOCUMENT_VIEWED',
+  DOCUMENT_COMPLETED: 'DOCUMENT_COMPLETED',
 } as const;
 export type SecurityEventType = (typeof SecurityEventType)[keyof typeof SecurityEventType];
 
@@ -188,6 +194,12 @@ export const SECURITY_EVENT_LABEL: Record<SecurityEventType, string> = {
   MEMBER_JOINED: 'Entrou em uma equipe',
   MEMBER_ROLE_CHANGED: 'Perfil de acesso alterado',
   MEMBER_REMOVED: 'Pessoa removida da equipe',
+  RECORD_VIEWED: 'Prontuário aberto',
+  RECORD_CREATED: 'Anotação no prontuário',
+  RECORD_DELETED: 'Anotação do prontuário apagada',
+  DOCUMENT_SENT: 'Documento enviado ao paciente',
+  DOCUMENT_VIEWED: 'Documento do paciente aberto',
+  DOCUMENT_COMPLETED: 'Documento preenchido',
 };
 
 export interface SecurityEventDto {

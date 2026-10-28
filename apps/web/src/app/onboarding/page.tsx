@@ -7,6 +7,7 @@ import {
   FEATURES,
   formatDuration,
   HEALTH_FEATURES,
+  isFeatureAvailable,
   Role,
   ROLE_INFO,
   SEGMENT_PRESETS,
@@ -75,7 +76,7 @@ export default function OnboardingPage() {
     // Trocar de segmento recomeça serviços e módulos com os padrões dele.
     if (s !== segment) {
       setServices(servicesFor(s));
-      setFeatures(SEGMENT_PRESETS[s].features);
+      setFeatures(SEGMENT_PRESETS[s].features.filter(isFeatureAvailable));
     }
     setSegment(s);
     setError(null);
@@ -363,8 +364,9 @@ export default function OnboardingPage() {
                       type="button"
                       role="switch"
                       aria-checked={on}
+                      disabled={!isFeatureAvailable(f)}
                       onClick={() => setFeatures(on ? features.filter((x) => x !== f) : [...features, f])}
-                      className={cn('flex items-start gap-3 rounded-2xl border-2 p-3.5 text-left', on ? 'border-primary bg-primary-soft' : 'border-input bg-card hover:bg-muted')}
+                      className={cn('flex items-start gap-3 rounded-2xl border-2 p-3.5 text-left', on ? 'border-primary bg-primary-soft' : 'border-input bg-card hover:bg-muted', !isFeatureAvailable(f) && 'cursor-not-allowed opacity-60 hover:bg-card')}
                     >
                       <span className={cn('mt-0.5 grid size-5 shrink-0 place-items-center rounded-md border-2', on ? 'border-primary bg-primary text-primary-foreground' : 'border-input')}>
                         {on ? <Check className="size-3.5" strokeWidth={3} /> : null}
@@ -372,6 +374,7 @@ export default function OnboardingPage() {
                       <span>
                         <span className="flex items-center gap-1.5 font-semibold">
                           {FEATURE_INFO[f].label}
+                          {!isFeatureAvailable(f) ? <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-bold text-muted-foreground">Em breve</span> : null}
                           {HEALTH_FEATURES.includes(f) ? <ShieldAlert className="size-4 text-warning" aria-label="Dado de saúde (LGPD)" /> : null}
                         </span>
                         <span className="block text-sm text-muted-foreground">{FEATURE_INFO[f].description}</span>

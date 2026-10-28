@@ -14,6 +14,7 @@ import { MailModule } from './mail/mail.module';
 import { SecurityModule } from './security/security.module';
 import { UsersModule } from './users/users.module';
 import { getDatabaseOptions } from './database/db-options';
+import { ClinicoModule } from './clinico/clinico.module';
 import { ContactModule } from './contact/contact.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { OrgGuard } from './organizations/org-context';
@@ -53,6 +54,7 @@ import { FidelizacaoModule } from './fidelizacao/fidelizacao.module';
     AgendaModule,
     StockModule,
     FidelizacaoModule,
+    ClinicoModule,
     FinanceModule,
     ContactModule,
   ],

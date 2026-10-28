@@ -6,6 +6,7 @@ import {
   FEATURE_INFO,
   FEATURES,
   HEALTH_FEATURES,
+  isFeatureAvailable,
   PAYMENT_METHOD_LABEL,
   Permission,
   SEGMENT_PRESETS,
@@ -22,6 +23,7 @@ import * as React from 'react';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/layout/page-header';
 import { SegmentIcon } from '@/components/layout/segment-icon';
+import { TemplatesEditor } from '@/components/clinico/templates-editor';
 import { BrandingEditor } from '@/components/org/branding-editor';
 import { UnitSheet } from '@/components/org/unit-sheet';
 import { Button } from '@/components/ui/button';
@@ -40,7 +42,7 @@ import { cn } from '@/lib/utils';
 
 function Section({ title, description, children, action }: { title: string; description?: string; children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <section className="grid gap-4 xl:grid-cols-[16rem_minmax(0,1fr)] xl:gap-8">
+    <section className="grid grid-cols-[minmax(0,1fr)] gap-4 xl:grid-cols-[16rem_minmax(0,1fr)] xl:gap-8">
       <div className="flex items-start justify-between gap-3 xl:block">
         <div>
           <h2 className="text-lg font-extrabold">{title}</h2>
@@ -192,17 +194,19 @@ function Modules() {
             type="button"
             role="switch"
             aria-checked={on}
-            disabled={update.isPending}
+            disabled={update.isPending || !isFeatureAvailable(f)}
             onClick={() => toggle(f)}
             className={cn(
               'flex items-start gap-3 rounded-2xl border-2 p-3.5 text-left transition-colors',
               on ? 'border-primary bg-primary-soft' : 'border-input bg-card hover:bg-muted',
+              !isFeatureAvailable(f) && 'cursor-not-allowed opacity-60 hover:bg-card',
             )}
           >
             <ToggleTrack on={on} className="mt-0.5" />
             <span className="min-w-0">
               <span className="flex items-center gap-1.5 font-semibold">
                 {FEATURE_INFO[f].label}
+                {!isFeatureAvailable(f) ? <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-bold text-muted-foreground">Em breve</span> : null}
                 {HEALTH_FEATURES.includes(f) ? <ShieldAlert className="size-4 text-warning" aria-label="Dado de saúde (LGPD)" /> : null}
               </span>
               <span className="block text-sm text-muted-foreground">{FEATURE_INFO[f].description}</span>
@@ -377,6 +381,11 @@ export default function ConfiguracoesPage() {
         {org.features.includes(FeatureKey.FIDELIDADE) ? (
           <Section title="Pontos de fidelidade" description="Quanto cada real pago rende e quanto vale um resgate. Vale para as próximas comandas.">
             <Loyalty />
+          </Section>
+        ) : null}
+        {org.features.includes(FeatureKey.ANAMNESE) || org.features.includes(FeatureKey.TERMOS) ? (
+          <Section title="Fichas e termos" description="Modelos de anamnese e de termo de consentimento que você envia ao paciente. Mudar um modelo não altera o que já foi enviado.">
+            <TemplatesEditor />
           </Section>
         ) : null}
         <Section title="Módulos" description="Ligue só o que o seu negócio usa — o resto some das telas. Os marcados com escudo guardam dados de saúde.">

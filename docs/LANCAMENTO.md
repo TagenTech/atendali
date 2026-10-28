@@ -143,6 +143,7 @@ O Skedulei trata **dado de saúde** (LGPD art. 11) em nome das clínicas. Antes 
 - Base legal e consentimento para dado de saúde; prazo de retenção; canal do titular e **encarregado (DPO)**.
 - Telas já existentes que ajudam: excluir/anonimizar cliente (histórico permanece sem identificação), excluir minha conta,
   observações de saúde cifradas, CPF cifrado e nunca devolvido inteiro ao navegador.
+- **Prontuário eletrônico**: o módulo entrega o mínimo (anotações cifradas, anamnese, termo com aceite simples). Para **dispensar o prontuário em papel**, conselhos como CFM/CRO e a Lei 13.787/2018 exigem requisitos de certificação e assinatura digital (ICP-Brasil); valide com o jurídico antes de prometer isso às clínicas.
 - Plano de resposta a incidentes (quem avisa a ANPD e os titulares em até 3 dias úteis).
 
 ## 8. Operação

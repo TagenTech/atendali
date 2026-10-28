@@ -20,6 +20,8 @@ import { toast } from 'sonner';
 import { ClientSheet } from '@/components/agenda/client-sheet';
 import { NewAppointmentSheet } from '@/components/agenda/new-appointment-sheet';
 import { STATUS_DOT } from '@/components/agenda/status';
+import { ClientDocuments } from '@/components/clinico/client-documents';
+import { ClientRecords } from '@/components/clinico/client-records';
 import { ClientRetention } from '@/components/org/client-retention';
 import { FormTopBar, useBack } from '@/components/layout/form-page';
 import { Button } from '@/components/ui/button';
@@ -140,6 +142,8 @@ export default function ClientePage() {
             <Stat label="Última visita" value={c.stats.lastVisit ? formatDateShort(zonedParts(new Date(c.stats.lastVisit), tz).date, false) : '—'} />
           </div>
           <ClientRetention clientId={c.id} />
+          <ClientDocuments clientId={c.id} clientName={c.name} phone={c.phone} />
+          <ClientRecords clientId={c.id} />
           {canEdit ? (
             <Button
               variant="danger"

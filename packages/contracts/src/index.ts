@@ -21,3 +21,4 @@ export * from './retention';
 export * from './branding';
 export * from './password';
 export * from './guardian';
+export * from './clinical';

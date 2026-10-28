@@ -202,8 +202,15 @@ export function vocabularyFor(segment: Segment): Vocabulary {
   return SEGMENT_PRESETS[segment].vocabulary;
 }
 
-/** Mantém só módulos conhecidos, sem repetição e na ordem do catálogo. */
+/**
+ * Módulos que ainda não têm tela (Fase 5 do plano): aparecem como "Em breve", ficam desligados e a API não deixa ligar.
+ * Quando um módulo for construído, tire-o desta lista.
+ */
+export const COMING_SOON_FEATURES: readonly Feature[] = ['SALAS', 'EQUIPAMENTOS', 'FOTOS', 'TELECONSULTA', 'CONVENIOS'];
+export const isFeatureAvailable = (f: Feature) => !COMING_SOON_FEATURES.includes(f);
+
+/** Mantém só módulos conhecidos e disponíveis, sem repetição e na ordem do catálogo. */
 export function normalizeFeatures(list: readonly string[]): Feature[] {
   const set = new Set(list);
-  return FEATURES.filter((f) => set.has(f));
+  return FEATURES.filter((f) => set.has(f) && isFeatureAvailable(f));
 }
