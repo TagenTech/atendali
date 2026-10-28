@@ -1,1 +1,1 @@
-# atendali
+# skedulei
