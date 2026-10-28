@@ -1,8 +1,10 @@
 name: Migrations
 
+# Aplica as migrations no banco de PRODUÇÃO (Supabase). Por isso roda só na `main` (ou à mão, em "Run workflow"):
+# um push na `develop` nunca mexe no banco de produção.
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -12,19 +14,38 @@ jobs:
   migrate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      DATABASE_URL: ${{ secrets.SUPABASE_MIGRATIONS_URL }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      # Sem o segredo configurado (Settings → Secrets and variables → Actions → SUPABASE_MIGRATIONS_URL)
+      # não há banco para migrar: o fluxo termina verde, com um aviso, em vez de tentar conectar em localhost.
+      - name: Conferir o segredo do banco
+        id: cfg
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Migrations puladas::O segredo SUPABASE_MIGRATIONS_URL ainda não está configurado (veja docs/DEPLOY_VERCEL_SUPABASE.md, seção 3)."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.cfg.outputs.configured == 'true'
+        uses: actions/checkout@v4
+      - if: steps.cfg.outputs.configured == 'true'
+        uses: pnpm/action-setup@v4
+      - if: steps.cfg.outputs.configured == 'true'
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @skedulei/contracts build
-      - run: pnpm --filter @skedulei/api build
+      - if: steps.cfg.outputs.configured == 'true'
+        run: pnpm install --frozen-lockfile
+      - if: steps.cfg.outputs.configured == 'true'
+        run: pnpm --filter @skedulei/contracts build
+      - if: steps.cfg.outputs.configured == 'true'
+        run: pnpm --filter @skedulei/api build
       - name: Aplicar migrations no Supabase
+        if: steps.cfg.outputs.configured == 'true'
         run: pnpm --filter @skedulei/api migration:run:prod
         env:
-          DATABASE_URL: ${{ secrets.SUPABASE_MIGRATIONS_URL }}
           DB_SSL: 'true'
           NODE_ENV: production

@@ -12,7 +12,7 @@ Supabase pg_cron + pg_net ── a cada minuto/hora/dia ──→ POST /v1/inter
 
 - Tabelas com prefixo `skedulei_` (inclusive `skedulei_migrations`), RLS ligado e sem acesso para `anon`/`authenticated`: a API REST do Supabase não enxerga nada.
 - Os `@Cron` ficam desligados na Vercel (`SCHEDULER_ENABLED=false`); quem dispara é o pg_cron ([deploy/supabase/cron.sql](../deploy/supabase/cron.sql)).
-- Migrations rodam no GitHub Actions ([migrate.yml](../.github/workflows/migrate.yml)) a cada push na `main`, não na subida da API.
+- Migrations rodam no GitHub Actions ([migrate.yml](../.github/workflows/migrate.yml)) a cada push na `main` (nunca na `develop`, que não toca o banco de produção), não na subida da API. Sem o segredo `SUPABASE_MIGRATIONS_URL` o fluxo termina verde, com um aviso "Migrations puladas".
 - Plano Hobby da Vercel é para uso não comercial: ao começar a cobrar a licença, migre para o Pro.
 
 ## 1. Cloudflare
