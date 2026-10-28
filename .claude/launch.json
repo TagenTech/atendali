@@ -1,0 +1,96 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "api",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter",
+        "@agendei/api",
+        "start:dev"
+      ],
+      "port": 3200
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter",
+        "@agendei/web",
+        "dev"
+      ],
+      "port": 3201
+    },
+    {
+      "name": "web-prod",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "apps/web/.next/standalone/apps/web/server.js"
+      ],
+      "env": {
+        "PORT": "3201",
+        "HOSTNAME": "127.0.0.1",
+        "NODE_ENV": "production"
+      },
+      "port": 3201
+    },
+    {
+      "name": "web-3203",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter",
+        "@agendei/web",
+        "exec",
+        "next",
+        "dev",
+        "-p",
+        "3203"
+      ],
+      "port": 3203
+    },
+    {
+      "name": "e2e-api",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter",
+        "@agendei/api",
+        "exec",
+        "ts-node",
+        "-r",
+        "tsconfig-paths/register",
+        "src/main.ts"
+      ],
+      "port": 3210,
+      "env": {
+        "NODE_ENV": "test",
+        "PORT": "3210",
+        "DATABASE_URL": "postgres://postgres:postgres@localhost:5432/agendei_e2e_web",
+        "TYPEORM_SYNC": "true",
+        "TS_NODE_TRANSPILE_ONLY": "1",
+        "JWT_SECRET": "playwright-secret-playwright-secret-0001",
+        "DATA_ENCRYPTION_KEY": "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=",
+        "PUBLIC_WEB_URL": "http://localhost:3211",
+        "VAPID_PUBLIC_KEY": "",
+        "VAPID_PRIVATE_KEY": "",
+        "RESEND_API_KEY": "",
+        "GOOGLE_CLIENT_ID": "",
+        "MICROSOFT_CLIENT_ID": "",
+        "FACEBOOK_CLIENT_ID": "",
+        "SIGNUP_ENABLED": "true"
+      }
+    },
+    {
+      "name": "e2e-web",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd apps/web && pnpm exec next build && pnpm exec next start -p 3211"
+      ],
+      "port": 3211,
+      "env": {
+        "NEXT_DIST_DIR": ".next-e2e",
+        "API_URL": "http://localhost:3210"
+      }
+    }
+  ]
+}

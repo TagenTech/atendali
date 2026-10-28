@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  qualidade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: agendei_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Auditoria de dependências (falha em high/critical)
+        run: pnpm audit --prod --audit-level high
+      - run: pnpm --filter @agendei/contracts build
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - name: Testes ponta a ponta (Postgres real)
+        run: pnpm --filter @agendei/api test:e2e
+        env:
+          E2E_DATABASE_URL: postgres://postgres:postgres@localhost:5432/agendei_test
+      - run: pnpm build
+      - name: Navegador para os testes do web
+        run: pnpm --filter @agendei/web exec playwright install --with-deps chromium
+      - name: Testes no navegador (Playwright)
+        run: pnpm --filter @agendei/web test:e2e
+        env:
+          E2E_WEB_DATABASE_URL: postgres://postgres:postgres@localhost:5432/agendei_e2e_web
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report
+          retention-days: 7

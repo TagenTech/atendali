@@ -1,0 +1,93 @@
+# Produção: Postgres + API + Web + Caddy (HTTPS automático) + backup diário criptografado.
+#   cp .env.prod.example .env.prod   # preencha os segredos
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+#   docker compose -f docker-compose.prod.yml exec api node dist/scripts/create-user.js --name "Nome" --email voce@email.com --password "senha-forte"
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-agendei}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-agendei}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-agendei}']
+      interval: 10s
+      retries: 5
+
+  api:
+    build: { context: ., dockerfile: apps/api/Dockerfile }
+    restart: unless-stopped
+    depends_on:
+      postgres: { condition: service_healthy }
+    environment:
+      NODE_ENV: production
+      PORT: 3200
+      DATABASE_URL: postgres://${POSTGRES_USER:-agendei}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-agendei}
+      TYPEORM_SYNC: 'false'
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET}
+      CORS_ORIGINS: ''
+      PUBLIC_WEB_URL: https://${DOMAIN}
+      DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY:?defina DATA_ENCRYPTION_KEY}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:contato@agendei.app}
+      SIGNUP_ENABLED: ${SIGNUP_ENABLED:-true}
+      TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-1}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      MICROSOFT_CLIENT_ID: ${MICROSOFT_CLIENT_ID:-}
+      MICROSOFT_CLIENT_SECRET: ${MICROSOFT_CLIENT_SECRET:-}
+      FACEBOOK_CLIENT_ID: ${FACEBOOK_CLIENT_ID:-}
+      FACEBOOK_CLIENT_SECRET: ${FACEBOOK_CLIENT_SECRET:-}
+      TZ: America/Sao_Paulo
+
+  web:
+    build: { context: ., dockerfile: apps/web/Dockerfile }
+    restart: unless-stopped
+    depends_on: [api]
+    environment:
+      API_URL: http://api:3200
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    depends_on: [api, web]
+    environment:
+      DOMAIN: ${DOMAIN:?defina DOMAIN (ex.: aulas.seudominio.com.br)}
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  backup:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    depends_on: [postgres]
+    environment:
+      PGHOST: postgres
+      PGUSER: ${POSTGRES_USER:-agendei}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB:-agendei}
+      KEEP_DAYS: 14
+      # Backups criptografados (AES-256). Guarde esta senha fora do servidor!
+      BACKUP_PASSPHRASE: ${BACKUP_PASSPHRASE:?defina BACKUP_PASSPHRASE}
+    volumes:
+      - ./backups:/backups
+      - ./scripts/backup.sh:/backup.sh:ro
+    # Um dump criptografado por dia, guardando 14 dias.
+    entrypoint: ['/bin/sh', '-c', 'apk add --no-cache openssl >/dev/null && while true; do /bin/sh /backup.sh; sleep 86400; done']
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:

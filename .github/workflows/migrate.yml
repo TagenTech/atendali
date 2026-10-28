@@ -1,0 +1,30 @@
+name: Migrations
+
+on:
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @agendei/contracts build
+      - run: pnpm --filter @agendei/api build
+      - name: Aplicar migrations no Supabase
+        run: pnpm --filter @agendei/api migration:run:prod
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_MIGRATIONS_URL }}
+          DB_SSL: 'true'
+          NODE_ENV: production

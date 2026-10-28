@@ -1,0 +1,20 @@
+node_modules/
+dist/
+.next/
+.turbo/
+coverage/
+*.tsbuildinfo
+.env
+.env.local
+.DS_Store
+next-env.d.ts
+backups/
+.env.prod
+.next-e2e/
+playwright-report/
+test-results/
+.claude/settings.local.json
+*.log
+# Saídas locais com dados pessoais (ex.: painel de usuários)
+.local/
+videos/
