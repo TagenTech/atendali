@@ -12,6 +12,9 @@ import type {
   PortalSessionDto,
   PublicBookingDto,
   PublicBookingRequest,
+  PublicGroupBookingDto,
+  PublicGroupBookingRequest,
+  SequenceSlotsDto,
   RescheduleRequest,
   PublicOrgDto,
   SlotsDto,
@@ -54,6 +57,15 @@ export const publicSlots = (slug: string, p: { date: string; serviceId: string; 
   );
 export const publicBook = (slug: string, body: PublicBookingRequest) =>
   api<PublicBookingDto>(`/public/orgs/${encodeURIComponent(slug)}/bookings`, { method: 'POST', ...json(body) });
+export const publicSequence = (slug: string, date: string, serviceIds: string[]) =>
+  api<SequenceSlotsDto>(`/public/orgs/${encodeURIComponent(slug)}/slots/sequence?${new URLSearchParams({ date, serviceIds: serviceIds.join(',') })}`);
+export const publicBookGroup = (slug: string, body: PublicGroupBookingRequest) =>
+  api<PublicGroupBookingDto>(`/public/orgs/${encodeURIComponent(slug)}/bookings/group`, { method: 'POST', ...json(body) });
+export const publicGroup = (token: string) => api<PublicGroupBookingDto>(`/public/bookings/${encodeURIComponent(token)}/group`);
+export const publicGroupCancel = (token: string, itemId?: string) =>
+  api<PublicGroupBookingDto>(`/public/bookings/${encodeURIComponent(token)}/group/cancel`, { method: 'POST', ...json(itemId ? { itemId } : {}) });
+export const publicGroupReschedule = (token: string, body: RescheduleRequest) =>
+  api<PublicGroupBookingDto>(`/public/bookings/${encodeURIComponent(token)}/group/reschedule`, { method: 'POST', ...json(body) });
 export const publicBooking = (token: string) => api<PublicBookingDto>(`/public/bookings/${encodeURIComponent(token)}`);
 export const publicCancel = (token: string) => api<PublicBookingDto>(`/public/bookings/${encodeURIComponent(token)}/cancel`, { method: 'POST' });
 export const publicReschedule = (token: string, body: RescheduleRequest) =>

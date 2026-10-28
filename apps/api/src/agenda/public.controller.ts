@@ -3,7 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { Public } from '../common/decorators/public.decorator';
 import { BookingService } from './booking.service';
-import { PortalCodeDto, PortalVerifyDto, PublicBookingDto, PublicSlotsQueryDto, RescheduleDto } from './dto/agenda.dto';
+import { CancelGroupDto, PortalCodeDto, PortalVerifyDto, PublicBookingDto, PublicGroupBookingDto, PublicSlotsQueryDto, RescheduleDto, SequenceQueryDto } from './dto/agenda.dto';
 import { bearer, PortalService } from './portal.service';
 
 /** Agendamento online: página do negócio, horários livres e reserva — sem login. */
@@ -26,6 +26,38 @@ export class PublicBookingController {
   @Throttle({ default: { ttl: 60_000, limit: 60 } })
   slots(@Param('slug') slug: string, @Query() q: PublicSlotsQueryDto) {
     return this.booking.slots(slug, q);
+  }
+
+  @Get('orgs/:slug/slots/sequence')
+  @Throttle({ default: { ttl: 60_000, limit: 30 } })
+  sequence(@Param('slug') slug: string, @Query() q: SequenceQueryDto) {
+    return this.booking.sequenceSlots(slug, q.date, q.serviceIds.split(','));
+  }
+
+  @Post('orgs/:slug/bookings/group')
+  @Throttle({ default: { ttl: 3_600_000, limit: 10 } })
+  bookGroup(@Param('slug') slug: string, @Body() dto: PublicGroupBookingDto) {
+    return this.booking.bookGroup(slug, dto);
+  }
+
+  @Get('bookings/:token/group')
+  @Throttle({ default: { ttl: 60_000, limit: 30 } })
+  group(@Param('token') token: string) {
+    return this.booking.getGroup(token);
+  }
+
+  @Post('bookings/:token/group/cancel')
+  @HttpCode(200)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  cancelGroup(@Param('token') token: string, @Body() dto: CancelGroupDto) {
+    return this.booking.cancelGroup(token, dto.itemId);
+  }
+
+  @Post('bookings/:token/group/reschedule')
+  @HttpCode(200)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  rescheduleGroup(@Param('token') token: string, @Body() dto: RescheduleDto) {
+    return this.booking.rescheduleGroup(token, dto);
   }
 
   @Post('orgs/:slug/bookings')

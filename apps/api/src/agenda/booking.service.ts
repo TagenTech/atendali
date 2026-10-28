@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createHash, randomBytes } from 'crypto';
+import { createHash, randomBytes, randomUUID } from 'crypto';
 import { DataSource, EntityManager, In, IsNull, MoreThan, Not } from 'typeorm';
 import {
   addDays,
@@ -11,13 +11,17 @@ import {
   publicName,
   ratingSummary,
   ONLINE_BOOKING,
+  anyOverlap,
+  planSequences,
   samePerson,
   normalizePersonName,
   todayIn,
   vocabularyFor,
   zonedParts,
   type PublicBookingDto as PublicBookingResponse,
+  type PublicGroupBookingDto as PublicGroupBookingResponse,
   type PublicOrgDto,
+  type SequenceSlotsDto,
   type SlotsDto,
 } from '@skedulei/contracts';
 import { Review } from '../fidelizacao/entities/review.entity';
@@ -26,7 +30,7 @@ import { Organization } from '../organizations/entities/organization.entity';
 import { brandingOf } from '../organizations/mappers';
 import { ServiceItem } from '../organizations/entities/service-item.entity';
 import type { Unit } from '../organizations/entities/unit.entity';
-import { PublicBookingDto, PublicSlotsQueryDto, RescheduleDto } from './dto/agenda.dto';
+import { PublicBookingDto, PublicGroupBookingDto, PublicSlotsQueryDto, RescheduleDto } from './dto/agenda.dto';
 import { Appointment } from './entities/appointment.entity';
 import { Client } from './entities/client.entity';
 import { SchedulingService } from './scheduling.service';
@@ -96,7 +100,7 @@ export class BookingService {
     };
   }
 
-  async slots(slug: string, q: PublicSlotsQueryDto, excludeAppointmentId?: string): Promise<SlotsDto> {
+  async slots(slug: string, q: PublicSlotsQueryDto, excludeAppointmentId?: string, stepMinutes: number = ONLINE_BOOKING.stepMinutes): Promise<SlotsDto> {
     const org = await this.org(slug);
     const em = this.db.manager;
     const unit = await this.scheduling.resolveUnit(em, org.id);
@@ -110,7 +114,7 @@ export class BookingService {
       durationMinutes: service.durationMinutes,
       members,
       notBefore: Date.now() + ONLINE_BOOKING.minLeadMinutes * 60_000,
-      stepMinutes: ONLINE_BOOKING.stepMinutes,
+      stepMinutes,
       excludeAppointmentId,
     });
   }
@@ -120,16 +124,7 @@ export class BookingService {
     const token = randomBytes(24).toString('base64url');
     const id = await this.db.transaction(async (em) => {
       const phone = normalizePhone(dto.phone);
-      // Sem login, quem quiser poderia ocupar a agenda toda: cada telefone mantém poucos horários futuros.
-      const family = await em.getRepository(Client).find({ where: { organizationId: org.id, phone } });
-      if (family.length) {
-        const active = await em.getRepository(Appointment).count({
-          where: { organizationId: org.id, clientId: In(family.map((c) => c.id)), source: AppointmentSource.ONLINE, status: In([AppointmentStatus.AGENDADO, AppointmentStatus.CONFIRMADO]), startsAt: MoreThan(new Date()) },
-        });
-        if (active >= ONLINE_BOOKING.maxActivePerPhone) {
-          throw new ConflictException(`Você já tem ${active} horários marcados. Cancele um para marcar outro ou fale com a clínica.`);
-        }
-      }
+      const family = await this.assertFamilyCap(em, org.id, phone, 1);
       const unit = await this.scheduling.resolveUnit(em, org.id);
       const service = await this.onlineService(em, org.id, dto.serviceId);
       const date = zonedParts(new Date(dto.startsAt), unit.timezone).date;
@@ -142,30 +137,7 @@ export class BookingService {
       const end = new Date(start.getTime() + service.durationMinutes * 60_000);
       await this.scheduling.assertFree(em, { organizationId: org.id, unitId: unit.id, memberId, start, end });
 
-      // O telefone é de quem marca (responsável); o paciente pode ser outra pessoa (filho, mãe…).
-      const clients = em.getRepository(Client);
-      const patientName = dto.patientName?.trim() || dto.name;
-      const forOther = !samePerson(patientName, dto.name);
-      let client = pickPatient(family, patientName, forOther);
-      if (!client) {
-        client = await clients.save(
-          clients.create({
-            organizationId: org.id,
-            name: patientName,
-            phone,
-            email: dto.email ?? null,
-            birthDate: dto.patientBirthDate ?? null,
-            guardianName: forOther ? dto.name : null,
-            guardianRelationship: forOther ? (dto.relationship ?? null) : null,
-          }),
-        );
-      } else {
-        const patch: Partial<Client> = {};
-        if (!client.email && dto.email) patch.email = dto.email;
-        if (!client.birthDate && dto.patientBirthDate) patch.birthDate = dto.patientBirthDate;
-        if (forOther && !client.guardianName) Object.assign(patch, { guardianName: dto.name, guardianRelationship: dto.relationship ?? null });
-        if (Object.keys(patch).length) await clients.update(client.id, patch);
-      }
+      const client = await this.resolvePatient(em, org.id, phone, family, dto);
 
       const saved = await em.getRepository(Appointment).save(
         em.getRepository(Appointment).create({
@@ -256,6 +228,220 @@ export class BookingService {
     });
   }
 
+  // ---------------------------------------------------------------- vários procedimentos (carrinho)
+
+  /** Teto de horários futuros por telefone (a família toda); `adding` = quantos esta reserva acrescenta. Devolve a família. */
+  private async assertFamilyCap(em: EntityManager, organizationId: string, phone: string, adding: number): Promise<Client[]> {
+    // Sem login, quem quiser poderia ocupar a agenda toda: cada telefone mantém poucos horários futuros.
+    const family = await em.getRepository(Client).find({ where: { organizationId, phone } });
+    if (family.length) {
+      const active = await em.getRepository(Appointment).count({
+        where: { organizationId, clientId: In(family.map((c) => c.id)), source: AppointmentSource.ONLINE, status: In([AppointmentStatus.AGENDADO, AppointmentStatus.CONFIRMADO]), startsAt: MoreThan(new Date()) },
+      });
+      if (active + adding > ONLINE_BOOKING.maxActivePerPhone) {
+        throw new ConflictException(
+          active >= ONLINE_BOOKING.maxActivePerPhone
+            ? `Você já tem ${active} horários marcados. Cancele um para marcar outro ou fale com a clínica.`
+            : `Você já tem ${active} horários marcados e o limite é ${ONLINE_BOOKING.maxActivePerPhone}. Marque menos procedimentos agora ou cancele algum.`,
+        );
+      }
+    }
+    return family;
+  }
+
+  /** O telefone é de quem marca (responsável); o paciente pode ser outra pessoa (filho, mãe…). */
+  private async resolvePatient(
+    em: EntityManager,
+    organizationId: string,
+    phone: string,
+    family: Client[],
+    dto: { name: string; email?: string | null; patientName?: string | null; patientBirthDate?: string | null; relationship?: PublicBookingDto['relationship'] },
+  ): Promise<Client> {
+    const clients = em.getRepository(Client);
+    const patientName = dto.patientName?.trim() || dto.name;
+    const forOther = !samePerson(patientName, dto.name);
+    let client = pickPatient(family, patientName, forOther);
+    if (!client) {
+      return clients.save(
+        clients.create({
+          organizationId,
+          name: patientName,
+          phone,
+          email: dto.email ?? null,
+          birthDate: dto.patientBirthDate ?? null,
+          guardianName: forOther ? dto.name : null,
+          guardianRelationship: forOther ? (dto.relationship ?? null) : null,
+        }),
+      );
+    }
+    const patch: Partial<Client> = {};
+    if (!client.email && dto.email) patch.email = dto.email;
+    if (!client.birthDate && dto.patientBirthDate) patch.birthDate = dto.patientBirthDate;
+    if (forOther && !client.guardianName) Object.assign(patch, { guardianName: dto.name, guardianRelationship: dto.relationship ?? null });
+    if (Object.keys(patch).length) {
+      await clients.update(client.id, patch);
+      client = { ...client, ...patch } as Client;
+    }
+    return client;
+  }
+
+  /** Todos os procedimentos um logo após o outro: os inícios possíveis do primeiro e quem atende cada um. */
+  async sequenceSlots(slug: string, date: string, serviceIds: string[]): Promise<SequenceSlotsDto> {
+    const org = await this.org(slug);
+    const em = this.db.manager;
+    const unit = await this.scheduling.resolveUnit(em, org.id);
+    this.assertBookableDate(date, unit.timezone);
+    const ids = [...new Set(serviceIds)];
+    if (ids.length < 2 || ids.length > ONLINE_BOOKING.maxItemsPerBooking) {
+      throw new BadRequestException(`Escolha de 2 a ${ONLINE_BOOKING.maxItemsPerBooking} procedimentos`);
+    }
+    const services = [];
+    for (const id of ids) services.push(await this.onlineService(em, org.id, id));
+    const members = await this.scheduling.bookableMembers(em, org.id);
+    const common = { organizationId: org.id, unit, date, members, notBefore: Date.now() + ONLINE_BOOKING.minLeadMinutes * 60_000 };
+    // Grade fina (5 min) para os seguintes encaixarem logo ao fim do anterior; o primeiro só em horários "redondos".
+    const offered: Record<string, string[]>[] = [];
+    for (const s of services) {
+      const r = await this.scheduling.slots(em, { ...common, durationMinutes: s.durationMinutes, stepMinutes: 5 });
+      offered.push(Object.fromEntries(r.slots.map((x) => [x.startsAt, x.memberIds])));
+    }
+    const first = await this.scheduling.slots(em, { ...common, durationMinutes: services[0].durationMinutes, stepMinutes: ONLINE_BOOKING.stepMinutes });
+    return {
+      date,
+      options: planSequences({
+        services: services.map((s) => ({ serviceId: s.id, durationMinutes: s.durationMinutes })),
+        offered,
+        firstStarts: first.slots.map((x) => x.startsAt),
+      }),
+    };
+  }
+
+  /** Reserva de 1 a 5 procedimentos, tudo ou nada, com um link só. */
+  async bookGroup(slug: string, dto: PublicGroupBookingDto): Promise<PublicGroupBookingResponse> {
+    const org = await this.org(slug);
+    const token = randomBytes(24).toString('base64url');
+    const groupId = randomUUID();
+    const single = dto.items.length === 1;
+    await this.db.transaction(async (em) => {
+      const unit = await this.scheduling.resolveUnit(em, org.id);
+      const phone = normalizePhone(dto.phone);
+      const family = await this.assertFamilyCap(em, org.id, phone, dto.items.length);
+
+      // Resolve cada item (procedimento, horário oferecido, profissional) antes de gravar qualquer um.
+      const planned: { service: ServiceItem; memberId: string; start: Date; end: Date }[] = [];
+      for (const item of dto.items) {
+        const service = await this.onlineService(em, org.id, item.serviceId);
+        const date = zonedParts(new Date(item.startsAt), unit.timezone).date;
+        this.assertBookableDate(date, unit.timezone);
+        // Grade de 5 min: o procedimento seguinte de uma sequência começa quando o anterior termina (ex.: 10:40).
+        const offered = await this.slots(slug, { date, serviceId: service.id, memberId: item.memberId ?? undefined }, undefined, 5);
+        const slot = offered.slots.find((s) => new Date(s.startsAt).getTime() === new Date(item.startsAt).getTime());
+        if (!slot) throw new ConflictException(`O horário de ${service.name} acabou de ser ocupado. Escolha outro, por favor.`);
+        const start = new Date(slot.startsAt);
+        planned.push({ service, memberId: item.memberId ?? slot.memberIds[0], start, end: new Date(start.getTime() + service.durationMinutes * 60_000) });
+      }
+      // A mesma pessoa não pode estar em dois procedimentos ao mesmo tempo.
+      if (anyOverlap(planned.map((p) => ({ startsAt: p.start.toISOString(), endsAt: p.end.toISOString() })))) {
+        throw new BadRequestException('Dois procedimentos ficaram no mesmo horário. Escolha horários diferentes.');
+      }
+      const client = await this.resolvePatient(em, org.id, phone, family, dto);
+      const repo = em.getRepository(Appointment);
+      for (const p of planned) {
+        await this.scheduling.assertFree(em, { organizationId: org.id, unitId: unit.id, memberId: p.memberId, start: p.start, end: p.end });
+        await repo.save(
+          repo.create({
+            organizationId: org.id,
+            unitId: unit.id,
+            clientId: client.id,
+            memberId: p.memberId,
+            serviceId: p.service.id,
+            startsAt: p.start,
+            endsAt: p.end,
+            status: AppointmentStatus.AGENDADO,
+            priceCents: p.service.priceCents,
+            notes: null,
+            source: AppointmentSource.ONLINE,
+            bookingGroupId: groupId,
+            // Um procedimento só segue o fluxo antigo (um link por agendamento); vários dividem o link do grupo.
+            manageTokenHash: single ? hashToken(token) : null,
+            groupTokenHash: single ? null : hashToken(token),
+          }),
+        );
+      }
+    });
+    const group = await this.getGroup(token);
+    if (dto.email) {
+      const lines = group.items.map((i) => `${i.serviceName} com ${i.professionalName}, ${this.whenText(i.startsAt, group.timezone)}`);
+      await this.mail.sendBookingConfirmation(dto.email, {
+        clientName: dto.name,
+        orgName: group.organizationName,
+        serviceName: group.items.map((i) => i.serviceName).join(' + '),
+        professionalName: [...new Set(group.items.map((i) => i.professionalName))].join(' e '),
+        when: single ? this.whenText(group.items[0].startsAt, group.timezone) : lines.join('; '),
+        url: `${this.config.get<string>('publicWebUrl')}/reserva/${token}`,
+      }).catch(() => undefined);
+    }
+    return group;
+  }
+
+  /** A reserva do link: um ou vários procedimentos. */
+  async getGroup(token: string): Promise<PublicGroupBookingResponse> {
+    const ids = await this.idsByToken(token);
+    const rows = await this.db.getRepository(Appointment).find({
+      where: { id: In(ids) },
+      relations: { client: true, member: true, service: true, unit: true, organization: true },
+      order: { startsAt: 'ASC' },
+    });
+    const first = rows[0];
+    return {
+      token,
+      organizationName: first.organization.name,
+      organizationSlug: first.organization.slug,
+      organizationPhone: first.organization.phone,
+      timezone: first.unit.timezone,
+      address: formatAddress(first.unit),
+      items: rows.map((a) => ({
+        id: a.id,
+        serviceId: a.serviceId,
+        serviceName: a.service.name,
+        professionalName: a.member.name,
+        clientName: a.client.name,
+        startsAt: a.startsAt.toISOString(),
+        endsAt: a.endsAt.toISOString(),
+        status: a.status,
+        canCancel: canClientCancel(a.status, a.startsAt.toISOString()),
+      })),
+    };
+  }
+
+  /** Cancela um procedimento (`itemId`) ou, sem `itemId`, todos os que ainda podem ser cancelados. */
+  async cancelGroup(token: string, itemId?: string | null): Promise<PublicGroupBookingResponse> {
+    const ids = await this.idsByToken(token);
+    if (itemId && !ids.includes(itemId)) throw new NotFoundException('Procedimento não encontrado nesta reserva');
+    const targets = itemId ? [itemId] : ids;
+    const rows = await this.db.getRepository(Appointment).find({ where: { id: In(targets) } });
+    const open = rows.filter((a) => canClientCancel(a.status, a.startsAt.toISOString()));
+    if (!open.length) {
+      throw new BadRequestException(`Pelo link só dá para cancelar até ${ONLINE_BOOKING.cancelUntilHours}h antes. Fale com o estabelecimento.`);
+    }
+    for (const a of open) await this.cancelById(a.id);
+    return this.getGroup(token);
+  }
+
+  /** Remarca um procedimento da reserva (`itemId` é obrigatório quando há mais de um). */
+  async rescheduleGroup(token: string, dto: RescheduleDto): Promise<PublicGroupBookingResponse> {
+    const ids = await this.idsByToken(token);
+    const id = dto.itemId ?? (ids.length === 1 ? ids[0] : null);
+    if (!id) throw new BadRequestException('Escolha qual procedimento remarcar');
+    if (!ids.includes(id)) throw new NotFoundException('Procedimento não encontrado nesta reserva');
+    await this.rescheduleById(id, dto);
+    return this.getGroup(token);
+  }
+
+  private whenText(startsAt: string, timezone: string) {
+    return `${new Date(startsAt).toLocaleDateString('pt-BR', { timeZone: timezone, weekday: 'long', day: 'numeric', month: 'long' })} às ${zonedParts(new Date(startsAt), timezone).time}`;
+  }
+
   // ---------------------------------------------------------------- utilitários
 
   private async org(slug: string): Promise<Organization> {
@@ -277,15 +463,22 @@ export class BookingService {
     }
   }
 
-  private async idByToken(token: string): Promise<string> {
-    const row = await this.db
+  /** Agendamentos do link: o próprio (reserva de um procedimento) ou todos do grupo, em ordem de horário. */
+  private async idsByToken(token: string): Promise<string[]> {
+    const h = hashToken(String(token).slice(0, 100));
+    const rows = await this.db
       .getRepository(Appointment)
       .createQueryBuilder('a')
       .select('a.id', 'id')
-      .where('a.manage_token_hash = :h', { h: hashToken(String(token).slice(0, 100)) })
-      .getRawOne<{ id: string }>();
-    if (!row) throw new NotFoundException('Agendamento não encontrado');
-    return row.id;
+      .where('a.manage_token_hash = :h OR a.group_token_hash = :h', { h })
+      .orderBy('a.starts_at', 'ASC')
+      .getRawMany<{ id: string }>();
+    if (!rows.length) throw new NotFoundException('Agendamento não encontrado');
+    return rows.map((r) => r.id);
+  }
+
+  private async idByToken(token: string): Promise<string> {
+    return (await this.idsByToken(token))[0];
   }
 
   private async toDto(id: string, token: string): Promise<PublicBookingResponse> {

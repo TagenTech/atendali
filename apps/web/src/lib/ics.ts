@@ -1,13 +1,32 @@
 /** Arquivo de calendário (.ics) de uma reserva: abre no Google Agenda, Apple e Outlook. */
 const stamp = (iso: string) => new Date(iso).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
-const esc = (t: string) => t.replace(/\\/g, '\\\\').replace(/;/g, '\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+const esc = (t: string) => t.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
 
-export function buildIcs(e: { uid: string; title: string; startsAt: string; endsAt: string; location?: string | null; description?: string }): string {
+export interface IcsEvent {
+  uid: string;
+  title: string;
+  startsAt: string;
+  endsAt: string;
+  location?: string | null;
+  description?: string;
+}
+
+/** Um calendário com um ou vários eventos (reserva com vários procedimentos). */
+export function buildIcsMany(events: IcsEvent[]): string {
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     'PRODID:-//Skedulei//Reservas//PT-BR',
     'CALSCALE:GREGORIAN',
+    ...events.flatMap(eventLines),
+    'END:VCALENDAR',
+  ].join('\r\n');
+}
+
+export const buildIcs = (e: IcsEvent): string => buildIcsMany([e]);
+
+function eventLines(e: IcsEvent): string[] {
+  return [
     'BEGIN:VEVENT',
     `UID:${e.uid}@skedulei`,
     `DTSTAMP:${stamp(new Date().toISOString())}`,
@@ -22,8 +41,7 @@ export function buildIcs(e: { uid: string; title: string; startsAt: string; ends
     `DESCRIPTION:${esc(e.title)}`,
     'END:VALARM',
     'END:VEVENT',
-    'END:VCALENDAR',
-  ].join('\r\n');
+  ];
 }
 
 export function downloadIcs(filename: string, content: string) {

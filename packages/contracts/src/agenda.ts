@@ -69,6 +69,8 @@ export const ONLINE_BOOKING = {
   codeMaxAttempts: 5,
   codeMaxPerHour: 5,
   portalSessionMinutes: 60,
+  /** Procedimentos numa mesma reserva (carrinho). */
+  maxItemsPerBooking: 5,
 } as const;
 
 // ------------------------------------------------------------------ disponibilidade
@@ -325,6 +327,100 @@ export interface PublicBookingDto {
   canCancel: boolean;
 }
 
+// ------------------------------------------------------------------ reserva com vários procedimentos (carrinho)
+
+export interface BookingItemRequest {
+  serviceId: string;
+  /** Omitido = qualquer profissional livre. */
+  memberId?: string | null;
+  startsAt: string;
+}
+
+/** Vários procedimentos de uma vez, cada um no seu horário: tudo ou nada, com um link só. */
+export interface PublicGroupBookingRequest {
+  items: BookingItemRequest[];
+  name: string;
+  phone: string;
+  email?: string | null;
+  patientName?: string | null;
+  patientBirthDate?: IsoDate | null;
+  relationship?: GuardianRelationship | null;
+}
+
+export interface PublicBookingItemDto {
+  id: string;
+  serviceId: string;
+  serviceName: string;
+  professionalName: string;
+  clientName: string;
+  startsAt: string;
+  endsAt: string;
+  status: AppointmentStatus;
+  canCancel: boolean;
+}
+
+/** A reserva (um ou mais procedimentos) que o link `/reserva/<token>` mostra. */
+export interface PublicGroupBookingDto {
+  token: string;
+  organizationName: string;
+  organizationSlug: string;
+  organizationPhone: string | null;
+  timezone: string;
+  address: string | null;
+  items: PublicBookingItemDto[];
+}
+
+/** Um jeito de encaixar todos em sequência: início do 1º e quem atende cada um. */
+export interface SequencePlanDto {
+  startsAt: string;
+  items: { serviceId: string; memberId: string; startsAt: string; endsAt: string }[];
+}
+
+export interface SequenceSlotsDto {
+  date: IsoDate;
+  options: SequencePlanDto[];
+}
+
+/**
+ * Procedimentos um logo após o outro: para cada início possível do primeiro, vê se o segundo tem alguém livre
+ * assim que o primeiro acaba, e assim por diante (quem atendeu o anterior continua, se estiver livre).
+ * `offered[i]` mapeia início (ISO) → profissionais livres para o procedimento i, numa grade fina (5 min).
+ */
+export function planSequences(p: {
+  services: { serviceId: string; durationMinutes: number }[];
+  offered: Record<string, string[]>[];
+  firstStarts: string[];
+}): SequencePlanDto[] {
+  const plans: SequencePlanDto[] = [];
+  for (const first of p.firstStarts) {
+    let t = new Date(first).getTime();
+    let previous: string | null = null;
+    const items: SequencePlanDto['items'] = [];
+    let ok = true;
+    for (let i = 0; i < p.services.length; i++) {
+      const startsAt = new Date(t).toISOString();
+      const members: string[] | undefined = p.offered[i]?.[startsAt];
+      if (!members?.length) {
+        ok = false;
+        break;
+      }
+      const memberId: string = previous && members.includes(previous) ? previous : members[0];
+      const endsAt = new Date(t + p.services[i].durationMinutes * 60_000).toISOString();
+      items.push({ serviceId: p.services[i].serviceId, memberId, startsAt, endsAt });
+      t += p.services[i].durationMinutes * 60_000;
+      previous = memberId;
+    }
+    if (ok) plans.push({ startsAt: first, items });
+  }
+  return plans;
+}
+
+/** Algum par de intervalos [início, fim) se sobrepõe? (a mesma pessoa não está em dois lugares ao mesmo tempo) */
+export function anyOverlap(intervals: { startsAt: string; endsAt: string }[]): boolean {
+  const sorted = [...intervals].sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+  return sorted.some((x, i) => i > 0 && new Date(x.startsAt).getTime() < new Date(sorted[i - 1].endsAt).getTime());
+}
+
 /** Uma reserva na área "Minhas reservas" (todas as pessoas do mesmo telefone naquele negócio). */
 export interface PortalBookingDto {
   id: string;
@@ -360,6 +456,8 @@ export interface RescheduleRequest {
   startsAt: string;
   /** Omitido = qualquer profissional livre. */
   memberId?: string | null;
+  /** Reserva com vários procedimentos: qual deles (obrigatório quando há mais de um). */
+  itemId?: string | null;
 }
 
 /** Até quando o cliente pode cancelar online. */

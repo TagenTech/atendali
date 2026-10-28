@@ -44,6 +44,8 @@ Permite ao cliente rever, remarcar e cancelar sem conta. Desenho de segurança (
 - **Sessão**: token assinado (HMAC-SHA256) de 60 min preso ao **negócio + telefone**; não serve em outro negócio nem com assinatura adulterada; cancelar/remarcar só alcançam pacientes daquele telefone (404 caso contrário).
 - **Limitação conhecida**: quem marcou **sem e-mail** não consegue usar o código; continua valendo o link da reserva, a lista neste aparelho e o WhatsApp da clínica. O canal por WhatsApp/SMS (Fase 4) fecha essa lacuna.
 
+**Carrinho** (`bookings/group`): limite de 10 reservas/h por IP, no máximo 5 itens, teto de 5 horários futuros por telefone contando cada item, tudo ou nada na mesma transação, e link de grupo só por hash (`group_token_hash`). Sem itens sobrepostos nem horários fora da grade.
+
 ### Em aberto (decisão ou infraestrutura)
 
 | # | OWASP | Achado | Sev. | O que fazer |

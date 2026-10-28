@@ -73,6 +73,15 @@ export class Appointment {
   @Column({ name: 'manage_token_hash', type: 'varchar', length: 64, nullable: true, unique: true, select: false })
   manageTokenHash: string | null;
 
+  /** Reserva online com vários procedimentos: todos compartilham o grupo e o mesmo link (hash em `groupTokenHash`). */
+  @Index()
+  @Column({ name: 'booking_group_id', type: 'uuid', nullable: true })
+  bookingGroupId: string | null;
+
+  @Index()
+  @Column({ name: 'group_token_hash', type: 'varchar', length: 64, nullable: true, select: false })
+  groupTokenHash: string | null;
+
   /** Chamado no painel de TV da recepção. */
   @Column({ name: 'called_at', type: 'timestamptz', nullable: true })
   calledAt: Date | null;

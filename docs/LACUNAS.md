@@ -12,7 +12,7 @@ existe hoje (com a evidência no código), o impacto e o que propor. Prioridade:
 | #1 Rever/cancelar depois de marcar | ✅ **feito** (camadas 1 e 2): reservas neste aparelho, `.ics`, e **Minhas reservas** com código no e-mail cadastrado; ⏳ login rápido/conta de cliente e código por WhatsApp (Fase 4) |
 | #6 Remarcar | ✅ **feito**: pelo link da reserva e em Minhas reservas (mesma antecedência de 2 h; avisa a lista de espera) |
 | Taxa de agendamento (sinal) | ⏳ opção visível e **desligada** ("Em breve") em Configurações; liga com o pagamento online (Fase 4) |
-| #2 Vários procedimentos (carrinho) | ⏳ próximo |
+| #2 Vários procedimentos (carrinho) | ✅ **feito**: escolher até 5 procedimentos; "um logo após o outro" (encaixe automático, mesma pessoa se estiver livre) ou "horário de cada um" (sem sobreposição); tudo ou nada; um link para ver, remarcar um item e cancelar um ou tudo. ⏳ combos com preço fechado e escolha de profissional por item |
 | #5 Módulos de saúde sem tela, #4 lembretes, #7 sinal, #8 gestão | ⏳ pendentes |
 
 ## Resumo

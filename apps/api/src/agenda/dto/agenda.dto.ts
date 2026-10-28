@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayMaxSize,
+  ArrayMinSize,
   IsArray,
   IsBoolean,
   IsEmail,
@@ -23,7 +24,10 @@ import {
   GUARDIAN_RELATIONSHIPS,
   type ClientInput,
   type GuardianRelationship,
+  type BookingItemRequest,
+  ONLINE_BOOKING,
   type PortalCodeRequest,
+  type PublicGroupBookingRequest,
   type PortalVerifyRequest,
   type RescheduleRequest,
   type CreateAppointmentRequest,
@@ -481,4 +485,97 @@ export class RescheduleDto implements RescheduleRequest {
   @IsOptional()
   @IsUUID()
   memberId?: string | null;
+
+  @ApiPropertyOptional({ description: 'Reserva com vários procedimentos: qual remarcar' })
+  @EmptyToNull()
+  @IsOptional()
+  @IsUUID()
+  itemId?: string | null;
+}
+
+
+// ------------------------------------------------------------------ vários procedimentos (carrinho)
+
+export class BookingItemDto implements BookingItemRequest {
+  @ApiProperty()
+  @IsUUID('all', { message: 'Escolha o procedimento' })
+  serviceId: string;
+
+  @ApiPropertyOptional()
+  @EmptyToNull()
+  @IsOptional()
+  @IsUUID()
+  memberId?: string | null;
+
+  @ApiProperty()
+  @IsISO8601({ strict: true }, { message: 'Horário inválido' })
+  startsAt: string;
+}
+
+export class PublicGroupBookingDto implements PublicGroupBookingRequest {
+  @ApiProperty({ type: [BookingItemDto] })
+  @IsArray()
+  @ArrayMinSize(1, { message: 'Escolha ao menos um procedimento' })
+  @ArrayMaxSize(ONLINE_BOOKING.maxItemsPerBooking, { message: `No máximo ${ONLINE_BOOKING.maxItemsPerBooking} procedimentos por reserva` })
+  @ValidateNested({ each: true })
+  @Type(() => BookingItemDto)
+  items: BookingItemDto[];
+
+  @ApiProperty()
+  @trim()
+  @IsString()
+  @IsNotEmpty({ message: 'Informe seu nome' })
+  @MaxLength(120)
+  name: string;
+
+  @ApiProperty()
+  @IsPhone()
+  phone: string;
+
+  @ApiPropertyOptional()
+  @lower()
+  @EmptyToNull()
+  @IsOptional()
+  @IsEmail({}, { message: 'E-mail inválido' })
+  @MaxLength(180)
+  email?: string | null;
+
+  @ApiPropertyOptional()
+  @trim()
+  @EmptyToNull()
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  patientName?: string | null;
+
+  @ApiPropertyOptional({ example: '2019-04-02' })
+  @EmptyToNull()
+  @IsOptional()
+  @IsIsoDate()
+  patientBirthDate?: string | null;
+
+  @ApiPropertyOptional({ enum: GUARDIAN_RELATIONSHIPS })
+  @EmptyToNull()
+  @IsOptional()
+  @IsIn([...GUARDIAN_RELATIONSHIPS], { message: 'Parentesco inválido' })
+  relationship?: GuardianRelationship | null;
+}
+
+export class SequenceQueryDto {
+  @ApiProperty({ example: '2026-11-10' })
+  @IsIsoDate()
+  date: string;
+
+  @ApiProperty({ description: 'Ids dos procedimentos, separados por vírgula, na ordem em que serão feitos' })
+  @IsString()
+  @Matches(/^[0-9a-f-]{36}(,[0-9a-f-]{36}){1,4}$/i, { message: 'Informe de 2 a 5 procedimentos' })
+  serviceIds: string;
+}
+
+export class CancelGroupDto {
+  @ApiPropertyOptional({ description: 'Sem isto, cancela todos os procedimentos que ainda podem ser cancelados' })
+  @EmptyToNull()
+  @IsOptional()
+  @IsUUID()
+  itemId?: string | null;
 }

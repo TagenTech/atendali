@@ -3,16 +3,12 @@
 import {
   addDays,
   formatBRL,
-  GUARDIAN_RELATIONSHIPS,
-  GUARDIAN_RELATIONSHIP_LABEL,
   formatDuration,
-  isValidPhone,
   ONLINE_BOOKING,
   todayIn,
   WEEKDAYS_SHORT,
   whatsappLink,
   zonedParts,
-  type GuardianRelationship,
   type PublicOrgDto,
 } from '@skedulei/contracts';
 import { BRAND_COLORS, formatRating, type BrandColor } from '@skedulei/contracts';
@@ -22,14 +18,13 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import * as React from 'react';
 import { LogoMark } from '@/components/brand/logo';
+import { CartFlow } from '@/components/public/cart-flow';
+import { PatientForm, type PatientValues } from '@/components/public/patient-form';
 import { SegmentIcon } from '@/components/layout/segment-icon';
 import { memberColor } from '@/components/org/member-sheet';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
-import { Field } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { PhoneInput } from '@/components/ui/phone-input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Stars } from '@/components/ui/stars';
 import * as agendaApi from '@/lib/api/agenda';
@@ -58,18 +53,12 @@ export default function BookingPage() {
   const page = useQuery({ queryKey: ['public', slug], queryFn: () => agendaApi.publicPage(slug), retry: false });
   const org = page.data;
 
-  const [service, setService] = React.useState<Service | null>(null);
+  // Carrinho: dá para escolher vários procedimentos. Com um só, segue o fluxo de sempre; com 2 ou mais, o `CartFlow`.
+  const [selected, setSelected] = React.useState<Service[]>([]);
+  const service = selected.length === 1 ? selected[0] : null;
   const [pro, setPro] = React.useState<string | null>(null);
   const [date, setDate] = React.useState<string | null>(null);
   const [startsAt, setStartsAt] = React.useState<string | null>(null);
-  const [name, setName] = React.useState('');
-  const [phone, setPhone] = React.useState('');
-  const [email, setEmail] = React.useState('');
-  // Reserva para outra pessoa (filho, mãe…): o paciente é ele; quem marca fica como responsável.
-  const [forOther, setForOther] = React.useState(false);
-  const [patientName, setPatientName] = React.useState('');
-  const [patientBirth, setPatientBirth] = React.useState('');
-  const [relationship, setRelationship] = React.useState<GuardianRelationship | ''>('');
   const [error, setError] = React.useState<string | null>(null);
   const [saving, setSaving] = React.useState(false);
 
@@ -110,11 +99,7 @@ export default function BookingPage() {
     org.services.reduce<Record<string, Service[]>>((acc, s) => ((acc[s.category ?? org.vocabulary.services] ??= []).push(s), acc), {}),
   );
 
-  const book = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (forOther && patientName.trim().length < 2) return setError(`Informe o nome d${org.vocabulary.client === 'Paciente' ? 'o paciente' : 'a pessoa que será atendida'}`);
-    if (name.trim().length < 2) return setError('Informe seu nome');
-    if (!isValidPhone(phone)) return setError('Informe um celular válido, com DDD');
+  const book = async (v: PatientValues) => {
     setSaving(true);
     setError(null);
     try {
@@ -122,10 +107,10 @@ export default function BookingPage() {
         serviceId: service!.id,
         memberId: memberId ?? null,
         startsAt: startsAt!,
-        name: name.trim(),
-        phone,
-        email: email.trim() || null,
-        ...(forOther ? { patientName: patientName.trim(), patientBirthDate: patientBirth || null, relationship: relationship || null } : {}),
+        name: v.name,
+        phone: v.phone,
+        email: v.email,
+        ...(v.patientName ? { patientName: v.patientName, patientBirthDate: v.patientBirthDate ?? null, relationship: v.relationship ?? null } : {}),
       });
       rememberBooking({ token: res.token, slug, serviceName: res.serviceName, patientName: res.clientName, startsAt: res.startsAt, timezone: res.timezone });
       router.push(`/reserva/${res.token}`);
@@ -215,6 +200,7 @@ export default function BookingPage() {
           {/* 1. Serviço */}
           <section>
             <StepTitle n={1}>Escolha o {org.vocabulary.service.toLowerCase()}</StepTitle>
+            {org.services.length > 1 ? <p className="-mt-1 mb-3 text-sm text-muted-foreground">Pode escolher mais de um (até {ONLINE_BOOKING.maxItemsPerBooking}) — você decide os horários em seguida.</p> : null}
             {org.services.length ? (
               <div className="space-y-4">
                 {groups.map(([cat, items]) => (
@@ -225,13 +211,21 @@ export default function BookingPage() {
                         <button
                           key={s.id}
                           type="button"
-                          aria-pressed={service?.id === s.id}
-                          onClick={() => (setService(s), setStartsAt(null))}
+                          aria-pressed={selected.some((x) => x.id === s.id)}
+                          onClick={() => {
+                            setStartsAt(null);
+                            setSelected((cur) => (cur.some((x) => x.id === s.id) ? cur.filter((x) => x.id !== s.id) : cur.length >= ONLINE_BOOKING.maxItemsPerBooking ? cur : [...cur, s]));
+                          }}
                           className={cn(
-                            'rounded-2xl border-2 bg-card p-4 text-left transition-colors',
-                            service?.id === s.id ? 'border-primary bg-primary-soft' : 'border-border hover:border-primary/50',
+                            'relative rounded-2xl border-2 bg-card p-4 text-left transition-colors',
+                            selected.some((x) => x.id === s.id) ? 'border-primary bg-primary-soft' : 'border-border hover:border-primary/50',
                           )}
                         >
+                          {selected.some((x) => x.id === s.id) && selected.length > 1 ? (
+                            <span aria-hidden className="absolute -right-2 -top-2 grid size-6 place-items-center rounded-full bg-primary text-xs font-black text-primary-foreground">
+                              {selected.findIndex((x) => x.id === s.id) + 1}
+                            </span>
+                          ) : null}
                           <span className="flex items-start justify-between gap-2">
                             <span className="font-semibold">{s.name}</span>
                             <span className="font-display font-extrabold tabular">{s.priceCents ? formatBRL(s.priceCents) : 'Gratuito'}</span>
@@ -252,6 +246,8 @@ export default function BookingPage() {
           </section>
 
           {/* 2. Profissional */}
+          {selected.length >= 2 ? <CartFlow slug={slug} org={org} selected={selected} days={openDays} today={today} tz={tz} /> : null}
+
           {service ? (
             <section>
               <StepTitle n={2}>Com quem?</StepTitle>
@@ -340,64 +336,7 @@ export default function BookingPage() {
           {startsAt ? (
             <section>
               <StepTitle n={4}>Seus dados</StepTitle>
-              <form onSubmit={book} className="grid max-w-xl gap-4" noValidate>
-                <div role="radiogroup" aria-label="Para quem é" className="grid grid-cols-2 gap-2">
-                  {[
-                    { other: false, label: 'Para mim' },
-                    { other: true, label: org.vocabulary.client === 'Paciente' ? 'Para outro paciente (filho, mãe…)' : 'Para outra pessoa' },
-                  ].map((o) => (
-                    <button
-                      key={String(o.other)}
-                      type="button"
-                      role="radio"
-                      aria-checked={forOther === o.other}
-                      onClick={() => setForOther(o.other)}
-                      className={cn('rounded-2xl border-2 px-3 py-3 text-sm font-semibold', forOther === o.other ? 'border-primary bg-primary-soft' : 'border-border bg-card')}
-                    >
-                      {o.label}
-                    </button>
-                  ))}
-                </div>
-                {forOther ? (
-                  <>
-                    <Field label={`Nome d${org.vocabulary.client === 'Paciente' ? 'o paciente' : 'a pessoa atendida'}`} htmlFor="bk-patient">
-                      <Input id="bk-patient" value={patientName} maxLength={120} onChange={(e) => setPatientName(e.target.value)} />
-                    </Field>
-                    <div className="grid grid-cols-2 gap-3">
-                      <Field label="Nascimento (opcional)" htmlFor="bk-birth">
-                        <Input id="bk-birth" type="date" value={patientBirth} max={today ?? undefined} onChange={(e) => setPatientBirth(e.target.value)} />
-                      </Field>
-                      <Field label="Seu parentesco" htmlFor="bk-rel">
-                        <select id="bk-rel" value={relationship} onChange={(e) => setRelationship(e.target.value as GuardianRelationship | '')} className="h-13 w-full rounded-2xl border-2 border-input bg-card px-3">
-                          <option value="">Prefiro não informar</option>
-                          {GUARDIAN_RELATIONSHIPS.map((r) => (
-                            <option key={r} value={r}>
-                              {GUARDIAN_RELATIONSHIP_LABEL[r]}
-                            </option>
-                          ))}
-                        </select>
-                      </Field>
-                    </div>
-                  </>
-                ) : null}
-                <Field label={forOther ? 'Seu nome (quem está marcando)' : 'Seu nome'} htmlFor="bk-name">
-                  <Input id="bk-name" autoComplete="name" value={name} maxLength={120} onChange={(e) => setName(e.target.value)} />
-                </Field>
-                <Field label="Celular (WhatsApp)" htmlFor="bk-phone" hint="Para confirmar o horário com você">
-                  <PhoneInput id="bk-phone" value={phone} onChange={setPhone} />
-                </Field>
-                <Field label="E-mail (recomendado)" htmlFor="bk-email" hint="Enviamos o comprovante e o código para ver, remarcar ou cancelar suas reservas depois">
-                  <Input id="bk-email" type="email" autoComplete="email" value={email} maxLength={180} onChange={(e) => setEmail(e.target.value)} />
-                </Field>
-                {error ? (
-                  <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 text-sm font-medium text-danger-soft-foreground">
-                    {error}
-                  </p>
-                ) : null}
-                <Button type="submit" size="lg" loading={saving}>
-                  Confirmar agendamento
-                </Button>
-              </form>
+              <PatientForm clientWord={org.vocabulary.client} today={today} saving={saving} error={error} onSubmit={book} />
             </section>
           ) : error ? (
             <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 text-sm font-medium text-danger-soft-foreground">
@@ -427,21 +366,39 @@ export default function BookingPage() {
         <aside className="lg:sticky lg:top-6 lg:self-start">
           <Card className="space-y-3">
             <p className="font-display text-lg font-extrabold">Resumo</p>
-            <ul className="space-y-2 text-sm">
-              <li className="flex items-center gap-2">
-                <Check className={cn('size-4', service ? 'text-success' : 'text-border')} />
-                {service ? `${service.name} · ${formatDuration(service.durationMinutes)}` : `Escolha o ${org.vocabulary.service.toLowerCase()}`}
-              </li>
-              <li className="flex items-center gap-2">
-                <UserRound className={cn('size-4', pro ? 'text-success' : 'text-border')} />
-                {pro ? (pro === ANY ? 'Qualquer pessoa' : proName(pro)) : 'Profissional'}
-              </li>
-              <li className="flex items-center gap-2">
-                <Clock className={cn('size-4', startsAt ? 'text-success' : 'text-border')} />
-                {startsAt && date ? `${date.split('-').reverse().slice(0, 2).join('/')} às ${timeOf(startsAt)}` : 'Dia e horário'}
-              </li>
-            </ul>
-            {service?.priceCents ? (
+            {selected.length >= 2 ? (
+              <ul className="space-y-2 text-sm" aria-label="Procedimentos escolhidos">
+                {selected.map((x, i) => (
+                  <li key={x.id} className="flex items-center gap-2">
+                    <Check className="size-4 text-success" />
+                    <span>
+                      {i + 1}. {x.name} · {formatDuration(x.durationMinutes)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <Check className={cn('size-4', service ? 'text-success' : 'text-border')} />
+                  {service ? `${service.name} · ${formatDuration(service.durationMinutes)}` : `Escolha o ${org.vocabulary.service.toLowerCase()}`}
+                </li>
+                <li className="flex items-center gap-2">
+                  <UserRound className={cn('size-4', pro ? 'text-success' : 'text-border')} />
+                  {pro ? (pro === ANY ? 'Qualquer pessoa' : proName(pro)) : 'Profissional'}
+                </li>
+                <li className="flex items-center gap-2">
+                  <Clock className={cn('size-4', startsAt ? 'text-success' : 'text-border')} />
+                  {startsAt && date ? `${date.split('-').reverse().slice(0, 2).join('/')} às ${timeOf(startsAt)}` : 'Dia e horário'}
+                </li>
+              </ul>
+            )}
+            {selected.length >= 2 ? (
+              <p className="border-t border-border pt-3 font-display text-xl font-black tabular">
+                {formatBRL(selected.reduce((t, x) => t + x.priceCents, 0))}
+                <span className="block text-sm font-normal text-muted-foreground">{formatDuration(selected.reduce((t, x) => t + x.durationMinutes, 0))} no total</span>
+              </p>
+            ) : service?.priceCents ? (
               <p className="border-t border-border pt-3 font-display text-xl font-black tabular">{formatBRL(service.priceCents)}</p>
             ) : null}
             {startsAt ? null : (
