@@ -1,6 +1,6 @@
 # Web Skedulei (Next.js standalone) — build a partir da raiz do monorepo:
 #   docker build -f apps/web/Dockerfile -t skedulei-web .
-FROM node:22-alpine AS build
+FROM node:26-alpine AS build
 RUN corepack enable
 WORKDIR /repo
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc tsconfig.base.json ./
@@ -15,7 +15,7 @@ ARG API_URL=http://api:3200
 ENV API_URL=$API_URL
 RUN pnpm --filter @skedulei/contracts build && pnpm --filter @skedulei/web build
 
-FROM node:22-alpine
+FROM node:26-alpine
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3201 HOSTNAME=0.0.0.0
 WORKDIR /app
 COPY --from=build /repo/apps/web/.next/standalone ./
