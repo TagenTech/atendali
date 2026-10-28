@@ -1,6 +1,6 @@
 'use client';
 
-import type { ClientInput, CreateAppointmentRequest, CreateBlockRequest, CreateWaitlistRequest, UpdateAppointmentRequest } from '@agendei/contracts';
+import type { ClientInput, CreateAppointmentRequest, CreateBlockRequest, CreateWaitlistRequest, UpdateAppointmentRequest } from '@skedulei/contracts';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as agendaApi from '@/lib/api/agenda';
 import { useOrg } from '@/lib/org';

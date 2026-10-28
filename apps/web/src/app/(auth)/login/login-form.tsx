@@ -14,7 +14,7 @@ import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { ApiError } from '@/lib/api/client';
 import { useAuth } from '@/lib/auth';
-import { safeNext } from '@agendei/contracts';
+import { safeNext } from '@skedulei/contracts';
 import { MFA_TICKET_KEY } from '@/components/auth/mfa-code-form';
 import { cn, haptic } from '@/lib/utils';
 

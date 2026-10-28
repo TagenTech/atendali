@@ -1,4 +1,4 @@
-import type { Segment } from '@agendei/contracts';
+import type { Segment } from '@skedulei/contracts';
 import { Brush, CalendarClock, HeartPulse, Scissors, Smile, Sparkles, Stethoscope, type LucideIcon } from 'lucide-react';
 
 const ICONS: Record<Segment, LucideIcon> = {

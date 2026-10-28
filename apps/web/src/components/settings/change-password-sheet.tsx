@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PASSWORD_COMMON_MESSAGE, PASSWORD_MIN_LENGTH, isCommonPassword } from '@agendei/contracts';
+import { PASSWORD_COMMON_MESSAGE, PASSWORD_MIN_LENGTH, isCommonPassword } from '@skedulei/contracts';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';

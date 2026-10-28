@@ -1,7 +1,7 @@
 /**
  * DataSource para a CLI do TypeORM (migrations).
- *   pnpm --filter @agendei/api migration:generate src/migrations/NomeDaMudanca
- *   pnpm --filter @agendei/api migration:run
+ *   pnpm --filter @skedulei/api migration:generate src/migrations/NomeDaMudanca
+ *   pnpm --filter @skedulei/api migration:run
  */
 import 'dotenv/config';
 import 'reflect-metadata';
@@ -10,6 +10,6 @@ import { DataSource } from 'typeorm';
 import { getDatabaseOptions } from './database/db-options';
 
 export default new DataSource({
-  ...getDatabaseOptions(process.env.DATABASE_URL ?? 'postgres://postgres:postgres@localhost:5432/agendei'),
+  ...getDatabaseOptions(process.env.DATABASE_URL ?? 'postgres://postgres:postgres@localhost:5432/skedulei'),
   entities: [join(__dirname, '**', '*.entity.{ts,js}')],
 });

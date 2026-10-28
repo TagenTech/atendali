@@ -1,6 +1,6 @@
 'use client';
 
-import { formatRating, Permission } from '@agendei/contracts';
+import { formatRating, Permission } from '@skedulei/contracts';
 import { Eye, EyeOff } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';

@@ -1,6 +1,6 @@
 'use client';
 
-import { isMfaChallenge, type LoginRequest, type RegisterRequest, type UserDto } from '@agendei/contracts';
+import { isMfaChallenge, type LoginRequest, type RegisterRequest, type UserDto } from '@skedulei/contracts';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 import * as authApi from './api/auth';

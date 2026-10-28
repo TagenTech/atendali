@@ -22,7 +22,7 @@ function layout(title: string, body: string, cta?: { label: string; url: string 
   return `
   <div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#fbf8ff;padding:24px">
     <div style="max-width:480px;margin:0 auto;background:#fff;border-radius:24px;padding:32px;border:1px solid #ece6f7">
-      <div style="font-size:28px;font-weight:900;color:#2d2640">Agendei <span style="color:#e8689f">💜</span></div>
+      <div style="font-size:28px;font-weight:900;color:#2d2640">Skedulei <span style="color:#e8689f">💜</span></div>
       <h2 style="color:#2d2640;margin:24px 0 8px">${title}</h2>
       <div style="color:#4a4360;font-size:15px;line-height:1.6">${body}</div>
       ${
@@ -69,7 +69,7 @@ export class MailService {
         method: 'POST',
         headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: process.env.MAIL_FROM ?? 'Agendei <onboarding@resend.dev>',
+          from: process.env.MAIL_FROM ?? 'Skedulei <onboarding@resend.dev>',
           to: mail.to,
           subject: mail.subject,
           html: mail.html,
@@ -89,7 +89,7 @@ export class MailService {
     return this.send({
       to,
       link: url,
-      subject: 'Confirme seu e-mail no Agendei',
+      subject: 'Confirme seu e-mail no Skedulei',
       html: layout(
         `Oi, ${escapeHtml(name.split(' ')[0])}! 👋`,
         'Falta só confirmar que este e-mail é seu. É rapidinho:',
@@ -102,7 +102,7 @@ export class MailService {
     return this.send({
       to,
       link: url,
-      subject: 'Redefinir sua senha do Agendei',
+      subject: 'Redefinir sua senha do Skedulei',
       html: layout(
         'Vamos criar uma senha nova',
         'Recebemos um pedido para redefinir a senha da sua conta. O link vale por 1 hora. Se não foi você, é só ignorar — nada muda.',
@@ -116,7 +116,7 @@ export class MailService {
     return this.send({
       to,
       replyTo: email,
-      subject: `[Agendei] Contato de ${name.replace(/[\r\n\[\]]/g, ' ')}`,
+      subject: `[Skedulei] Contato de ${name.replace(/[\r\n\[\]]/g, ' ')}`,
       html: layout(
         'Mensagem de contato',
         `<p><strong>${escapeHtml(name)}</strong> (${escapeHtml(email)}) escreveu:</p><p style="white-space:pre-line">${escapeHtml(message)}</p>`,
@@ -143,7 +143,7 @@ export class MailService {
     return this.send({
       to,
       link: url,
-      subject: `Convite para a equipe de ${orgName.replace(/[\r\n]/g, ' ')} no Agendei`,
+      subject: `Convite para a equipe de ${orgName.replace(/[\r\n]/g, ' ')} no Skedulei`,
       html: layout(
         'Você foi convidado(a) para a equipe 🎉',
         `<strong>${escapeHtml(inviterName)}</strong> convidou você para entrar em <strong>${escapeHtml(orgName)}</strong> como <strong>${escapeHtml(roleLabel)}</strong>. O convite vale por 7 dias.`,
@@ -156,7 +156,7 @@ export class MailService {
     return this.send({
       to,
       link: loginUrl,
-      subject: 'Você já tem conta no Agendei',
+      subject: 'Você já tem conta no Skedulei',
       html: layout('Você já tem uma conta 🙂', 'Alguém (talvez você) tentou se cadastrar com este e-mail. É só entrar — ou recuperar a senha se esqueceu.', {
         label: 'Entrar',
         url: loginUrl,

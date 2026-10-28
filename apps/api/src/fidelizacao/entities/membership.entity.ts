@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Organization } from '../../organizations/entities/organization.entity';
-import type { MembershipStatus } from '@agendei/contracts';
+import type { MembershipStatus } from '@skedulei/contracts';
 import { Client } from '../../agenda/entities/client.entity';
 import { ServiceItem } from '../../organizations/entities/service-item.entity';
 

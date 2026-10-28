@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-/* Agendei — design tokens. Paleta "meiga": lavanda, rosa, menta, manteiga e coral. */
+/* Skedulei — design tokens. Paleta "meiga": lavanda, rosa, menta, manteiga e coral. */
 :root {
   color-scheme: light;
   --background: #fbf8ff;

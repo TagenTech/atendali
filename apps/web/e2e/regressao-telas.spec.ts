@@ -219,13 +219,13 @@ test('tema escuro e claro: telas principais abrem nos dois', async ({}, info) =>
   for (const scheme of ['dark', 'light'] as const) {
     await owner.emulateMedia({ colorScheme: scheme });
     // O padrão é claro; aqui forçamos cada tema como a pessoa faria em Aparência.
-    await owner.evaluate((t) => localStorage.setItem('agendei_theme', t), scheme);
+    await owner.evaluate((t) => localStorage.setItem('skedulei_theme', t), scheme);
     for (const route of ['/inicio', '/agenda', '/caixa', `/clientes/${clientId}`]) {
       await owner.goto(route);
       await expect(owner.locator('h1, h2').first(), `${route} ${scheme}`).toBeVisible();
     }
     if (info.project.name === 'celular') await expectNoHorizontalScroll(owner, `tema ${scheme}`);
   }
-  await owner.evaluate(() => localStorage.removeItem('agendei_theme'));
+  await owner.evaluate(() => localStorage.removeItem('skedulei_theme'));
   await owner.emulateMedia({ colorScheme: null });
 });

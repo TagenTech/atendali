@@ -1,4 +1,4 @@
-import { ORG_HEADER, type ApiError as ApiErrorBody, type AuthResponse } from '@agendei/contracts';
+import { ORG_HEADER, type ApiError as ApiErrorBody, type AuthResponse } from '@skedulei/contracts';
 
 /** O navegador chama sempre a mesma origem; o Next (dev) / nginx (prod) repassa para a API. */
 const BASE = '/api/v1';

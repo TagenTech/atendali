@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, Param, ParseEnumPipe, ParseUUI
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
-import { BrandImageKind, Permission as P } from '@agendei/contracts';
+import { BrandImageKind, Permission as P } from '@skedulei/contracts';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Public } from '../common/decorators/public.decorator';
 import type { JwtPayload } from '../common/types/jwt-payload';

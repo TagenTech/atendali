@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
-import { Feature, loyaltyOf, type LoyaltyBalanceDto, type LoyaltyRule } from '@agendei/contracts';
+import { Feature, loyaltyOf, type LoyaltyBalanceDto, type LoyaltyRule } from '@skedulei/contracts';
 import { Client } from '../agenda/entities/client.entity';
 import { Order } from '../financeiro/entities/order.entity';
 import { Organization } from '../organizations/entities/organization.entity';

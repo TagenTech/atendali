@@ -17,7 +17,7 @@ import {
   type PublicBookingDto as PublicBookingResponse,
   type PublicOrgDto,
   type SlotsDto,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { Review } from '../fidelizacao/entities/review.entity';
 import { MailService } from '../mail/mail.service';
 import { Organization } from '../organizations/entities/organization.entity';

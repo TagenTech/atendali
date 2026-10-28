@@ -44,7 +44,7 @@ export default (): AppConfig => {
     port: Number(process.env.PORT ?? 3200),
     apiPrefix: process.env.API_PREFIX ?? 'v1',
     databaseUrl:
-      process.env.DATABASE_URL ?? 'postgres://postgres:postgres@localhost:5432/agendei',
+      process.env.DATABASE_URL ?? 'postgres://postgres:postgres@localhost:5432/skedulei',
     cronSecret: process.env.CRON_SECRET ?? null,
     typeormSync:
       process.env.TYPEORM_SYNC === 'true' ||
@@ -58,7 +58,7 @@ export default (): AppConfig => {
     vapid: {
       publicKey: process.env.VAPID_PUBLIC_KEY || null,
       privateKey: process.env.VAPID_PRIVATE_KEY || null,
-      subject: process.env.VAPID_SUBJECT || 'mailto:contato@agendei.app',
+      subject: process.env.VAPID_SUBJECT || 'mailto:contato@skedulei.app',
     },
     signupEnabled: process.env.SIGNUP_ENABLED !== 'false',
     oauth: {

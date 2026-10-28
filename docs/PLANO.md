@@ -2,7 +2,7 @@
 
 > SaaS de agendamento e gestão para **negócios de serviço com hora marcada**: salões de beleza, barbearias, clínicas de estética, clínicas médicas, consultórios (odonto, fisio, psico, nutri), spas e studios.
 > **Web responsivo + PWA instalável** (como o Turmei em `../gestao-aulas`), com **experiência de desktop de verdade** (agenda multiprofissional, tabelas, atalhos) e **mobile-first** para o profissional na rua e para o cliente final.
-> Nome provisório: **Agendei** (alternativas: Horaí, Marquei, Encaixe).
+> Nome provisório: **Skedulei** (alternativas: Horaí, Marquei, Encaixe).
 
 Status (28/10/2026): **Fase 3 implementada** (estoque + ficha técnica, pacotes, clube, vale-presente, pontos, avaliações, painel de TV — decisões: mensalidade do clube é item manual da comanda até o gateway da Fase 4; venda de vale não é receita, vira receita quando usado como pagamento). **Fases 0 e 1 implementadas; Fase 2 com caixa, comandas, formas de pagamento, comissões e painel financeiro** (faltam contas a pagar/receber, DRE/fluxo de caixa e importação de clientes) — multiempresa com RLS, perfis, onboarding, equipe, serviços, agenda multiprofissional, clientes e agendamento online. Como rodar: [README](../README.md). Fase 1 completa (arrastar e soltar, semana, horário por profissional e lista de espera incluídos). Ficam para a fase 4, por dependerem do WhatsApp oficial e de jobs: OTP no agendamento online, aviso automático da lista de espera e lembretes automáticos.
 
@@ -103,7 +103,7 @@ Implementado na Fase 0: tabela `ROLE_PERMISSIONS` em `packages/contracts/src/acc
 - Sincronização com Google Calendar/iCloud via `.ics` (leitura) e, depois, Google Calendar API (bidirecional) para o profissional.
 
 ### 4.2 Agendamento online (cliente final)
-- **Página pública** do negócio (`agendei.app/nome-do-salao`): fotos, endereço, serviços com preço, profissionais, avaliações, botão "Agendar".
+- **Página pública** do negócio (`skedulei.app/nome-do-salao`): fotos, endereço, serviços com preço, profissionais, avaliações, botão "Agendar".
 - Fluxo em 4 passos: serviço → profissional (ou "qualquer um") → data/hora → identificação (nome + WhatsApp com OTP).
 - Regras: antecedência mínima/máxima, intervalo de grade (15/30 min), serviços que só a recepção agenda, limite de agendamentos por cliente.
 - **Sinal/pré-pagamento** por PIX ou cartão (opcional por serviço), **política de cancelamento** com prazo e taxa, **cliente confiável** dispensado de sinal, bloqueio automático após N faltas.
@@ -249,7 +249,7 @@ Princípios:
 | Decisão | Motivo |
 |---|---|
 | **Reaproveitar o monorepo do Turmei** (pnpm + Turbo, `apps/api`, `apps/web`, `packages/contracts`) | Mesma equipe, mesmas convenções, segurança já resolvida (CSP com nonce, crypto de campos, revogação de sessão, OAuth). |
-| **Multi-tenant em banco único com `organizationId` em todas as tabelas** + guard global `OrgGuard` + **RLS** (rotas de negócio em transação com `app.org_id` e papel `agendei_tenant` sem BYPASSRLS) | Simples de operar; o banco barra vazamento mesmo se uma consulta esquecer o filtro. |
+| **Multi-tenant em banco único com `organizationId` em todas as tabelas** + guard global `OrgGuard` + **RLS** (rotas de negócio em transação com `app.org_id` e papel `skedulei_tenant` sem BYPASSRLS) | Simples de operar; o banco barra vazamento mesmo se uma consulta esquecer o filtro. |
 | **`packages/contracts` com regras puras testadas**: perfis e permissões, segmentos, horário de funcionamento, slug; depois disponibilidade de horário, comissão, DRE, política de cancelamento | Mesma regra na API e no web. |
 | **Motor de disponibilidade** como módulo isolado | É a parte mais crítica e mais testada: horários × bloqueios × recursos × buffers × agendamentos. |
 | **Filas com pg-boss** (Postgres) em vez de Redis no início | Lembretes, WhatsApp, NFS-e, webhooks, relatórios pesados; uma dependência a menos (funciona no Supabase). |

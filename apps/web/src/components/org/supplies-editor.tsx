@@ -1,6 +1,6 @@
 'use client';
 
-import { ProductKind } from '@agendei/contracts';
+import { ProductKind } from '@skedulei/contracts';
 import { Plus, Trash2 } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';

@@ -14,7 +14,7 @@ import {
   type PayablesListDto,
   type ReceivableDto,
   type ReceivablesListDto,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { Organization } from '../organizations/entities/organization.entity';
 import type { OrgContext } from '../organizations/org-context';
 import { TenantDb } from '../tenancy/tenant-db';

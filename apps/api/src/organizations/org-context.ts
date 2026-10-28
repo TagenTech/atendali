@@ -12,7 +12,7 @@ import { ApiHeader } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { Request } from 'express';
 import { Repository } from 'typeorm';
-import { can, MemberStatus, ORG_HEADER, type Permission, type Role } from '@agendei/contracts';
+import { can, MemberStatus, ORG_HEADER, type Permission, type Role } from '@skedulei/contracts';
 import type { JwtPayload } from '../common/types/jwt-payload';
 import { Member } from './entities/member.entity';
 

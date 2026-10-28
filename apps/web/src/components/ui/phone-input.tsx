@@ -1,6 +1,6 @@
 'use client';
 
-import { formatPhone, normalizePhone, PHONE_MAX_LENGTH } from '@agendei/contracts';
+import { formatPhone, normalizePhone, PHONE_MAX_LENGTH } from '@skedulei/contracts';
 import * as React from 'react';
 import { Input, type InputProps } from './input';
 

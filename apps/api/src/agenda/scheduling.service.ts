@@ -10,7 +10,7 @@ import {
   type Interval,
   type IsoDate,
   type SlotsDto,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { Member } from '../organizations/entities/member.entity';
 import { Unit } from '../organizations/entities/unit.entity';
 import { Appointment } from './entities/appointment.entity';

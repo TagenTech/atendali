@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { PHONE_MAX_LENGTH, type BusinessHours, type MemberStatus, type Role } from '@agendei/contracts';
+import { PHONE_MAX_LENGTH, type BusinessHours, type MemberStatus, type Role } from '@skedulei/contracts';
 import { User } from '../../users/entities/user.entity';
 import { Organization } from './organization.entity';
 

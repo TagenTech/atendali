@@ -7,7 +7,7 @@ import { Sheet } from '@/components/ui/sheet';
 import { useInstallPrompt } from '@/lib/pwa';
 import { useHydrated } from '@/lib/use-hydrated';
 
-const DISMISS_KEY = 'agendei_install_dismissed';
+const DISMISS_KEY = 'skedulei_install_dismissed';
 
 function readDismissed() {
   try {
@@ -43,7 +43,7 @@ export function InstallCard({ dismissible = true }: { dismissible?: boolean }) {
           <Smartphone className="size-6" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="font-display font-extrabold text-pink-soft-foreground">Instale o Agendei</p>
+          <p className="font-display font-extrabold text-pink-soft-foreground">Instale o Skedulei</p>
           <p className="text-sm text-pink-soft-foreground/80">Abre como app e recebe os avisos da agenda.</p>
         </div>
         <Button
@@ -86,7 +86,7 @@ export function InstallCard({ dismissible = true }: { dismissible?: boolean }) {
           <li className="flex items-center gap-4">
             <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-pink-soft text-xl">💜</span>
             <p>
-              Toque em <strong>Adicionar</strong> e abra o Agendei pelo ícone.
+              Toque em <strong>Adicionar</strong> e abra o Skedulei pelo ícone.
             </p>
           </li>
         </ol>

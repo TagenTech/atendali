@@ -1,6 +1,6 @@
 'use client';
 
-import { AUTH_PROVIDER_LABEL, formatCpf, isValidCpf, isValidPhone, normalizeCpf } from '@agendei/contracts';
+import { AUTH_PROVIDER_LABEL, formatCpf, isValidCpf, isValidPhone, normalizeCpf } from '@skedulei/contracts';
 import { BadgeCheck, IdCard, MailWarning, MapPin, Phone, ShieldCheck, User } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';

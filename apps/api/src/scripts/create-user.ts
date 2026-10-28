@@ -7,7 +7,7 @@
  */
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
-import { PASSWORD_MIN_LENGTH } from '@agendei/contracts';
+import { PASSWORD_MIN_LENGTH } from '@skedulei/contracts';
 import { AppModule } from '../app.module';
 import { UsersService } from '../users/users.service';
 

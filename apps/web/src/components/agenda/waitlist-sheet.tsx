@@ -1,6 +1,6 @@
 'use client';
 
-import { formatDateShort, slotOpenedMessage, whatsappLink, zonedParts, type WaitlistEntryDto } from '@agendei/contracts';
+import { formatDateShort, slotOpenedMessage, whatsappLink, zonedParts, type WaitlistEntryDto } from '@skedulei/contracts';
 import { BellRing, CalendarPlus, Check, MessageCircle, Plus } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';

@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Organization } from '../../organizations/entities/organization.entity';
-import type { ProductKind } from '@agendei/contracts';
+import type { ProductKind } from '@skedulei/contracts';
 
 @Entity('products')
 export class Product {

@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager, In, IsNull } from 'typeorm';
-import { todayIn, waitlistMatches, zonedParts, type WaitlistEntryDto } from '@agendei/contracts';
+import { todayIn, waitlistMatches, zonedParts, type WaitlistEntryDto } from '@skedulei/contracts';
 import { Member } from '../organizations/entities/member.entity';
 import { ServiceItem } from '../organizations/entities/service-item.entity';
 import type { OrgContext } from '../organizations/org-context';

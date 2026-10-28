@@ -14,7 +14,7 @@ import type {
   SettlePayableRequest,
   SettleReceivableRequest,
   UpdatePayableRequest,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { api } from './client';
 
 const json = (body: unknown) => ({ body: JSON.stringify(body) });

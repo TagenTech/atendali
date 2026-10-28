@@ -16,7 +16,7 @@ import {
   type Feature,
   type SampleService,
   type Segment,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Check, Plus, ShieldAlert, Trash2 } from 'lucide-react';
 import Link from 'next/link';
@@ -143,7 +143,7 @@ export default function OnboardingPage() {
         <div className="sticky top-10 space-y-8">
           <div className="flex items-center gap-2.5">
             <LogoMark className="size-10" />
-            <span className="font-display text-2xl font-black">Agendei</span>
+            <span className="font-display text-2xl font-black">Skedulei</span>
           </div>
           <ol className="space-y-1">
             {STEPS.map((label, i) => (

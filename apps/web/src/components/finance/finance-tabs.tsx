@@ -1,6 +1,6 @@
 'use client';
 
-import { Permission } from '@agendei/contracts';
+import { Permission } from '@skedulei/contracts';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useOrg } from '@/lib/org';

@@ -3,7 +3,7 @@ import base from './playwright.config';
 
 /**
  * Grava vídeos do fluxo completo (clínica pediátrica) — fora da suíte de regressão.
- *   pnpm --filter @agendei/web video            (E2E_SKIP_BUILD=1 reaproveita o último build)
+ *   pnpm --filter @skedulei/web video            (E2E_SKIP_BUILD=1 reaproveita o último build)
  * Os vídeos ficam em apps/web/videos/.
  */
 export default defineConfig({

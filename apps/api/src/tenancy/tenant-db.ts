@@ -13,7 +13,7 @@ const storage = new AsyncLocalStorage<TenantStore>();
 /**
  * Acesso ao banco dentro de uma rota de negócio (@OrgRoute).
  * O TenantInterceptor abre uma transação com `app.org_id` = negócio ativo e o papel restrito
- * `agendei_tenant`: as políticas RLS do Postgres só deixam ver e gravar linhas desse negócio,
+ * `skedulei_tenant`: as políticas RLS do Postgres só deixam ver e gravar linhas desse negócio,
  * mesmo que uma consulta esqueça o `where organizationId`. Fora de rota de negócio (login,
  * onboarding, página pública), usa a conexão normal — e o filtro por negócio fica no código.
  */

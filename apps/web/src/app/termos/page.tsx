@@ -7,12 +7,12 @@ export const metadata: Metadata = { title: 'Termos de uso' };
 export default function TermosPage() {
   return (
     <LegalPage title="Termos de uso" updated="27/10/2026">
-      <p>O Agendei é uma ferramenta para negócios com hora marcada (salões, barbearias, clínicas e consultórios) organizarem agenda, equipe, clientes e financeiro.</p>
+      <p>O Skedulei é uma ferramenta para negócios com hora marcada (salões, barbearias, clínicas e consultórios) organizarem agenda, equipe, clientes e financeiro.</p>
       <h2>Sua conta</h2>
       <ul>
         <li>Você é responsável pelos dados que cadastra e por manter sua senha em segurança.</li>
         <li>Quem é dono(a) do negócio decide quem da equipe acessa o quê e responde pelos dados dos clientes cadastrados.</li>
-        <li>Os dados dos clientes pertencem ao negócio; o Agendei os trata apenas para prestar o serviço (operador, na LGPD).</li>
+        <li>Os dados dos clientes pertencem ao negócio; o Skedulei os trata apenas para prestar o serviço (operador, na LGPD).</li>
       </ul>
       <h2>Uso gratuito e assinatura</h2>
       <p>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Feature, initials, Permission } from '@agendei/contracts';
+import { Feature, initials, Permission } from '@skedulei/contracts';
 import {
   Boxes,
   Building2,
@@ -134,7 +134,7 @@ export default function MaisPage() {
         </Group>
 
         <Group title="Minha conta">
-          <Row icon={Download} label="Exportar meus dados" onClick={() => void downloadFile('/me/export', 'agendei-meus-dados.json')} />
+          <Row icon={Download} label="Exportar meus dados" onClick={() => void downloadFile('/me/export', 'skedulei-meus-dados.json')} />
           <Row icon={ShieldCheck} label="Segurança da conta" href="/mais/seguranca" hint={user && !user.mfaEnabled ? '2FA' : undefined} tone="bg-success-soft text-success-soft-foreground" />
           <Row icon={KeyRound} label={user?.hasPassword === false ? 'Criar senha' : 'Alterar senha'} onClick={() => setPasswordOpen(true)} />
           <Row icon={LifeBuoy} label="Relatar um problema" href="/contato" />
@@ -157,7 +157,7 @@ export default function MaisPage() {
           <LogOut /> Sair
         </Button>
 
-        <p className="pb-2 text-center text-xs text-muted-foreground">Agendei · versão 1.0</p>
+        <p className="pb-2 text-center text-xs text-muted-foreground">Skedulei · versão 1.0</p>
       </div>
       <ChangePasswordSheet open={passwordOpen} onOpenChange={setPasswordOpen} />
     </>

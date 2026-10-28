@@ -1,20 +1,20 @@
 {
-  "name": "agendei",
+  "name": "skedulei",
   "private": true,
   "packageManager": "pnpm@9.15.1",
   "scripts": {
     "dev": "turbo run dev",
-    "dev:api": "pnpm --filter @agendei/api start:dev",
-    "dev:web": "pnpm --filter @agendei/web dev",
+    "dev:api": "pnpm --filter @skedulei/api start:dev",
+    "dev:web": "pnpm --filter @skedulei/web dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "clean": "turbo run clean",
-    "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm --filter @agendei/api test:e2e && pnpm build && pnpm --filter @agendei/web test:e2e",
+    "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm --filter @skedulei/api test:e2e && pnpm build && pnpm --filter @skedulei/web test:e2e",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
-    "api:create-user": "pnpm --filter @agendei/api create-user"
+    "api:create-user": "pnpm --filter @skedulei/api create-user"
   },
   "devDependencies": {
     "turbo": "^2.11.10",

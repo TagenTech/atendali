@@ -12,7 +12,7 @@ let dona: { name: string; email: string; password: string };
 
 test.beforeAll(async ({ browser }, info) => {
   page = await browser.newPage();
-  dona = { name: 'Zé Playwright', email: `ze+${info.project.name}-${Date.now()}@agendei.test`, password: 'senha-forte-123' };
+  dona = { name: 'Zé Playwright', email: `ze+${info.project.name}-${Date.now()}@skedulei.test`, password: 'senha-forte-123' };
 });
 
 test.afterAll(async () => {
@@ -87,7 +87,7 @@ test('equipe: dono, barbeiro sem acesso e convite para a recepção', async () =
 
   await page.getByRole('button', { name: 'Adicionar', exact: true }).click();
   await page.getByLabel('Nome', { exact: true }).fill('Rita Recepção');
-  await page.getByLabel('E-mail').fill(`rita+${Date.now()}@agendei.test`);
+  await page.getByLabel('E-mail').fill(`rita+${Date.now()}@skedulei.test`);
   await page.getByRole('radio', { name: /Recepção/ }).click();
   await page.getByRole('button', { name: 'Salvar' }).click();
   await expect(page.getByText(/Convite enviado para/)).toBeVisible();

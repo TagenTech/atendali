@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { LessThan, MoreThan } from 'typeorm';
-import { AppointmentStatus, CALL_HIGHLIGHT_SECONDS, publicName, type TvBoardDto, type TvEntryDto } from '@agendei/contracts';
+import { AppointmentStatus, CALL_HIGHLIGHT_SECONDS, publicName, type TvBoardDto, type TvEntryDto } from '@skedulei/contracts';
 import { Organization } from '../organizations/entities/organization.entity';
 import type { OrgContext } from '../organizations/org-context';
 import { TenantDb } from '../tenancy/tenant-db';

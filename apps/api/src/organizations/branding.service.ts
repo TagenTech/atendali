@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { BRAND_IMAGE_MAX_BYTES, sniffImageMime, type BrandImageKind, type OrganizationDto } from '@agendei/contracts';
+import { BRAND_IMAGE_MAX_BYTES, sniffImageMime, type BrandImageKind, type OrganizationDto } from '@skedulei/contracts';
 import { TenantDb } from '../tenancy/tenant-db';
 import { Organization } from './entities/organization.entity';
 import { OrganizationImage } from './entities/organization-image.entity';

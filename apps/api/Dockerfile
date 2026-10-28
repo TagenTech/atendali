@@ -1,16 +1,16 @@
-# API Agendei — build a partir da raiz do monorepo:
-#   docker build -f apps/api/Dockerfile -t agendei-api .
+# API Skedulei — build a partir da raiz do monorepo:
+#   docker build -f apps/api/Dockerfile -t skedulei-api .
 FROM node:22-alpine AS build
 RUN corepack enable
 WORKDIR /repo
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc tsconfig.base.json ./
 COPY packages/contracts/package.json packages/contracts/
 COPY apps/api/package.json apps/api/
-RUN pnpm install --frozen-lockfile --filter @agendei/api...
+RUN pnpm install --frozen-lockfile --filter @skedulei/api...
 COPY packages/contracts packages/contracts
 COPY apps/api apps/api
-RUN pnpm --filter @agendei/contracts build && pnpm --filter @agendei/api build
-RUN pnpm --filter @agendei/api deploy --prod /out
+RUN pnpm --filter @skedulei/contracts build && pnpm --filter @skedulei/api build
+RUN pnpm --filter @skedulei/api deploy --prod /out
 
 FROM node:22-alpine
 ENV NODE_ENV=production

@@ -1,4 +1,4 @@
-import { Feature, Permission, type Vocabulary } from '@agendei/contracts';
+import { Feature, Permission, type Vocabulary } from '@skedulei/contracts';
 import { Boxes, CalendarDays, ChartNoAxesCombined, ContactRound, Gift, HandCoins, House, Monitor, Scissors, Settings2, Star, UsersRound, Wallet, type LucideIcon } from 'lucide-react';
 
 export interface NavItem {

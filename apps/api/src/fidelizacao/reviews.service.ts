@@ -11,7 +11,7 @@ import {
   type ReviewDto,
   type ReviewRequestDto,
   type ReviewsDto,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { OrderItem } from '../financeiro/entities/order-item.entity';
 import { Order } from '../financeiro/entities/order.entity';
 import { Organization } from '../organizations/entities/organization.entity';

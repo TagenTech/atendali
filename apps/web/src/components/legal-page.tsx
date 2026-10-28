@@ -6,7 +6,7 @@ export function LegalPage({ title, updated, children }: { title: string; updated
   return (
     <main className="mx-auto max-w-2xl px-5 py-10">
       <Link href="/login" className="mb-8 inline-flex items-center gap-2 font-display font-black">
-        <LogoMark className="size-8" /> Agendei
+        <LogoMark className="size-8" /> Skedulei
       </Link>
       <h1 className="text-3xl font-black">{title}</h1>
       <p className="mt-1 text-sm text-muted-foreground">Atualizado em {updated}</p>

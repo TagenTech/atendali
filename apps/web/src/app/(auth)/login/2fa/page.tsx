@@ -1,6 +1,6 @@
 'use client';
 
-import { safeNext } from '@agendei/contracts';
+import { safeNext } from '@skedulei/contracts';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
@@ -45,7 +45,7 @@ function SecondStep() {
   }
 
   return (
-    <AuthLayout title="Verificação em duas etapas 🔐" subtitle="Abra seu app autenticador e digite o código do Agendei.">
+    <AuthLayout title="Verificação em duas etapas 🔐" subtitle="Abra seu app autenticador e digite o código do Skedulei.">
       <MfaCodeForm
         loading={loading}
         error={error}

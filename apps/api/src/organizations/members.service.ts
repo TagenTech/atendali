@@ -13,7 +13,7 @@ import {
   type InviteInfoDto,
   type MemberDto,
   type OrganizationSummaryDto,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { maskEmail } from '../auth/login-guard';
 import { MailService } from '../mail/mail.service';
 import type { RequestContext } from '../security/request-context';

@@ -14,7 +14,7 @@ import {
   slugify,
   type OrganizationDto,
   type OrganizationSummaryDto,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import type { RequestContext } from '../security/request-context';
 import { SecurityEventsService } from '../security/security-events.service';
 import { User } from '../users/entities/user.entity';

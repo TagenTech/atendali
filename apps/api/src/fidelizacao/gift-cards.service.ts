@@ -10,7 +10,7 @@ import {
   normalizeGiftCode,
   type GiftCardDto,
   type IsoDate,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { Order } from '../financeiro/entities/order.entity';
 import type { OrgContext } from '../organizations/org-context';
 import { assertFeature } from '../tenancy/feature-gate';

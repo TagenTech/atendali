@@ -13,11 +13,11 @@ test.describe('tema: abre claro por padrão', () => {
 
   test('quem escolheu escuro ou automático continua com a escolha', async ({ page }) => {
     await page.goto('/login');
-    await page.evaluate(() => localStorage.setItem('agendei_theme', 'dark'));
+    await page.evaluate(() => localStorage.setItem('skedulei_theme', 'dark'));
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 
-    await page.evaluate(() => localStorage.setItem('agendei_theme', 'system'));
+    await page.evaluate(() => localStorage.setItem('skedulei_theme', 'system'));
     await page.reload();
     await expect(page.locator('html')).not.toHaveAttribute('data-theme', /.+/);
     expect(await bg(page)).toBe('rgb(23, 19, 31)');

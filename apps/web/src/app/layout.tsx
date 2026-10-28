@@ -9,10 +9,10 @@ const nunito = Nunito({ subsets: ['latin'], variable: '--font-nunito', weight: [
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: { default: 'Agendei', template: '%s · Agendei' },
+  title: { default: 'Skedulei', template: '%s · Skedulei' },
   description: 'Agendamento, equipe e financeiro para salões, clínicas e consultórios.',
-  applicationName: 'Agendei',
-  appleWebApp: { capable: true, title: 'Agendei', statusBarStyle: 'default' },
+  applicationName: 'Skedulei',
+  appleWebApp: { capable: true, title: 'Skedulei', statusBarStyle: 'default' },
   formatDetection: { telephone: false },
   icons: {
     icon: [{ url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' }],

@@ -26,7 +26,7 @@ test.beforeAll(async ({ browser }, info) => {
   const stamp = `${info.project.name}-${Date.now()}`;
   await page.goto('/cadastro');
   await page.getByLabel('Seu nome').fill('Zé Agenda');
-  await page.getByLabel('E-mail').fill(`ze-agenda+${stamp}@agendei.test`);
+  await page.getByLabel('E-mail').fill(`ze-agenda+${stamp}@skedulei.test`);
   await page.getByLabel('Senha', { exact: true }).fill('senha-forte-123');
   await page.getByLabel('Confirmar senha').fill('senha-forte-123');
   await page.getByRole('checkbox').check();

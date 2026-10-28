@@ -15,7 +15,7 @@ import {
   type CommissionEntryDto,
   type CommissionPayoutDto,
   type FinanceSummaryDto,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { Member } from '../organizations/entities/member.entity';
 import type { OrgContext } from '../organizations/org-context';
 import { TenantDb } from '../tenancy/tenant-db';

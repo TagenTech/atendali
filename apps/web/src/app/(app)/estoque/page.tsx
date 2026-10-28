@@ -1,6 +1,6 @@
 'use client';
 
-import { formatBRL, Permission, PRODUCT_KIND_LABEL, STOCK_MOVEMENT_LABEL, STOCK_STATUS_LABEL, type ProductDto, type StockStatus } from '@agendei/contracts';
+import { formatBRL, Permission, PRODUCT_KIND_LABEL, STOCK_MOVEMENT_LABEL, STOCK_STATUS_LABEL, type ProductDto, type StockStatus } from '@skedulei/contracts';
 import { ArrowDownUp, Plus, Search } from 'lucide-react';
 import * as React from 'react';
 import { Kpi } from '@/components/finance/kpi';

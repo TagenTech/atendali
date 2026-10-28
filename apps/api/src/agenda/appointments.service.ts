@@ -13,7 +13,7 @@ import {
   type AppointmentDto,
   type BlockDto,
   type SlotsDto,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import type { OrgContext } from '../organizations/org-context';
 import { OrderItem } from '../financeiro/entities/order-item.entity';
 import { Member } from '../organizations/entities/member.entity';

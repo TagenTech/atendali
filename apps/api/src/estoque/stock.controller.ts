@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Put, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { Permission as P } from '@agendei/contracts';
+import { Permission as P } from '@skedulei/contracts';
 import { CurrentOrg, OrgRoute, type OrgContext } from '../organizations/org-context';
 import { MovementDto, MovementsQueryDto, ProductDto, SuppliesDto, UpdateProductDto } from './dto/stock.dto';
 import { StockService } from './stock.service';

@@ -1,6 +1,6 @@
 'use client';
 
-import { Feature, formatDuration, type ServiceDto } from '@agendei/contracts';
+import { Feature, formatDuration, type ServiceDto } from '@skedulei/contracts';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';

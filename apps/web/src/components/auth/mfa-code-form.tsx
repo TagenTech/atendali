@@ -7,7 +7,7 @@ import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
-export const MFA_TICKET_KEY = 'agendei_mfa_ticket';
+export const MFA_TICKET_KEY = 'skedulei_mfa_ticket';
 
 /** Campo do código de 6 dígitos (com troca para código de recuperação). */
 export function MfaCodeForm({

@@ -10,7 +10,7 @@ import {
   type ProductInput,
   type SetSuppliesRequest,
   type UpdateProductRequest,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { EmptyToNull } from '../../common/validators/br.validators';
 
 const trim = () => Transform(({ value }) => (typeof value === 'string' ? value.trim() : value));

@@ -1,6 +1,6 @@
 'use client';
 
-import { formatBRL, formatDateShort, pct, Permission, zonedParts } from '@agendei/contracts';
+import { formatBRL, formatDateShort, pct, Permission, zonedParts } from '@skedulei/contracts';
 import { HandCoins, Plus } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';

@@ -1,11 +1,11 @@
-# Agendei — guia rápido para agentes
+# Skedulei — guia rápido para agentes
 
 Monorepo pnpm + Turbo, nascido do Turmei (`../gestao-aulas`). Leia o [README](README.md) e o [docs/PLANO.md](docs/PLANO.md) (produto, roadmap por fases).
 
 ## Convenções
 - Textos de interface e mensagens de erro em **português (pt-BR)**, tom acolhedor e curto.
 - **Dinheiro em centavos** (int). **Datas de calendário** como `'YYYY-MM-DD'`; instantes em UTC; "hoje" no fuso da **unidade** (`todayIn(tz)` em `packages/contracts/src/dates.ts`).
-- **Regras puras** (perfis/permissões, segmentos, horário de funcionamento, slug; depois disponibilidade, comissão, DRE) ficam em `packages/contracts` com testes — API e web usam as mesmas. Depois de mudar contracts: `pnpm --filter @agendei/contracts build`.
+- **Regras puras** (perfis/permissões, segmentos, horário de funcionamento, slug; depois disponibilidade, comissão, DRE) ficam em `packages/contracts` com testes — API e web usam as mesmas. Depois de mudar contracts: `pnpm --filter @skedulei/contracts build`.
 - Status derivados (atrasado, pago…) são **calculados**, nunca gravados.
 
 ## Multiempresa e permissões
@@ -15,7 +15,7 @@ Monorepo pnpm + Turbo, nascido do Turmei (`../gestao-aulas`). Leia o [README](RE
 - Perfis e permissões: `ROLE_PERMISSIONS`/`canAssignRole` em `packages/contracts/src/access.ts`. No web, esconda o que a pessoa não pode com `useOrg().can(...)` — a API também recusa.
 - Módulos por segmento: `SEGMENT_PRESETS`/`FEATURES` em `packages/contracts/src/segments.ts`; no web `useOrg().has(feature)` e `useOrg().vocab` ("Serviço" × "Procedimento", "Cliente" × "Paciente"). Nunca escreva "cliente"/"serviço" fixo onde o vocabulário muda.
 - Isolamento entre negócios tem teste e2e (`apps/api/test/organizations.e2e-spec.ts`, `agenda.e2e-spec.ts`). Recurso novo de negócio → teste de que outro negócio não lê nem altera.
-- **RLS no Postgres** (`apps/api/src/tenancy`): em rota @OrgRoute o `TenantInterceptor` abre uma transação com `app.org_id` e `SET LOCAL ROLE agendei_tenant`; as políticas só deixam ler/gravar linhas do negócio ativo. Nos serviços de negócio use `TenantDb.repo(Entidade)` / `TenantDb.transaction(...)` (nunca `@InjectRepository`), senão a consulta sai da transação e perde a proteção. Tabela nova com `organization_id` entra nas políticas sozinha (na subida da API). Rotas públicas/sistema (login, onboarding, `/public/*`) não têm RLS: filtre pelo negócio no código.
+- **RLS no Postgres** (`apps/api/src/tenancy`): em rota @OrgRoute o `TenantInterceptor` abre uma transação com `app.org_id` e `SET LOCAL ROLE skedulei_tenant`; as políticas só deixam ler/gravar linhas do negócio ativo. Nos serviços de negócio use `TenantDb.repo(Entidade)` / `TenantDb.transaction(...)` (nunca `@InjectRepository`), senão a consulta sai da transação e perde a proteção. Tabela nova com `organization_id` entra nas políticas sozinha (na subida da API). Rotas públicas/sistema (login, onboarding, `/public/*`) não têm RLS: filtre pelo negócio no código.
 
 ## Agenda (Fase 1)
 - Regras puras em `packages/contracts/src/agenda.ts`: `availableSlots`, `withinBusinessHours`, `STATUS_FLOW`/`canMoveTo`, `occupiesSlot` (cancelado libera), `ONLINE_BOOKING`.
@@ -45,12 +45,12 @@ Monorepo pnpm + Turbo, nascido do Turmei (`../gestao-aulas`). Leia o [README](RE
 ## Personalização e demo
 - Página pública: logo e fundo em `organization_images` (bytea; o navegador reduz antes de enviar; a API confere os bytes — PNG/JPG/WebP, nunca SVG), cor da paleta `BRAND_COLORS` e frase. Endereços `/public/orgs/<slug>/brand/{logo,cover}?v=` (cache longo, versão = data da troca).
 - Limites de cadastro/criação de negócio (10/h por IP) vêm de `REGISTER_THROTTLE_LIMIT` (o Playwright usa 1000).
-- `node apps/api/scripts/seed-demo.js` cria um usuário demo por segmento (`demo-<segmento>@agendei.test`, senha `senha-forte-123`), com todos os módulos ligados. Só dev. `node apps/api/scripts/seed-demo-data.js` enche essas contas com ~30 dias de movimento (equipe, clientes, agenda, caixa, comandas, comissões, contas, estoque, pacotes, clube, vale, pontos, avaliações); só roda em negócio sem comandas.
+- `node apps/api/scripts/seed-demo.js` cria um usuário demo por segmento (`demo-<segmento>@skedulei.test`, senha `senha-forte-123`), com todos os módulos ligados. Só dev. `node apps/api/scripts/seed-demo-data.js` enche essas contas com ~30 dias de movimento (equipe, clientes, agenda, caixa, comandas, comissões, contas, estoque, pacotes, clube, vale, pontos, avaliações); só roda em negócio sem comandas.
 - **Regressão**: `pnpm verify` (tipos, lint, regras, API e2e, build, Playwright). `apps/web/e2e/regressao-telas.spec.ts` abre toda tela como dono e como cada perfil (recepção, profissional, financeiro, gerente), no celular e no desktop, e falha com erro de console, resposta 5xx ou rolagem lateral. Mudou tela, rota ou permissão → rode antes de encerrar.
 
 - **Formulários**: erro embaixo do campo (`useFieldErrors`, `lib/use-field-errors.ts`; chave = `id` do campo) ou zod + react-hook-form nas telas de conta; nunca só `toast.error` para campo vazio. Senha: `passwordProblem`/`isCommonPassword` (`contracts/src/password.ts`) — tela e API (`NotCommonPassword`) recusam senhas comuns. Testes: `e2e/senhas.spec.ts`, `e2e/formularios-erros.spec.ts`.
 - **Tema**: abre **claro** por padrão (`lib/theme.ts`); escuro/automático só se a pessoa escolher (`e2e/tema.spec.ts`).
-- **Vídeo do fluxo completo** (clínica pediátrica: cadastro, agenda pela recepção, paciente pelo celular, comanda, caixa, comissão, financeiro): `pnpm --filter @agendei/web video` (`E2E_SKIP_BUILD=1` reaproveita o build) → `apps/web/videos/` (3 atos em .webm + `pediatria-completo.mp4` com ffmpeg). Roteiro em `apps/web/e2e-video/`, fora do `verify`.
+- **Vídeo do fluxo completo** (clínica pediátrica: cadastro, agenda pela recepção, paciente pelo celular, comanda, caixa, comissão, financeiro): `pnpm --filter @skedulei/web video` (`E2E_SKIP_BUILD=1` reaproveita o build) → `apps/web/videos/` (3 atos em .webm + `pediatria-completo.mp4` com ffmpeg). Roteiro em `apps/web/e2e-video/`, fora do `verify`.
 
 ## Contas, DRE e fluxo (fim da Fase 2)
 - Regras puras em `packages/contracts/src/ledger.ts` (`payableStatus`/`receivableStatus`, `monthlyDates`, `settlementDate`, `buildDre`, `buildCashFlow`, plano de contas `defaultChartOfAccounts`) e `csv.ts` (`parseCsv`, `csvSafe`/`toCsv` neutralizam fórmula, `previewClientImport`).
@@ -91,6 +91,6 @@ Monorepo pnpm + Turbo, nascido do Turmei (`../gestao-aulas`). Leia o [README](RE
 - Rotas dinâmicas novas exigem reiniciar o `next dev`.
 
 ## Verificação
-`pnpm typecheck && pnpm lint && pnpm test && pnpm --filter @agendei/api test:e2e && pnpm build && pnpm --filter @agendei/web test:e2e`
+`pnpm typecheck && pnpm lint && pnpm test && pnpm --filter @skedulei/api test:e2e && pnpm build && pnpm --filter @skedulei/web test:e2e`
 
 Testes: regras em `packages/contracts/*.spec.ts`; API em `src/**/*.spec.ts` (unidade) e `test/*.e2e-spec.ts` (Postgres real, setup em `test/env.ts`/`helpers.ts`); web em `apps/web/e2e` (Playwright, projetos `celular` e `desktop`, seletores por rótulo/papel acessível). Funcionalidade nova → teste junto.

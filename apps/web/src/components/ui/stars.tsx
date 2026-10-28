@@ -1,6 +1,6 @@
 'use client';
 
-import { MAX_RATING } from '@agendei/contracts';
+import { MAX_RATING } from '@skedulei/contracts';
 import { Star } from 'lucide-react';
 import * as React from 'react';
 import { cn } from '@/lib/utils';

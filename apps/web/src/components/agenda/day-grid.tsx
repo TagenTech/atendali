@@ -1,6 +1,6 @@
 'use client';
 
-import { APPOINTMENT_STATUS_LABEL, zonedParts, type AgendaDayDto, type AppointmentDto, type TimeRange } from '@agendei/contracts';
+import { APPOINTMENT_STATUS_LABEL, zonedParts, type AgendaDayDto, type AppointmentDto, type TimeRange } from '@skedulei/contracts';
 import { CheckCircle2, Globe, Lock } from 'lucide-react';
 import * as React from 'react';
 import { memberColor } from '@/components/org/member-sheet';

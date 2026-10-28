@@ -8,7 +8,7 @@ import {
   type ClientMembershipDto,
   type IsoDate,
   type MembershipPlanDto as MembershipPlanResponse,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { ServiceItem } from '../organizations/entities/service-item.entity';
 import type { OrgContext } from '../organizations/org-context';
 import { assertFeature } from '../tenancy/feature-gate';

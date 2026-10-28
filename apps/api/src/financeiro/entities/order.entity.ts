@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Organization } from '../../organizations/entities/organization.entity';
-import type { OrderStatus } from '@agendei/contracts';
+import type { OrderStatus } from '@skedulei/contracts';
 import { Client } from '../../agenda/entities/client.entity';
 
 /** Comanda: o que o cliente consumiu e como pagou. */

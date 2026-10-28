@@ -5,7 +5,7 @@ import type request from 'supertest';
 import { DataSource, type EntityTarget } from 'typeorm';
 import { AppModule } from '../src/app.module';
 import { configureApp } from '../src/configure-app';
-import { defaultBusinessHours } from '@agendei/contracts';
+import { defaultBusinessHours } from '@skedulei/contracts';
 
 export function quotedTable<T extends object>(db: DataSource, entity: EntityTarget<T>) {
   return `"${db.getMetadata(entity).tableName}"`;
@@ -30,7 +30,7 @@ type Http = ReturnType<typeof request>;
  */
 export async function registerUser(http: Http, name: string, email: string, password = 'senha-forte-123') {
   const res = await http.post('/v1/auth/register').send({ name, email, password, acceptTerms: true }).expect(201);
-  const cookie = (res.headers['set-cookie'] as unknown as string[]).find((c) => c.startsWith('agendei_refresh='))!.split(';')[0];
+  const cookie = (res.headers['set-cookie'] as unknown as string[]).find((c) => c.startsWith('skedulei_refresh='))!.split(';')[0];
   return {
     id: res.body.user.id as string,
     token: res.body.accessToken as string,

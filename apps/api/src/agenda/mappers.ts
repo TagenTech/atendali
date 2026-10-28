@@ -1,4 +1,4 @@
-import type { AppointmentDto, BlockDto, ClientDto } from '@agendei/contracts';
+import type { AppointmentDto, BlockDto, ClientDto } from '@skedulei/contracts';
 import { decryptField } from '../common/crypto/field-crypto';
 import type { Appointment } from './entities/appointment.entity';
 import type { ScheduleBlock } from './entities/block.entity';

@@ -1,6 +1,6 @@
 'use client';
 
-import { CLIENT_IMPORT_MAX_ROWS, formatDateShort, formatPhone, Permission, toCsv, type ClientImportPreview, type ClientImportReport, type ClientImportRow } from '@agendei/contracts';
+import { CLIENT_IMPORT_MAX_ROWS, formatDateShort, formatPhone, Permission, toCsv, type ClientImportPreview, type ClientImportReport, type ClientImportRow } from '@skedulei/contracts';
 import { ArrowLeft, Download, FileUp } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';

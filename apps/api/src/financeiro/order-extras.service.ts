@@ -17,7 +17,7 @@ import {
   sessionValueCents,
   cycleEnd,
   type IsoDate,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { StockService } from '../estoque/stock.service';
 import { Product } from '../estoque/entities/product.entity';
 import { ServiceSupply } from '../estoque/entities/service-supply.entity';

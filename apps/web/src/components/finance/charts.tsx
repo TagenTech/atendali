@@ -1,6 +1,6 @@
 'use client';
 
-import { formatBRL } from '@agendei/contracts';
+import { formatBRL } from '@skedulei/contracts';
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 

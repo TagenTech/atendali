@@ -1,6 +1,6 @@
 'use client';
 
-import { Permission, zonedParts, zonedToUtc, type AgendaDayDto } from '@agendei/contracts';
+import { Permission, zonedParts, zonedToUtc, type AgendaDayDto } from '@skedulei/contracts';
 import { Trash2 } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';

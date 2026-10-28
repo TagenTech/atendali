@@ -20,10 +20,10 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @agendei/contracts build
-      - run: pnpm --filter @agendei/api build
+      - run: pnpm --filter @skedulei/contracts build
+      - run: pnpm --filter @skedulei/api build
       - name: Aplicar migrations no Supabase
-        run: pnpm --filter @agendei/api migration:run:prod
+        run: pnpm --filter @skedulei/api migration:run:prod
         env:
           DATABASE_URL: ${{ secrets.SUPABASE_MIGRATIONS_URL }}
           DB_SSL: 'true'

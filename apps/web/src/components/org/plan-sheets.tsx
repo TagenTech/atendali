@@ -1,6 +1,6 @@
 'use client';
 
-import type { MembershipPlanDto, PackagePlanDto } from '@agendei/contracts';
+import type { MembershipPlanDto, PackagePlanDto } from '@skedulei/contracts';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';

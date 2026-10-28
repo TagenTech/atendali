@@ -2,7 +2,7 @@
  * Conta e preferências contra um Postgres real: esqueci a senha, reenviar confirmação, renovação de sessão
  * (com detecção de reuso), sair, encerrar um aparelho, desativar 2FA e gerar novos códigos, ajustes,
  * exportar dados, push (status/desativar/teste) e novo link do calendário.
- *   pnpm --filter @agendei/api test:e2e
+ *   pnpm --filter @skedulei/api test:e2e
  */
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
@@ -20,13 +20,13 @@ describe('Conta (e2e)', () => {
     );
   const tokenOf = (link: string) => new URL(link).searchParams.get('token')!;
   const cookieOf = (res: request.Response) =>
-    ((res.headers['set-cookie'] as unknown as string[]) ?? []).find((c) => c.startsWith('agendei_refresh='))?.split(';')[0];
+    ((res.headers['set-cookie'] as unknown as string[]) ?? []).find((c) => c.startsWith('skedulei_refresh='))?.split(';')[0];
   const login = (email: string, password: string) => http.post('/v1/auth/login').send({ email, password });
 
   beforeAll(async () => {
     app = await createTestApp();
     http = request(app.getHttpServer());
-    me = await registerUser(http, 'Prof Conta', 'conta@agendei.test');
+    me = await registerUser(http, 'Prof Conta', 'conta@skedulei.test');
   });
 
   afterAll(async () => {
@@ -43,9 +43,9 @@ describe('Conta (e2e)', () => {
   });
 
   it('esqueci a senha: não revela contas, o link troca a senha uma vez e derruba as sessões', async () => {
-    const victim = await registerUser(http, 'Esquecida', 'esquecida@agendei.test', 'senha-antiga-123');
-    await http.post('/v1/auth/forgot-password').send({ email: 'ninguem@agendei.test' }).expect(204);
-    expect(await outbox('ninguem@agendei.test', 'Redefinir')).toHaveLength(0);
+    const victim = await registerUser(http, 'Esquecida', 'esquecida@skedulei.test', 'senha-antiga-123');
+    await http.post('/v1/auth/forgot-password').send({ email: 'ninguem@skedulei.test' }).expect(204);
+    expect(await outbox('ninguem@skedulei.test', 'Redefinir')).toHaveLength(0);
 
     await http.post('/v1/auth/forgot-password').send({ email: victim.email }).expect(204);
     const [mail] = await outbox(victim.email, 'Redefinir');
@@ -62,7 +62,7 @@ describe('Conta (e2e)', () => {
   });
 
   it('renovar sessão troca o cookie; reusar o cookie antigo derruba tudo (roubo de token)', async () => {
-    const t = await registerUser(http, 'Renova', 'renova@agendei.test');
+    const t = await registerUser(http, 'Renova', 'renova@skedulei.test');
     const renewed = await http.post('/v1/auth/refresh').set('Cookie', t.cookie).expect(200);
     const newCookie = cookieOf(renewed)!;
     expect(newCookie).toBeDefined();
@@ -76,9 +76,9 @@ describe('Conta (e2e)', () => {
   });
 
   it('sair encerra a sessão e apaga o cookie', async () => {
-    const t = await registerUser(http, 'Sai', 'sai-sessao@agendei.test');
+    const t = await registerUser(http, 'Sai', 'sai-sessao@skedulei.test');
     const res = await http.post('/v1/auth/logout').set('Cookie', t.cookie).expect(204);
-    expect(cookieOf(res)).toBe('agendei_refresh=');
+    expect(cookieOf(res)).toBe('skedulei_refresh=');
     await http.post('/v1/auth/refresh').set('Cookie', t.cookie).expect(401);
     await http.get('/v1/organizations').set(t.auth).expect(401);
     // Sair sem sessão não quebra.
@@ -86,7 +86,7 @@ describe('Conta (e2e)', () => {
   });
 
   it('encerrar um aparelho específico derruba só ele', async () => {
-    const phone = await registerUser(http, 'Dois Aparelhos', 'dois@agendei.test');
+    const phone = await registerUser(http, 'Dois Aparelhos', 'dois@skedulei.test');
     const laptop = await login(phone.email, phone.password).expect(200);
     const laptopAuth = { authorization: `Bearer ${laptop.body.accessToken}` };
 

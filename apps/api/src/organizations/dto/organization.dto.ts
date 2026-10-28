@@ -47,7 +47,7 @@ import {
   type UpdateOrganizationRequest,
   type UpdateServiceRequest,
   type UpdateUnitRequest,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { EmptyToNull, IsPhone } from '../../common/validators/br.validators';
 
 const trim = () => Transform(({ value }) => (typeof value === 'string' ? value.trim() : value));

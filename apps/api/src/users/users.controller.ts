@@ -3,7 +3,7 @@ import { Throttle } from '@nestjs/throttler';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../common/types/jwt-payload';
-import { isValidCpf, SecurityEventType } from '@agendei/contracts';
+import { isValidCpf, SecurityEventType } from '@skedulei/contracts';
 import type { Request } from 'express';
 import { contextOf } from '../security/request-context';
 import { SecurityEventsService } from '../security/security-events.service';
@@ -37,7 +37,7 @@ export class UsersController {
 
   @Get('export')
   @Throttle({ default: { ttl: 60_000, limit: 3 } })
-  @Header('Content-Disposition', 'attachment; filename="agendei-meus-dados.json"')
+  @Header('Content-Disposition', 'attachment; filename="skedulei-meus-dados.json"')
   export(@CurrentUser() user: JwtPayload) {
     return this.exporter.export(user.sub);
   }

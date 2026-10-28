@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { PHONE_MAX_LENGTH } from '@agendei/contracts';
+import { PHONE_MAX_LENGTH } from '@skedulei/contracts';
 import { Organization } from '../../organizations/entities/organization.entity';
 
 /** Cliente/paciente de um negócio. Observações podem ter dado de saúde: ficam cifradas. */

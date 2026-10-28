@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsOptional, IsString, IsTimeZone, MaxLength } from 'class-validator';
-import type { UpdateSettingsRequest } from '@agendei/contracts';
+import type { UpdateSettingsRequest } from '@skedulei/contracts';
 
 const trim = () => Transform(({ value }) => (typeof value === 'string' ? value.trim() : value));
 

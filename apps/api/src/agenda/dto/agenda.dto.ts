@@ -25,7 +25,7 @@ import {
   type CreateWaitlistRequest,
   type PublicBookingRequest,
   type UpdateAppointmentRequest,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { EmptyToNull, IsIsoDate, IsPhone } from '../../common/validators/br.validators';
 
 const trim = () => Transform(({ value }) => (typeof value === 'string' ? value.trim() : value));

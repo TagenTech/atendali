@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Organization } from '../../organizations/entities/organization.entity';
-import type { PaymentMethod } from '@agendei/contracts';
+import type { PaymentMethod } from '@skedulei/contracts';
 import { Order } from './order.entity';
 
 /** Pagamento de uma comanda (vários por comanda: parte no PIX, parte no cartão). */

@@ -11,7 +11,7 @@ import {
   type ClientMembershipDto,
   type MembershipPlanDto,
   type PackagePlanDto,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';

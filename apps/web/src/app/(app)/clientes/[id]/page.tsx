@@ -9,7 +9,7 @@ import {
   todayIn,
   whatsappLink,
   zonedParts,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { CalendarPlus, Mail, MessageCircle, Pencil, Phone, Trash2 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import * as React from 'react';

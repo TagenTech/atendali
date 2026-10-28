@@ -1,6 +1,6 @@
 'use client';
 
-import { formatBRL, ORDER_STATUS_LABEL, PAYMENT_METHOD_LABEL, todayIn, zonedParts, type OrderSummaryDto } from '@agendei/contracts';
+import { formatBRL, ORDER_STATUS_LABEL, PAYMENT_METHOD_LABEL, todayIn, zonedParts, type OrderSummaryDto } from '@skedulei/contracts';
 import { ArrowDownToLine, ArrowUpFromLine, ChevronRight, Lock, Plus, Unlock } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

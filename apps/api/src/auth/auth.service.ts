@@ -12,7 +12,7 @@ import {
   type AuthResponse,
   type MfaSetupDto,
   type SessionDto,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import type { AppConfig } from '../config/configuration';
 import { decryptField, encryptField } from '../common/crypto/field-crypto';
 import type { JwtPayload } from '../common/types/jwt-payload';
@@ -31,7 +31,7 @@ import { generateRecoveryCodes, generateSecret, normalizeRecoveryCode, otpauthUr
 
 /** Hash usado quando o e-mail não existe, para o tempo de resposta não revelar contas. */
 let dummyHash: Promise<string> | undefined;
-const getDummyHash = () => (dummyHash ??= bcrypt.hash('agendei-dummy', BCRYPT_ROUNDS));
+const getDummyHash = () => (dummyHash ??= bcrypt.hash('skedulei-dummy', BCRYPT_ROUNDS));
 
 const VERIFY_TTL_MS = 3 * 86_400_000;
 const RESET_TTL_MS = 3_600_000;

@@ -1,11 +1,11 @@
 /**
  * Fase 3 contra um Postgres real: estoque e ficha técnica, pacotes, clube, vale-presente, fidelidade,
- * avaliações e painel de TV — todos passando pela comanda (banco agendei_test).
+ * avaliações e painel de TV — todos passando pela comanda (banco skedulei_test).
  */
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { DataSource } from 'typeorm';
-import { addDays, cycleEnd, ORG_HEADER, todayIn } from '@agendei/contracts';
+import { addDays, cycleEnd, ORG_HEADER, todayIn } from '@skedulei/contracts';
 import { createTestApp, newOrg, registerUser } from './helpers';
 
 type Session = Awaited<ReturnType<typeof registerUser>>;
@@ -53,15 +53,15 @@ describe('Estoque, pacotes, clube, vales, pontos, avaliações e TV (e2e)', () =
     app = await createTestApp();
     http = request(app.getHttpServer());
     db = app.get(DataSource);
-    dona = await registerUser(http, 'Dona Retenção', 'dona-ret@agendei.test');
+    dona = await registerUser(http, 'Dona Retenção', 'dona-ret@skedulei.test');
     const org = await http
       .post('/v1/organizations')
       .set(dona.auth)
       .send(
         newOrg('Salão Retenção', {
           team: [
-            { name: 'Paula Pro', email: 'paula-ret@agendei.test', role: 'PROFISSIONAL', bookable: true },
-            { name: 'Rita Recepção', email: 'rita-ret@agendei.test', role: 'RECEPCAO', bookable: false },
+            { name: 'Paula Pro', email: 'paula-ret@skedulei.test', role: 'PROFISSIONAL', bookable: true },
+            { name: 'Rita Recepção', email: 'rita-ret@skedulei.test', role: 'RECEPCAO', bookable: false },
           ],
         }),
       )
@@ -70,8 +70,8 @@ describe('Estoque, pacotes, clube, vales, pontos, avaliações e TV (e2e)', () =
     slug = org.body.slug;
     corte = (await http.get('/v1/org/services').set(inOrg(dona)).expect(200)).body[0];
     members = (await http.get('/v1/org/members').set(inOrg(dona)).expect(200)).body;
-    paula = await join('Paula', 'paula-ret@agendei.test');
-    rita = await join('Rita', 'rita-ret@agendei.test');
+    paula = await join('Paula', 'paula-ret@skedulei.test');
+    rita = await join('Rita', 'rita-ret@skedulei.test');
     await http.patch(`/v1/org/members/${memberId('Paula Pro')}`).set(inOrg(dona)).send({ commissionBps: 4000 }).expect(200);
     await http.post('/v1/org/cash/open').set(inOrg(rita)).send({ openingCents: 0 }).expect(201);
   });
@@ -219,12 +219,12 @@ describe('Estoque, pacotes, clube, vales, pontos, avaliações e TV (e2e)', () =
     const refused = await cancel(sale.id).expect(400);
     expect(refused.body.message).toMatch(/já foi usado/);
 
-    await db.query(`UPDATE agendei_client_packages SET expires_at = $1 WHERE id = $2`, [addDays(TODAY, -1), cpId]);
+    await db.query(`UPDATE skedulei_client_packages SET expires_at = $1 WHERE id = $2`, [addDays(TODAY, -1), cpId]);
     expect((await http.get(`/v1/org/client-packages?clientId=${ana}`).set(inOrg(rita)).expect(200)).body[0].status).toBe('EXPIRADO');
     const late = await addItem(await order(ana), { kind: 'SESSAO_PACOTE', refId: cpId }).expect(400);
     expect(late.body.message).toMatch(/não está mais ativo/);
     // Esgotado também.
-    await db.query(`UPDATE agendei_client_packages SET expires_at = NULL, sessions_used = sessions_total WHERE id = $1`, [cpId]);
+    await db.query(`UPDATE skedulei_client_packages SET expires_at = NULL, sessions_used = sessions_total WHERE id = $1`, [cpId]);
     expect((await http.get(`/v1/org/client-packages?clientId=${ana}`).set(inOrg(rita)).expect(200)).body[0]).toMatchObject({ status: 'ESGOTADO', sessionsLeft: 0 });
     expect((await http.get(`/v1/org/client-packages?clientId=${ana}&ativos=1`).set(inOrg(rita)).expect(200)).body).toEqual([]);
   });
@@ -258,8 +258,8 @@ describe('Estoque, pacotes, clube, vales, pontos, avaliações e TV (e2e)', () =
   it('clube vencido: bloqueia o uso, renova recomeçando o ciclo e a renovação não estorna sozinha', async () => {
     const bia = ((await http.get('/v1/org/clients?q=Bia').set(inOrg(rita)).expect(200)).body as { id: string }[])[0].id;
     const m = (await http.get(`/v1/org/memberships?clientId=${bia}`).set(inOrg(rita)).expect(200)).body[0];
-    await db.query(`UPDATE agendei_client_memberships SET paid_through = $1 WHERE id = $2`, [addDays(TODAY, -1), m.id]);
-    await db.query(`UPDATE agendei_membership_uses SET used_date = used_date - 60 WHERE membership_id = $1`, [m.id]);
+    await db.query(`UPDATE skedulei_client_memberships SET paid_through = $1 WHERE id = $2`, [addDays(TODAY, -1), m.id]);
+    await db.query(`UPDATE skedulei_membership_uses SET used_date = used_date - 60 WHERE membership_id = $1`, [m.id]);
     expect((await http.get(`/v1/org/memberships?clientId=${bia}`).set(inOrg(rita)).expect(200)).body[0]).toMatchObject({ state: 'VENCIDA', canUse: false });
     const blocked = await addItem(await order(bia), { kind: 'SESSAO_CLUBE', refId: m.id, serviceId: corte.id }).expect(400);
     expect(blocked.body.message).toMatch(/vencida/);
@@ -279,7 +279,7 @@ describe('Estoque, pacotes, clube, vales, pontos, avaliações e TV (e2e)', () =
     await sell(caio, { kind: 'CLUBE', refId: clubId }, 9900);
     const mid = (await http.get(`/v1/org/memberships?clientId=${caio}`).set(inOrg(rita)).expect(200)).body[0].id;
     // Perto de vencer (5 dias), renovar acrescenta um ciclo; estornar volta ao ciclo anterior.
-    await db.query(`UPDATE agendei_client_memberships SET paid_through = $1 WHERE id = $2`, [addDays(TODAY, 5), mid]);
+    await db.query(`UPDATE skedulei_client_memberships SET paid_through = $1 WHERE id = $2`, [addDays(TODAY, 5), mid]);
     const renew = await sell(caio, { kind: 'CLUBE', refId: clubId }, 9900);
     expect((await http.get(`/v1/org/memberships?clientId=${caio}`).set(inOrg(rita)).expect(200)).body[0].paidThrough).toBe(cycleEnd(TODAY, 2));
     await cancel(renew).expect(200);
@@ -343,7 +343,7 @@ describe('Estoque, pacotes, clube, vales, pontos, avaliações e TV (e2e)', () =
     const id = await sell(undefined, { kind: 'VALE', unitPriceCents: 5000 }, 5000);
     expect(id).toBeTruthy();
     const [card] = (await http.get('/v1/org/gift-cards').set(inOrg(rita)).expect(200)).body;
-    await db.query(`UPDATE agendei_gift_cards SET expires_at = $1 WHERE id = $2`, [addDays(TODAY, -1), card.id]);
+    await db.query(`UPDATE skedulei_gift_cards SET expires_at = $1 WHERE id = $2`, [addDays(TODAY, -1), card.id]);
     expect((await http.get('/v1/org/gift-cards').set(inOrg(rita)).expect(200)).body[0].status).toBe('EXPIRADO');
     const o = await order();
     await addItem(o, { kind: 'SERVICO', serviceId: corte.id }).expect(201);
@@ -488,7 +488,7 @@ describe('Estoque, pacotes, clube, vales, pontos, avaliações e TV (e2e)', () =
     expect(board.next.map((e: { name: string }) => e.name)).not.toContain('Lia S.');
 
     // Chamada vencida (> 2 min) sai do destaque; quem chegou aparece em "aguardando".
-    await db.query(`UPDATE agendei_appointments SET called_at = NOW() - INTERVAL '5 minutes' WHERE id = $1`, [appt.id]);
+    await db.query(`UPDATE skedulei_appointments SET called_at = NOW() - INTERVAL '5 minutes' WHERE id = $1`, [appt.id]);
     await http.post('/v1/org/orders').set(inOrg(rita)).send({ appointmentIds: [appt.id] }).expect(201);
     board = (await http.get('/v1/org/tv').set(inOrg(rita)).expect(200)).body;
     expect(board.calling).toEqual([]);
@@ -503,7 +503,7 @@ describe('Estoque, pacotes, clube, vales, pontos, avaliações e TV (e2e)', () =
   // ------------------------------------------------------------------ isolamento
 
   it('outro negócio não vê vales, pacotes, estoque nem avaliações', async () => {
-    const outra = await registerUser(http, 'Outra Retenção', 'outra-ret@agendei.test');
+    const outra = await registerUser(http, 'Outra Retenção', 'outra-ret@skedulei.test');
     const other = (await http.post('/v1/organizations').set(outra.auth).send(newOrg('Outro Salão Ret')).expect(201)).body;
     await http
       .patch('/v1/org')

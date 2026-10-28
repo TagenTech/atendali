@@ -9,7 +9,7 @@ import type {
   UpdateMembershipPlanRequest,
   UpdatePackagePlanRequest,
   UpdateProductRequest,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as r from '@/lib/api/retention';
 import { useOrg } from '@/lib/org';

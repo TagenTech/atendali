@@ -20,7 +20,7 @@ export class ExportService {
     );
     return {
       exportedAt: new Date().toISOString(),
-      app: 'Agendei',
+      app: 'Skedulei',
       user,
       teams: await q(
         `SELECT o.name AS organization, o.segment, m.name, m.role, m.status, m.bookable, m.joined_at

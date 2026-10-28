@@ -1,6 +1,6 @@
 'use client';
 
-import { addDays, addMonths, firstDayOf, lastDayOf, monthOf, todayIn } from '@agendei/contracts';
+import { addDays, addMonths, firstDayOf, lastDayOf, monthOf, todayIn } from '@skedulei/contracts';
 import * as React from 'react';
 import { Chip } from '@/components/ui/chip';
 import { useOrg } from '@/lib/org';

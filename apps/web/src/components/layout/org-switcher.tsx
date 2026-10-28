@@ -1,6 +1,6 @@
 'use client';
 
-import { ROLE_INFO, SEGMENT_PRESETS } from '@agendei/contracts';
+import { ROLE_INFO, SEGMENT_PRESETS } from '@skedulei/contracts';
 import { Check, ChevronsUpDown, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from '@/components/ui/menu';

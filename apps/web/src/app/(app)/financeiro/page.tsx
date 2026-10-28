@@ -1,6 +1,6 @@
 'use client';
 
-import { formatBRL, PAYMENT_METHOD_LABEL } from '@agendei/contracts';
+import { formatBRL, PAYMENT_METHOD_LABEL } from '@skedulei/contracts';
 import { DailyColumns, HBars } from '@/components/finance/charts';
 import { Kpi } from '@/components/finance/kpi';
 import { FinanceTabs } from '@/components/finance/finance-tabs';

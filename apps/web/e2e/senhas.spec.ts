@@ -34,7 +34,7 @@ test.describe('senhas: cadastro, recuperação e troca', () => {
     await expect(page.getByText('Esse e-mail não parece certo')).toBeVisible();
     await expect(page.getByText(/muito comum/)).toBeVisible();
 
-    await page.getByLabel('E-mail').fill(`senhas-cad+${stamp}@agendei.test`);
+    await page.getByLabel('E-mail').fill(`senhas-cad+${stamp}@skedulei.test`);
     await page.getByLabel('Senha', { exact: true }).fill(NOVA);
     await page.getByLabel('Confirmar senha').fill('outra-coisa-123');
     await page.getByRole('button', { name: 'Criar minha conta' }).click();
@@ -48,13 +48,13 @@ test.describe('senhas: cadastro, recuperação e troca', () => {
 
   test('a API também recusa senha comum e curta', async ({ request }) => {
     for (const password of ['12345678', 'password123', 'abc']) {
-      const res = await request.post('/api/v1/auth/register', { data: { name: 'Teste', email: `comum+${stamp}-${password}@agendei.test`, password, acceptTerms: true } });
+      const res = await request.post('/api/v1/auth/register', { data: { name: 'Teste', email: `comum+${stamp}-${password}@skedulei.test`, password, acceptTerms: true } });
       expect(res.status(), password).toBe(400);
     }
   });
 
   test('esqueci a senha: e-mail inválido, link por e-mail, regras e login com a nova senha', async ({ page, context }) => {
-    const email = `senhas-rec+${stamp}@agendei.test`;
+    const email = `senhas-rec+${stamp}@skedulei.test`;
     await signUp(context, 'Rita Recupera', email);
     await context.clearCookies();
 
@@ -95,7 +95,7 @@ test.describe('senhas: cadastro, recuperação e troca', () => {
   });
 
   test('o mesmo link de redefinição não funciona duas vezes', async ({ page, context }) => {
-    const email = `senhas-uso+${stamp}@agendei.test`;
+    const email = `senhas-uso+${stamp}@skedulei.test`;
     await signUp(context, 'Uso Único', email);
     await context.clearCookies();
     await page.request.post('/api/v1/auth/forgot-password', { data: { email } });

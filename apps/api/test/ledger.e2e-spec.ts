@@ -1,10 +1,10 @@
 /**
- * Contas a pagar/receber, DRE, fluxo de caixa e importação de clientes (banco agendei_test).
- *   pnpm --filter @agendei/api test:e2e
+ * Contas a pagar/receber, DRE, fluxo de caixa e importação de clientes (banco skedulei_test).
+ *   pnpm --filter @skedulei/api test:e2e
  */
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { addDays, ORG_HEADER, todayIn } from '@agendei/contracts';
+import { addDays, ORG_HEADER, todayIn } from '@skedulei/contracts';
 import { createTestApp, newOrg, registerUser } from './helpers';
 
 type Session = Awaited<ReturnType<typeof registerUser>>;
@@ -35,7 +35,7 @@ describe('Contas, DRE, fluxo de caixa e importação (e2e)', () => {
   beforeAll(async () => {
     app = await createTestApp();
     http = request(app.getHttpServer());
-    dona = await registerUser(http, 'Dona Contas', 'dona-contas@agendei.test');
+    dona = await registerUser(http, 'Dona Contas', 'dona-contas@skedulei.test');
     orgId = (
       await http
         .post('/v1/organizations')
@@ -43,16 +43,16 @@ describe('Contas, DRE, fluxo de caixa e importação (e2e)', () => {
         .send(
           newOrg('Salão Contas', {
             team: [
-              { name: 'Paula Pro', email: 'paula-contas@agendei.test', role: 'PROFISSIONAL', bookable: true },
-              { name: 'Rita Recepção', email: 'rita-contas@agendei.test', role: 'RECEPCAO', bookable: false },
+              { name: 'Paula Pro', email: 'paula-contas@skedulei.test', role: 'PROFISSIONAL', bookable: true },
+              { name: 'Rita Recepção', email: 'rita-contas@skedulei.test', role: 'RECEPCAO', bookable: false },
             ],
           }),
         )
         .expect(201)
     ).body.id;
-    paula = await join('Paula', 'paula-contas@agendei.test');
-    rita = await join('Rita', 'rita-contas@agendei.test');
-    outra = await registerUser(http, 'Outra Contas', 'outra-contas@agendei.test');
+    paula = await join('Paula', 'paula-contas@skedulei.test');
+    rita = await join('Rita', 'rita-contas@skedulei.test');
+    outra = await registerUser(http, 'Outra Contas', 'outra-contas@skedulei.test');
     otherId = (await http.post('/v1/organizations').set(outra.auth).send(newOrg('Outro Contas', { segment: 'CLINICA_MEDICA' })).expect(201)).body.id;
   });
 

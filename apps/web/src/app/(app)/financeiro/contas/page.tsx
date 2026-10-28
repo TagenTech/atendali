@@ -14,7 +14,7 @@ import {
   RECEIVABLE_STATUS_LABEL,
   type PayableDto,
   type ReceivableDto,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { ChevronLeft, ChevronRight, ListTree, Plus } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';

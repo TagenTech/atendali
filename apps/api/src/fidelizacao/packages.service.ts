@@ -7,7 +7,7 @@ import {
   type ClientPackageDto,
   type IsoDate,
   type PackagePlanDto as PackagePlanResponse,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { ServiceItem } from '../organizations/entities/service-item.entity';
 import type { OrgContext } from '../organizations/org-context';
 import { assertFeature } from '../tenancy/feature-gate';

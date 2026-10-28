@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: 'Entrar' };
 
 export default function LoginPage() {
   return (
-    <AuthLayout title="Agendei" subtitle="Agenda, equipe e financeiro do seu negócio num só lugar 💜">
+    <AuthLayout title="Skedulei" subtitle="Agenda, equipe e financeiro do seu negócio num só lugar 💜">
       <Suspense>
         <LoginForm />
       </Suspense>

@@ -11,7 +11,7 @@ import {
   validateBusinessHours,
   type BusinessHours,
   type MemberDto,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { Check, Mail, Send } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';

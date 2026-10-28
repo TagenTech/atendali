@@ -11,8 +11,8 @@ import {
   whatsappLink,
   zonedParts,
   type PublicOrgDto,
-} from '@agendei/contracts';
-import { BRAND_COLORS, formatRating, type BrandColor } from '@agendei/contracts';
+} from '@skedulei/contracts';
+import { BRAND_COLORS, formatRating, type BrandColor } from '@skedulei/contracts';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Check, Clock, MapPin, MessageCircle, UserRound, Users } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
@@ -370,7 +370,7 @@ export default function BookingPage() {
             )}
           </Card>
           <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-            <LogoMark className="size-4" /> Agendamento por Agendei
+            <LogoMark className="size-4" /> Agendamento por Skedulei
           </p>
         </aside>
       </div>

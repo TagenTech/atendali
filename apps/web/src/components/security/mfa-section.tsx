@@ -1,6 +1,6 @@
 'use client';
 
-import type { MfaSetupDto } from '@agendei/contracts';
+import type { MfaSetupDto } from '@skedulei/contracts';
 import { Copy, Download, ExternalLink, ShieldCheck, ShieldOff } from 'lucide-react';
 import QRCode from 'qrcode';
 import * as React from 'react';
@@ -17,7 +17,7 @@ import { haptic } from '@/lib/utils';
 const errMsg = (e: unknown) => (e instanceof ApiError ? (e.details?.[0] ?? e.message) : 'Algo deu errado');
 
 function RecoveryCodes({ codes, onDone }: { codes: string[]; onDone: () => void }) {
-  const text = `Códigos de recuperação do Agendei (cada um funciona uma vez):\n\n${codes.join('\n')}\n`;
+  const text = `Códigos de recuperação do Skedulei (cada um funciona uma vez):\n\n${codes.join('\n')}\n`;
   return (
     <div className="space-y-4">
       <p className="text-sm">
@@ -43,7 +43,7 @@ function RecoveryCodes({ codes, onDone }: { codes: string[]; onDone: () => void 
           variant="soft"
           onClick={() => {
             const url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
-            Object.assign(document.createElement('a'), { href: url, download: 'agendei-codigos-de-recuperacao.txt' }).click();
+            Object.assign(document.createElement('a'), { href: url, download: 'skedulei-codigos-de-recuperacao.txt' }).click();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
           }}
         >

@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { EntityManager, In, IsNull } from 'typeorm';
-import { cashExpected, OrderStatus, type CashSessionDto } from '@agendei/contracts';
+import { cashExpected, OrderStatus, type CashSessionDto } from '@skedulei/contracts';
 import { Member } from '../organizations/entities/member.entity';
 import { Unit } from '../organizations/entities/unit.entity';
 import type { OrgContext } from '../organizations/org-context';

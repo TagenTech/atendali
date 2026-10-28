@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { ServiceDto as ServiceResponse, UnitDto as UnitResponse } from '@agendei/contracts';
+import type { ServiceDto as ServiceResponse, UnitDto as UnitResponse } from '@skedulei/contracts';
 import { ServiceDto, UnitDto, UpdateServiceDto, UpdateUnitDto } from './dto/organization.dto';
 import { ServiceItem } from './entities/service-item.entity';
 import { Unit } from './entities/unit.entity';

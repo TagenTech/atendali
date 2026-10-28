@@ -1,6 +1,6 @@
 'use client';
 
-import { formatBRL, PAYMENT_METHOD_LABEL, PAYMENT_METHODS, type CashMovementKind, type CashSessionDto } from '@agendei/contracts';
+import { formatBRL, PAYMENT_METHOD_LABEL, PAYMENT_METHODS, type CashMovementKind, type CashSessionDto } from '@skedulei/contracts';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';

@@ -8,7 +8,7 @@ import {
   type ClientDto as ClientResponse,
   type ClientImportPreview,
   type ClientImportReport,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { encryptField } from '../common/crypto/field-crypto';
 import type { OrgContext } from '../organizations/org-context';
 import { TenantDb } from '../tenancy/tenant-db';

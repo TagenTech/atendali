@@ -10,7 +10,7 @@ export async function lockdownSupabaseTables(queryRunner: QueryRunner) {
       FOR target IN
         SELECT schemaname, tablename
         FROM pg_tables
-        WHERE schemaname = 'public' AND tablename LIKE 'agendei\\_%' ESCAPE '\\'
+        WHERE schemaname = 'public' AND tablename LIKE 'skedulei\\_%' ESCAPE '\\'
       LOOP
         EXECUTE format('ALTER TABLE %I.%I ENABLE ROW LEVEL SECURITY', target.schemaname, target.tablename);
         FOREACH role_name IN ARRAY ARRAY['anon', 'authenticated'] LOOP
@@ -33,7 +33,7 @@ export async function disableSupabaseRls(queryRunner: QueryRunner) {
       FOR target IN
         SELECT schemaname, tablename
         FROM pg_tables
-        WHERE schemaname = 'public' AND tablename LIKE 'agendei\\_%' ESCAPE '\\'
+        WHERE schemaname = 'public' AND tablename LIKE 'skedulei\\_%' ESCAPE '\\'
       LOOP
         EXECUTE format('ALTER TABLE %I.%I DISABLE ROW LEVEL SECURITY', target.schemaname, target.tablename);
       END LOOP;

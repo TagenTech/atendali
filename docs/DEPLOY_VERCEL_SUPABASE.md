@@ -1,22 +1,22 @@
 # Deploy: Cloudflare + Vercel (free) + Supabase
 
-> Herdado do Turmei. Os jobs agendados (pg_cron → `/v1/internal/jobs/*`) ainda não existem no Agendei — voltam com os lembretes da Fase 1; ignore a seção 6 até lá.
+> Herdado do Turmei. Os jobs agendados (pg_cron → `/v1/internal/jobs/*`) ainda não existem no Skedulei — voltam com os lembretes da Fase 1; ignore a seção 6 até lá.
 
 Alternativa ao deploy em VPS ([LANCAMENTO.md](LANCAMENTO.md)). Topologia:
 
 ```text
-agendei.com.br (Cloudflare DNS) → Vercel "agendei-web" (Next) ──/api/v1/*──→ Vercel "agendei-api" (NestJS serverless)
+skedulei.com.br (Cloudflare DNS) → Vercel "skedulei-web" (Next) ──/api/v1/*──→ Vercel "skedulei-api" (NestJS serverless)
                                                                               │
-Supabase pg_cron + pg_net ── a cada minuto/hora/dia ──→ POST /v1/internal/jobs/* ┘ → Supabase Postgres (tabelas agendei_*)
+Supabase pg_cron + pg_net ── a cada minuto/hora/dia ──→ POST /v1/internal/jobs/* ┘ → Supabase Postgres (tabelas skedulei_*)
 ```
 
-- Tabelas com prefixo `agendei_` (inclusive `agendei_migrations`), RLS ligado e sem acesso para `anon`/`authenticated`: a API REST do Supabase não enxerga nada.
+- Tabelas com prefixo `skedulei_` (inclusive `skedulei_migrations`), RLS ligado e sem acesso para `anon`/`authenticated`: a API REST do Supabase não enxerga nada.
 - Os `@Cron` ficam desligados na Vercel (`SCHEDULER_ENABLED=false`); quem dispara é o pg_cron ([deploy/supabase/cron.sql](../deploy/supabase/cron.sql)).
 - Migrations rodam no GitHub Actions ([migrate.yml](../.github/workflows/migrate.yml)) a cada push na `main`, não na subida da API.
 - Plano Hobby da Vercel é para uso não comercial: ao começar a cobrar a licença, migre para o Pro.
 
 ## 1. Cloudflare
-1. Zona `agendei.com.br` no plano Free, nameservers trocados no Registro.br, zona **Active**.
+1. Zona `skedulei.com.br` no plano Free, nameservers trocados no Registro.br, zona **Active**.
 2. SSL/TLS → **Full (strict)**; Edge Certificates → **Always Use HTTPS**.
 3. Os registros da Vercel entram no passo 5.
 
@@ -30,22 +30,22 @@ Supabase pg_cron + pg_net ── a cada minuto/hora/dia ──→ POST /v1/inter
 ## 3. Migrations (GitHub Actions)
 1. GitHub → repo → Settings → Secrets and variables → Actions → **New repository secret**: `SUPABASE_MIGRATIONS_URL` = string do Session pooler.
 2. Actions → **Migrations** → Run workflow (ou faça push na `main`).
-3. Confira no Supabase (Table Editor) as tabelas `agendei_*` e o aviso de RLS ligado.
+3. Confira no Supabase (Table Editor) as tabelas `skedulei_*` e o aviso de RLS ligado.
 
 ## 4. Vercel
 Importe o repositório **duas vezes** (Add New → Project), uma por app. A Vercel precisa ter acesso à org TagenTech no GitHub.
 
-**agendei-api**
+**skedulei-api**
 - Root Directory: `apps/api` · Framework Preset: **Other** (o resto vem do `apps/api/vercel.json`).
 - Environment Variables: as da seção "API" do [.env.vercel.example](../.env.vercel.example). Gere os segredos como em [LANCAMENTO.md](LANCAMENTO.md#1-chaves-e-segredos); `CRON_SECRET` com `openssl rand -base64 48`.
-- Depois do deploy: `https://<agendei-api>.vercel.app/v1/health` deve responder `{"status":"ok"}`.
+- Depois do deploy: `https://<skedulei-api>.vercel.app/v1/health` deve responder `{"status":"ok"}`.
 
-**agendei-web**
+**skedulei-web**
 - Root Directory: `apps/web` · Framework Preset: **Next.js**.
-- Environment Variables: `API_URL=https://<agendei-api>.vercel.app`.
+- Environment Variables: `API_URL=https://<skedulei-api>.vercel.app`.
 
 ## 5. Domínio
-1. agendei-web → Settings → Domains → adicione `agendei.com.br` e `www.agendei.com.br` (www redireciona para o domínio raiz).
+1. skedulei-web → Settings → Domains → adicione `skedulei.com.br` e `www.skedulei.com.br` (www redireciona para o domínio raiz).
 2. No Cloudflare → DNS, crie o que a Vercel mostrar, com proxy **desligado (DNS only, nuvem cinza)**. Normalmente:
    - `A` `@` → `76.76.21.21`
    - `CNAME` `www` → `cname.vercel-dns.com`
@@ -60,6 +60,6 @@ Importe o repositório **duas vezes** (Add New → Project), uma por app. A Verc
    Esperado: `200` com `{"job":"reminders","ok":true,...}`. `401` = segredo diferente; `404` = URL errada ou `CRON_SECRET` não configurado na API.
 
 ## 7. Conferência final
-- `https://agendei.com.br` abre, cadastro e login funcionam, `https://agendei.com.br/api/v1/health` responde.
-- Faça login e confira o IP gravado: `select ip, created_at from agendei_security_events order by created_at desc limit 5;`. Se aparecer um IP da Vercel em vez do seu, ajuste `TRUST_PROXY_HOPS` na agendei-api (o rate-limit de login depende disso).
-- E-mail (Resend) e OAuth: siga [LANCAMENTO.md](LANCAMENTO.md), usando `https://agendei.com.br` nas URLs de callback e criando os registros DNS do Resend no Cloudflare.
+- `https://skedulei.com.br` abre, cadastro e login funcionam, `https://skedulei.com.br/api/v1/health` responde.
+- Faça login e confira o IP gravado: `select ip, created_at from skedulei_security_events order by created_at desc limit 5;`. Se aparecer um IP da Vercel em vez do seu, ajuste `TRUST_PROXY_HOPS` na skedulei-api (o rate-limit de login depende disso).
+- E-mail (Resend) e OAuth: siga [LANCAMENTO.md](LANCAMENTO.md), usando `https://skedulei.com.br` nas URLs de callback e criando os registros DNS do Resend no Cloudflare.

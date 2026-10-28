@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Organization } from '../../organizations/entities/organization.entity';
-import type { CashMovementKind } from '@agendei/contracts';
+import type { CashMovementKind } from '@skedulei/contracts';
 
 /** Sangria (tira dinheiro da gaveta) ou suprimento (põe troco). */
 @Entity('cash_movements')

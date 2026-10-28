@@ -1,6 +1,6 @@
 'use client';
 
-import { STOCK_MOVEMENT_LABEL, type ManualMovement, type ProductDto } from '@agendei/contracts';
+import { STOCK_MOVEMENT_LABEL, type ManualMovement, type ProductDto } from '@skedulei/contracts';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';

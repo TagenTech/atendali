@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-const REFRESH_COOKIE = 'agendei_refresh';
+const REFRESH_COOKIE = 'skedulei_refresh';
 /** Telas de entrada: com sessão, vai direto para o app. */
 const ENTRY = ['/login', '/cadastro', '/esqueci-senha'];
 /** Área logada. */

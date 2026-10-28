@@ -1,6 +1,6 @@
 'use client';
 
-import { defaultBusinessHours, validateBusinessHours, type UnitDto } from '@agendei/contracts';
+import { defaultBusinessHours, validateBusinessHours, type UnitDto } from '@skedulei/contracts';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';

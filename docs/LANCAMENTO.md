@@ -1,8 +1,8 @@
 # Lançamento — o que falta e como configurar
 
-Atualizado em **28/10/2026**. Este é o checklist para colocar o Agendei no ar. Os itens marcados 🔴 **bloqueiam** o
+Atualizado em **28/10/2026**. Este é o checklist para colocar o Skedulei no ar. Os itens marcados 🔴 **bloqueiam** o
 lançamento; 🟡 são fortemente recomendados; 🟢 podem vir depois. A análise de segurança que originou a lista está em
-[SEGURANCA.md](SEGURANCA.md#auditoria-de-lançamento--agendei-28102026).
+[SEGURANCA.md](SEGURANCA.md#auditoria-de-lançamento--skedulei-28102026).
 
 Repositório: <https://github.com/TagenTech/skedulei> (ainda **sem push**; só há commits locais).
 
@@ -57,7 +57,7 @@ confirmação → todas as sessões são encerradas. Em produção **ele só fun
 
 1. Crie a conta no [Resend](https://resend.com) e **verifique o domínio** (registros DNS que ele mostra).
 2. No DNS (Cloudflare) deixe: **SPF**, **DKIM** (os do Resend) e **DMARC** (`_dmarc` → `v=DMARC1; p=quarantine; rua=mailto:dmarc@seudominio`). Sem isso os e-mails caem no spam.
-3. Variáveis: `RESEND_API_KEY` e `MAIL_FROM` (ex.: `Agendei <nao-responda@seudominio.com.br>`).
+3. Variáveis: `RESEND_API_KEY` e `MAIL_FROM` (ex.: `Skedulei <nao-responda@seudominio.com.br>`).
 4. **Teste em homologação**: cadastre-se → chega o link de confirmação; "Esqueci minha senha" → chega o link; convide uma pessoa para a equipe → chega o convite; confirme que nenhum cai em spam.
 
 E-mails enviados hoje: confirmação de cadastro, redefinição de senha, aviso de "já existe conta com seu e-mail",
@@ -107,11 +107,11 @@ Em qualquer opção, ative no Cloudflare: *Bot Fight Mode* e a regra gerenciada 
 
 ## 5. Banco de dados
 
-- Tabelas com prefixo `agendei_`; produção usa **migrations** (`apps/api/src/migrations`), nunca `synchronize`. O workflow
+- Tabelas com prefixo `skedulei_`; produção usa **migrations** (`apps/api/src/migrations`), nunca `synchronize`. O workflow
   [migrate.yml](../.github/workflows/migrate.yml) roda a cada push na `main` com o secret `SUPABASE_MIGRATIONS_URL` (Session pooler).
-- **Isolamento entre negócios** depende de RLS + papel `agendei_tenant`. Valide em **homologação no Supabase** (ainda não
+- **Isolamento entre negócios** depende de RLS + papel `skedulei_tenant`. Valide em **homologação no Supabase** (ainda não
   testado fora do Postgres local): a API usa `SET LOCAL ROLE` dentro de transação; confirme que funciona pelo
-  *Transaction pooler* (porta 6543) e que `agendei_tenant` existe e tem `GRANT` nas tabelas. Teste: usuário do negócio A
+  *Transaction pooler* (porta 6543) e que `skedulei_tenant` existe e tem `GRANT` nas tabelas. Teste: usuário do negócio A
   recebe 404 em dados do negócio B (há testes e2e: `organizations.e2e-spec.ts`, `agenda.e2e-spec.ts`).
 - `lockdownSupabaseTables` desliga o acesso `anon`/`authenticated` da API REST do Supabase — confira no painel que as
   tabelas aparecem com RLS ligado e **sem políticas públicas**.
@@ -135,10 +135,10 @@ Em qualquer opção, ative no Cloudflare: *Bot Fight Mode* e a regra gerenciada 
 
 ## 7. LGPD e textos legais
 
-O Agendei trata **dado de saúde** (LGPD art. 11) em nome das clínicas. Antes de lançar, com apoio jurídico:
+O Skedulei trata **dado de saúde** (LGPD art. 11) em nome das clínicas. Antes de lançar, com apoio jurídico:
 
 - Reescrever **Termos** e **Política de Privacidade** (`/termos`, `/privacidade`) para o modelo real: a **clínica é a controladora**
-  dos dados dos pacientes e o Agendei é **operador**; prever contrato de tratamento de dados (DPA) para as clínicas.
+  dos dados dos pacientes e o Skedulei é **operador**; prever contrato de tratamento de dados (DPA) para as clínicas.
 - Base legal e consentimento para dado de saúde; prazo de retenção; canal do titular e **encarregado (DPO)**.
 - Telas já existentes que ajudam: excluir/anonimizar cliente (histórico permanece sem identificação), excluir minha conta,
   observações de saúde cifradas, CPF cifrado e nunca devolvido inteiro ao navegador.
@@ -150,5 +150,5 @@ O Agendei trata **dado de saúde** (LGPD art. 11) em nome das clínicas. Antes d
 - **Monitoramento**: `SENTRY_DSN` (dados pessoais são removidos antes do envio); health check `GET /v1/health`; alerta de uptime.
 - **Backups**: Supabase (diário) + dumps cifrados (`BACKUP_PASSPHRASE`); **faça um teste de restauração** antes do lançamento e a cada trimestre.
 - **CI**: `.github/workflows/ci.yml` (tipos, lint, testes, build, `pnpm audit`), `codeql.yml`, `migrate.yml`. Habilite *branch protection* na `main` exigindo o CI verde.
-- **Antes de cada versão**: `pnpm verify` (tipos, lint, regras, API e2e, build, Playwright). Vídeo de demonstração: `pnpm --filter @agendei/web video`.
+- **Antes de cada versão**: `pnpm verify` (tipos, lint, regras, API e2e, build, Playwright). Vídeo de demonstração: `pnpm --filter @skedulei/web video`.
 - **Renovações**: segredo do cliente Microsoft, certificados (Cloudflare/Let's Encrypt automático), chaves VAPID.

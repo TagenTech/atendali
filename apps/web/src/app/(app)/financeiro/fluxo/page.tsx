@@ -1,6 +1,6 @@
 'use client';
 
-import { formatBRL, formatDateShort, PROJECTION_DAYS } from '@agendei/contracts';
+import { formatBRL, formatDateShort, PROJECTION_DAYS } from '@skedulei/contracts';
 import * as React from 'react';
 import { FlowColumns } from '@/components/finance/charts';
 import { FinanceTabs } from '@/components/finance/finance-tabs';

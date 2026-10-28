@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { Permission as P } from '@agendei/contracts';
+import { Permission as P } from '@skedulei/contracts';
 import { CurrentOrg, OrgRoute, type OrgContext } from '../organizations/org-context';
 import { CashService } from './cash.service';
 import { CommissionsService } from './commissions.service';

@@ -7,13 +7,13 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-agendei}
+      POSTGRES_USER: ${POSTGRES_USER:-skedulei}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB:-agendei}
+      POSTGRES_DB: ${POSTGRES_DB:-skedulei}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-agendei}']
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-skedulei}']
       interval: 10s
       retries: 5
 
@@ -25,7 +25,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3200
-      DATABASE_URL: postgres://${POSTGRES_USER:-agendei}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-agendei}
+      DATABASE_URL: postgres://${POSTGRES_USER:-skedulei}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-skedulei}
       TYPEORM_SYNC: 'false'
       JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET}
       CORS_ORIGINS: ''
@@ -34,7 +34,7 @@ services:
       SENTRY_DSN: ${SENTRY_DSN:-}
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
-      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:contato@agendei.app}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:contato@skedulei.app}
       SIGNUP_ENABLED: ${SIGNUP_ENABLED:-true}
       TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-1}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
@@ -75,9 +75,9 @@ services:
     depends_on: [postgres]
     environment:
       PGHOST: postgres
-      PGUSER: ${POSTGRES_USER:-agendei}
+      PGUSER: ${POSTGRES_USER:-skedulei}
       PGPASSWORD: ${POSTGRES_PASSWORD}
-      PGDATABASE: ${POSTGRES_DB:-agendei}
+      PGDATABASE: ${POSTGRES_DB:-skedulei}
       KEEP_DAYS: 14
       # Backups criptografados (AES-256). Guarde esta senha fora do servidor!
       BACKUP_PASSPHRASE: ${BACKUP_PASSPHRASE:?defina BACKUP_PASSPHRASE}

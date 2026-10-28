@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { DEFAULT_TIMEZONE, PHONE_MAX_LENGTH, type BusinessHours } from '@agendei/contracts';
+import { DEFAULT_TIMEZONE, PHONE_MAX_LENGTH, type BusinessHours } from '@skedulei/contracts';
 import { Organization } from './organization.entity';
 
 /** Unidade (filial): endereço, fuso e horário de funcionamento próprios. */

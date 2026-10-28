@@ -1,10 +1,10 @@
 /**
- * Multiempresa, perfis de acesso e onboarding contra um Postgres real (banco agendei_test).
- *   pnpm --filter @agendei/api test:e2e
+ * Multiempresa, perfis de acesso e onboarding contra um Postgres real (banco skedulei_test).
+ *   pnpm --filter @skedulei/api test:e2e
  */
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { defaultBusinessHours, ORG_HEADER } from '@agendei/contracts';
+import { defaultBusinessHours, ORG_HEADER } from '@skedulei/contracts';
 import { ServiceItem } from '../src/organizations/entities/service-item.entity';
 import { TenantDb } from '../src/tenancy/tenant-db';
 import { createTestApp, newOrg, registerUser } from './helpers';
@@ -28,7 +28,7 @@ describe('Negócios, equipe e permissões (e2e)', () => {
   beforeAll(async () => {
     app = await createTestApp();
     http = request(app.getHttpServer());
-    dona = await registerUser(http, 'Bela Dona', 'bela@agendei.test');
+    dona = await registerUser(http, 'Bela Dona', 'bela@skedulei.test');
   });
 
   afterAll(async () => {
@@ -59,8 +59,8 @@ describe('Negócios, equipe e permissões (e2e)', () => {
       .send(
         newOrg('Studio Bella & Cia', {
           team: [
-            { name: 'Rita Recepção', email: 'rita@agendei.test', role: 'RECEPCAO', bookable: false },
-            { name: 'Paula Profissional', email: 'paula@agendei.test', role: 'PROFISSIONAL', bookable: true },
+            { name: 'Rita Recepção', email: 'rita@skedulei.test', role: 'RECEPCAO', bookable: false },
+            { name: 'Paula Profissional', email: 'paula@skedulei.test', role: 'PROFISSIONAL', bookable: true },
             { name: 'Mari Manicure', role: 'PROFISSIONAL', bookable: true },
           ],
         }),
@@ -94,7 +94,7 @@ describe('Negócios, equipe e permissões (e2e)', () => {
   });
 
   it('mesmo nome gera outro endereço público', async () => {
-    const outra = await registerUser(http, 'Outra Bella', 'outra-bella@agendei.test');
+    const outra = await registerUser(http, 'Outra Bella', 'outra-bella@skedulei.test');
     const res = await http.post('/v1/organizations').set(outra.auth).send(newOrg('Studio Bella & Cia')).expect(201);
     expect(res.body.slug).toBe('studio-bella-e-cia-2');
   });
@@ -103,23 +103,23 @@ describe('Negócios, equipe e permissões (e2e)', () => {
     await http.get('/v1/org').set(dona.auth).expect(403);
     await http.get('/v1/org').set(inOrg(dona, 'nao-e-uuid')).expect(403);
     await http.get('/v1/org').set(inOrg(dona, '00000000-0000-4000-8000-000000000000')).expect(403);
-    const intrusa = await registerUser(http, 'Intrusa', 'intrusa@agendei.test');
+    const intrusa = await registerUser(http, 'Intrusa', 'intrusa@skedulei.test');
     await http.get('/v1/org/services').set(inOrg(intrusa)).expect(403);
     await http.post('/v1/org/services').set(inOrg(intrusa)).send({ name: 'X', durationMinutes: 30, priceCents: 0 }).expect(403);
   });
 
   let rita: Session;
   it('convite: só a conta do e-mail convidado aceita, uma vez', async () => {
-    const link = await lastInviteTo('rita@agendei.test');
+    const link = await lastInviteTo('rita@skedulei.test');
     const token = link.split('token=')[1];
     const info = (await http.get(`/v1/invites/info?token=${token}`).expect(200)).body;
     expect(info).toMatchObject({ organizationName: 'Studio Bella & Cia', role: 'RECEPCAO' });
-    expect(info.email).not.toBe('rita@agendei.test');
+    expect(info.email).not.toBe('rita@skedulei.test');
 
-    const errada = await registerUser(http, 'Errada', 'errada@agendei.test');
+    const errada = await registerUser(http, 'Errada', 'errada@skedulei.test');
     await http.post('/v1/invites/accept').set(errada.auth).send({ token }).expect(403);
 
-    rita = await registerUser(http, 'Rita R', 'rita@agendei.test');
+    rita = await registerUser(http, 'Rita R', 'rita@skedulei.test');
     const ok = await http.post('/v1/invites/accept').set(rita.auth).send({ token }).expect(201);
     expect(ok.body).toMatchObject({ id: orgId, role: 'RECEPCAO' });
     await http.post('/v1/invites/accept').set(rita.auth).send({ token }).expect(400);
@@ -144,7 +144,7 @@ describe('Negócios, equipe e permissões (e2e)', () => {
     await http
       .post('/v1/org/members')
       .set(inOrg(dona))
-      .send({ name: 'Repetida', email: 'PAULA@agendei.test', role: 'PROFISSIONAL', bookable: true })
+      .send({ name: 'Repetida', email: 'PAULA@skedulei.test', role: 'PROFISSIONAL', bookable: true })
       .expect(409);
   });
 
@@ -152,11 +152,11 @@ describe('Negócios, equipe e permissões (e2e)', () => {
     const gRes = await http
       .post('/v1/org/members')
       .set(inOrg(dona))
-      .send({ name: 'Gil Gerente', email: 'gil@agendei.test', role: 'GERENTE', bookable: false })
+      .send({ name: 'Gil Gerente', email: 'gil@skedulei.test', role: 'GERENTE', bookable: false })
       .expect(201);
-    const gil = await registerUser(http, 'Gil', 'gil@agendei.test');
+    const gil = await registerUser(http, 'Gil', 'gil@skedulei.test');
     // O link vem antes: o supertest não aceita uma requisição aberta enquanto outra roda.
-    const gilToken = (await lastInviteTo('gil@agendei.test')).split('token=')[1];
+    const gilToken = (await lastInviteTo('gil@skedulei.test')).split('token=')[1];
     await http.post('/v1/invites/accept').set(gil.auth).send({ token: gilToken }).expect(201);
 
     const members = (await http.get('/v1/org/members').set(inOrg(gil)).expect(200)).body as { id: string; name: string }[];
@@ -174,9 +174,9 @@ describe('Negócios, equipe e permissões (e2e)', () => {
   it('dar e-mail a quem não tinha acesso vira convite', async () => {
     const members = (await http.get('/v1/org/members').set(inOrg(dona)).expect(200)).body as { id: string; name: string }[];
     const mari = members.find((m) => m.name === 'Mari Manicure')!;
-    const res = await http.patch(`/v1/org/members/${mari.id}`).set(inOrg(dona)).send({ email: 'mari@agendei.test' }).expect(200);
+    const res = await http.patch(`/v1/org/members/${mari.id}`).set(inOrg(dona)).send({ email: 'mari@skedulei.test' }).expect(200);
     expect(res.body.status).toBe('CONVIDADO');
-    expect(await lastInviteTo('mari@agendei.test')).toContain('/convite?token=');
+    expect(await lastInviteTo('mari@skedulei.test')).toContain('/convite?token=');
   });
 
   it('o último dono não sai nem perde o perfil', async () => {
@@ -186,7 +186,7 @@ describe('Negócios, equipe e permissões (e2e)', () => {
   });
 
   it('isola dados entre negócios', async () => {
-    const outra = await registerUser(http, 'Vizinha', 'vizinha@agendei.test');
+    const outra = await registerUser(http, 'Vizinha', 'vizinha@skedulei.test');
     const other = (await http.post('/v1/organizations').set(outra.auth).send(newOrg('Barbearia Vizinha', { segment: 'BARBEARIA' })).expect(201)).body;
     otherOrgId = other.id;
     const theirServices = (await http.get('/v1/org/services').set(inOrg(outra, other.id)).expect(200)).body as { id: string }[];

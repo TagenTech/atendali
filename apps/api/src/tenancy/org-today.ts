@@ -1,4 +1,4 @@
-import { DEFAULT_TIMEZONE, todayIn, type IsoDate } from '@agendei/contracts';
+import { DEFAULT_TIMEZONE, todayIn, type IsoDate } from '@skedulei/contracts';
 import type { EntityManager } from 'typeorm';
 import { Unit } from '../organizations/entities/unit.entity';
 

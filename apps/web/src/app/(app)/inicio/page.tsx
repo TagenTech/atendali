@@ -1,6 +1,6 @@
 'use client';
 
-import { APPOINTMENT_STATUS_LABEL, MemberStatus, Permission, SEGMENT_PRESETS, todayIn, zonedParts } from '@agendei/contracts';
+import { APPOINTMENT_STATUS_LABEL, MemberStatus, Permission, SEGMENT_PRESETS, todayIn, zonedParts } from '@skedulei/contracts';
 import { BellRing, CalendarDays, ChartNoAxesCombined, Check, ChevronRight, Copy, ExternalLink, Scissors, UsersRound, Wallet, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';

@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Organization } from '../../organizations/entities/organization.entity';
-import type { StockMovementKind } from '@agendei/contracts';
+import type { StockMovementKind } from '@skedulei/contracts';
 import { Product } from './product.entity';
 
 @Entity('stock_movements')

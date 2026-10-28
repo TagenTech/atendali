@@ -1,6 +1,6 @@
 'use client';
 
-import type { OrderDto } from '@agendei/contracts';
+import type { OrderDto } from '@skedulei/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as fin from '@/lib/api/finance';
 import { useOrg } from '@/lib/org';

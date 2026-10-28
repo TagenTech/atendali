@@ -9,7 +9,7 @@ import {
   type RegisterRequest,
   type ResetPasswordRequest,
   type VerifyEmailRequest,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 
 const trim = () => Transform(({ value }) => (typeof value === 'string' ? value.trim() : value));
 @ValidatorConstraint({ name: 'notCommonPassword' })

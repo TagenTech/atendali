@@ -3,8 +3,8 @@ import type { MetadataRoute } from 'next';
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: '/',
-    name: 'Agendei — Agendamento e gestão',
-    short_name: 'Agendei',
+    name: 'Skedulei — Agendamento e gestão',
+    short_name: 'Skedulei',
     description: 'Agendamento, equipe e financeiro para salões, clínicas e consultórios.',
     lang: 'pt-BR',
     start_url: '/inicio',

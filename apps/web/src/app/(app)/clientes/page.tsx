@@ -1,6 +1,6 @@
 'use client';
 
-import { formatPhone, initials, Permission } from '@agendei/contracts';
+import { formatPhone, initials, Permission } from '@skedulei/contracts';
 import { ChevronRight, Plus, Search, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

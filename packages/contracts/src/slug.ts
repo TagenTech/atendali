@@ -1,4 +1,4 @@
-/** Endereço público do negócio: agendei.app/<slug>. */
+/** Endereço público do negócio: skedulei.app/<slug>. */
 
 export const SLUG_MAX_LENGTH = 48;
 

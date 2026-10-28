@@ -1,10 +1,10 @@
 /**
- * Caixa, comandas, formas de pagamento, comissões e resumo financeiro (banco agendei_test).
- *   pnpm --filter @agendei/api test:e2e
+ * Caixa, comandas, formas de pagamento, comissões e resumo financeiro (banco skedulei_test).
+ *   pnpm --filter @skedulei/api test:e2e
  */
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { addDays, ORG_HEADER, todayIn, weekdayOf, zonedToUtc } from '@agendei/contracts';
+import { addDays, ORG_HEADER, todayIn, weekdayOf, zonedToUtc } from '@skedulei/contracts';
 import { createTestApp, newOrg, registerUser } from './helpers';
 
 type Session = Awaited<ReturnType<typeof registerUser>>;
@@ -43,15 +43,15 @@ describe('Caixa, comandas e comissões (e2e)', () => {
   beforeAll(async () => {
     app = await createTestApp();
     http = request(app.getHttpServer());
-    dona = await registerUser(http, 'Dona Caixa', 'dona-caixa@agendei.test');
+    dona = await registerUser(http, 'Dona Caixa', 'dona-caixa@skedulei.test');
     const org = await http
       .post('/v1/organizations')
       .set(dona.auth)
       .send(
         newOrg('Salão Caixa', {
           team: [
-            { name: 'Paula Pro', email: 'paula-caixa@agendei.test', role: 'PROFISSIONAL', bookable: true },
-            { name: 'Rita Recepção', email: 'rita-caixa@agendei.test', role: 'RECEPCAO', bookable: false },
+            { name: 'Paula Pro', email: 'paula-caixa@skedulei.test', role: 'PROFISSIONAL', bookable: true },
+            { name: 'Rita Recepção', email: 'rita-caixa@skedulei.test', role: 'RECEPCAO', bookable: false },
           ],
         }),
       )
@@ -59,8 +59,8 @@ describe('Caixa, comandas e comissões (e2e)', () => {
     orgId = org.body.id;
     corte = (await http.get('/v1/org/services').set(inOrg(dona)).expect(200)).body[0];
     members = (await http.get('/v1/org/members').set(inOrg(dona)).expect(200)).body;
-    paula = await join('Paula', 'paula-caixa@agendei.test');
-    rita = await join('Rita', 'rita-caixa@agendei.test');
+    paula = await join('Paula', 'paula-caixa@skedulei.test');
+    rita = await join('Rita', 'rita-caixa@skedulei.test');
     anaId = (await http.post('/v1/org/clients').set(inOrg(dona)).send({ name: 'Ana Cliente' }).expect(201)).body.id;
   });
 
@@ -226,7 +226,7 @@ describe('Caixa, comandas e comissões (e2e)', () => {
   });
 
   it('isolamento entre negócios e remoção de quem tem histórico financeiro', async () => {
-    const outra = await registerUser(http, 'Outra Caixa', 'outra-caixa@agendei.test');
+    const outra = await registerUser(http, 'Outra Caixa', 'outra-caixa@skedulei.test');
     const other = (await http.post('/v1/organizations').set(outra.auth).send(newOrg('Outro Caixa')).expect(201)).body;
     await http.get(`/v1/org/orders/${orderId}`).set(inOrg(outra, other.id)).expect(404);
     expect((await http.get('/v1/org/orders').set(inOrg(outra, other.id)).expect(200)).body).toEqual([]);

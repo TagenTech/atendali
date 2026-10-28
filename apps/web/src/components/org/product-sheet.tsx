@@ -1,6 +1,6 @@
 'use client';
 
-import { PRODUCT_KIND_LABEL, ProductKind, type ProductDto } from '@agendei/contracts';
+import { PRODUCT_KIND_LABEL, ProductKind, type ProductDto } from '@skedulei/contracts';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';

@@ -11,7 +11,7 @@ import {
   type CashFlowDto,
   type DreDto,
   type FlowEvent,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import type { OrgContext } from '../organizations/org-context';
 import { TenantDb } from '../tenancy/tenant-db';
 import { mainUnit } from './cash.service';

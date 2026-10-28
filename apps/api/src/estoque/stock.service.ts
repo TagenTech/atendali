@@ -12,7 +12,7 @@ import {
   type StockMovementDto,
   type StockMovementKind,
   type StockReportDto,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { Order } from '../financeiro/entities/order.entity';
 import { ServiceItem } from '../organizations/entities/service-item.entity';
 import type { OrgContext } from '../organizations/org-context';

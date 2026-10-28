@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import { Permission as P } from '@agendei/contracts';
+import { Permission as P } from '@skedulei/contracts';
 import { Public } from '../common/decorators/public.decorator';
 import { CurrentOrg, OrgRoute, type OrgContext } from '../organizations/org-context';
 import {

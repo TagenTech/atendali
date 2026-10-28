@@ -8,7 +8,7 @@ describe('Contato (e2e)', () => {
   const previousContact = process.env.CONTACT_EMAIL;
 
   beforeAll(async () => {
-    process.env.CONTACT_EMAIL = 'dev@agendei.com.br';
+    process.env.CONTACT_EMAIL = 'dev@skedulei.com.br';
     app = await createTestApp();
   });
 
@@ -30,7 +30,7 @@ describe('Contato (e2e)', () => {
       .expect(200);
     expect(res.body).toEqual({ ok: true });
     expect(mail.sendContact).toHaveBeenCalledWith(
-      'dev@agendei.com.br',
+      'dev@skedulei.com.br',
       'Carlos',
       'carlos@exemplo.com',
       'Encontrei um problema na agenda das aulas.',

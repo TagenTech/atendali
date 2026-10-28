@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { DEFAULT_TIMEZONE, PHONE_MAX_LENGTH } from '@agendei/contracts';
+import { DEFAULT_TIMEZONE, PHONE_MAX_LENGTH } from '@skedulei/contracts';
 
 @Entity('users')
 export class User {

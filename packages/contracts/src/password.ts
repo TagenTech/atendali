@@ -5,7 +5,7 @@ const COMMON = new Set([
   '12345678', '123456789', '1234567890', '123123123', '11111111', '00000000', '87654321', '12341234',
   'password', 'password1', 'password123', 'passw0rd', 'senha123', 'senha1234', 'senha12345', 'senhasenha',
   'minhasenha', 'mudar123', 'mudar@123', 'abc12345', 'abcd1234', 'abcdefgh', 'qwertyui', 'qwerty123',
-  'qwertyuiop', 'asdfghjk', 'asdf1234', 'iloveyou', 'letmein1', 'admin123', 'agendei123', 'agendei1',
+  'qwertyuiop', 'asdfghjk', 'asdf1234', 'iloveyou', 'letmein1', 'admin123', 'skedulei123', 'skedulei1',
   'brasil123', 'brasil2020', 'corinthians', 'flamengo', 'flamengo1', 'palmeiras', 'gabriel123',
 ]);
 

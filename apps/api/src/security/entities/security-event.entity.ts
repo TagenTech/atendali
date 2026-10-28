@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
-import type { SecurityEventType } from '@agendei/contracts';
+import type { SecurityEventType } from '@skedulei/contracts';
 
 /** Trilha de auditoria de segurança (login, senha, 2FA, sessões…). */
 @Entity('security_events')

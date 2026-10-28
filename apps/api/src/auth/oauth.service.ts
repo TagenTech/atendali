@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createHash, randomBytes } from 'crypto';
-import { AuthProvider } from '@agendei/contracts';
+import { AuthProvider } from '@skedulei/contracts';
 import type { AppConfig } from '../config/configuration';
 import { OAuthError, type ProviderProfile } from './auth.service';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import type { TvEntryDto } from '@agendei/contracts';
+import type { TvEntryDto } from '@skedulei/contracts';
 import { Maximize2 } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';

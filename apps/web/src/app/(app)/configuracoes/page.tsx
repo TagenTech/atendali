@@ -15,7 +15,7 @@ import {
   type Feature,
   type PaymentMethodConfig,
   type UnitDto,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { Link2, MapPin, Plus, ShieldAlert } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
@@ -80,7 +80,7 @@ function BusinessInfo() {
             <span className="font-semibold">{SEGMENT_PRESETS[org.segment].label}</span>
             <span className="text-muted-foreground"> · página pública: </span>
             <span className="inline-flex items-center gap-1 font-mono text-xs">
-              <Link2 className="size-3.5" /> agendei.app/{org.slug}
+              <Link2 className="size-3.5" /> skedulei.app/{org.slug}
             </span>
           </span>
         </div>

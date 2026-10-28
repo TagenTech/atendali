@@ -1,4 +1,4 @@
-import type { AppointmentStatus } from '@agendei/contracts';
+import type { AppointmentStatus } from '@skedulei/contracts';
 
 /** Estilo do cartão na grade por status (os "em aberto" usam a cor do profissional). */
 export const STATUS_STYLE: Record<AppointmentStatus, string | null> = {

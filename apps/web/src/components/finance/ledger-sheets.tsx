@@ -7,7 +7,7 @@ import {
   type PaymentMethod,
   type PayableDto,
   type ReceivableDto,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';

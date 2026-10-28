@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import type { AppointmentSource, AppointmentStatus } from '@agendei/contracts';
+import type { AppointmentSource, AppointmentStatus } from '@skedulei/contracts';
 import { Member } from '../../organizations/entities/member.entity';
 import { Organization } from '../../organizations/entities/organization.entity';
 import { ServiceItem } from '../../organizations/entities/service-item.entity';

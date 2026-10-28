@@ -1,11 +1,11 @@
 /**
- * Agenda, clientes e agendamento online contra um Postgres real (banco agendei_test).
- *   pnpm --filter @agendei/api test:e2e
+ * Agenda, clientes e agendamento online contra um Postgres real (banco skedulei_test).
+ *   pnpm --filter @skedulei/api test:e2e
  */
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { DataSource } from 'typeorm';
-import { addDays, ORG_HEADER, todayIn, weekdayOf, zonedToUtc } from '@agendei/contracts';
+import { addDays, ORG_HEADER, todayIn, weekdayOf, zonedToUtc } from '@skedulei/contracts';
 import { Client } from '../src/agenda/entities/client.entity';
 import { createTestApp, newOrg, quotedTable, registerUser } from './helpers';
 
@@ -35,14 +35,14 @@ describe('Agenda, clientes e agendamento online (e2e)', () => {
   beforeAll(async () => {
     app = await createTestApp();
     http = request(app.getHttpServer());
-    dona = await registerUser(http, 'Dona Agenda', 'dona-agenda@agendei.test');
+    dona = await registerUser(http, 'Dona Agenda', 'dona-agenda@skedulei.test');
     const org = await http
       .post('/v1/organizations')
       .set(dona.auth)
       .send(
         newOrg('Salão Agenda', {
           team: [
-            { name: 'Paula Pro', email: 'paula-agenda@agendei.test', role: 'PROFISSIONAL', bookable: true },
+            { name: 'Paula Pro', email: 'paula-agenda@skedulei.test', role: 'PROFISSIONAL', bookable: true },
             { name: 'Mari Sem Acesso', role: 'PROFISSIONAL', bookable: true },
           ],
         }),
@@ -166,8 +166,8 @@ describe('Agenda, clientes e agendamento online (e2e)', () => {
 
   it('profissional só vê e mexe na própria agenda', async () => {
     const outbox = (await http.get('/v1/dev/outbox').expect(200)).body as { to: string; link?: string }[];
-    const token = outbox.find((m) => m.to === 'paula-agenda@agendei.test' && m.link?.includes('/convite?'))!.link!.split('token=')[1];
-    const paula = await registerUser(http, 'Paula', 'paula-agenda@agendei.test');
+    const token = outbox.find((m) => m.to === 'paula-agenda@skedulei.test' && m.link?.includes('/convite?'))!.link!.split('token=')[1];
+    const paula = await registerUser(http, 'Paula', 'paula-agenda@skedulei.test');
     await http.post('/v1/invites/accept').set(paula.auth).send({ token }).expect(201);
 
     const mine = await http
@@ -197,7 +197,7 @@ describe('Agenda, clientes e agendamento online (e2e)', () => {
   });
 
   it('isolamento: outro negócio não vê agenda, cliente nem agendamento', async () => {
-    const outra = await registerUser(http, 'Outra Agenda', 'outra-agenda@agendei.test');
+    const outra = await registerUser(http, 'Outra Agenda', 'outra-agenda@skedulei.test');
     const other = (await http.post('/v1/organizations').set(outra.auth).send(newOrg('Outro Salão')).expect(201)).body;
     await http.get(`/v1/org/appointments/${apptId}`).set(inOrg(outra, other.id)).expect(404);
     await http.get(`/v1/org/clients/${anaId}`).set(inOrg(outra, other.id)).expect(404);
@@ -318,7 +318,7 @@ describe('Agenda, clientes e agendamento online (e2e)', () => {
     });
     expect(list.find((e) => e.clientName === 'Ana Cliente')!.openSlot).toBeNull();
 
-    const outra = await registerUser(http, 'Outra Espera', 'outra-espera@agendei.test');
+    const outra = await registerUser(http, 'Outra Espera', 'outra-espera@skedulei.test');
     const other = (await http.post('/v1/organizations').set(outra.auth).send(newOrg('Outro Espera')).expect(201)).body;
     await http.delete(`/v1/org/waitlist/${entry.body.id}`).set(inOrg(outra, other.id)).expect(404);
     expect((await http.get('/v1/org/waitlist').set(inOrg(outra, other.id)).expect(200)).body).toEqual([]);

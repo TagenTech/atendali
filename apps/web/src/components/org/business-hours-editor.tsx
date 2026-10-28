@@ -1,6 +1,6 @@
 'use client';
 
-import { WEEKDAY_LABEL, WEEKDAY_SHORT, type BusinessHours, type TimeRange } from '@agendei/contracts';
+import { WEEKDAY_LABEL, WEEKDAY_SHORT, type BusinessHours, type TimeRange } from '@skedulei/contracts';
 import { Copy, Plus, X } from 'lucide-react';
 import { ToggleTrack } from '@/components/ui/toggle-track';
 

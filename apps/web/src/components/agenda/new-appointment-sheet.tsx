@@ -1,6 +1,6 @@
 'use client';
 
-import { formatBRL, formatDuration, Permission, zonedParts, zonedToUtc, type ClientDto } from '@agendei/contracts';
+import { formatBRL, formatDuration, Permission, zonedParts, zonedToUtc, type ClientDto } from '@skedulei/contracts';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';

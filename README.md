@@ -1,4 +1,4 @@
-# Agendei — agendamento e gestão para negócios com hora marcada
+# Skedulei — agendamento e gestão para negócios com hora marcada
 
 Web app (PWA instalável, mobile-first **e** com layout próprio para desktop) para salões, barbearias, clínicas de
 estética, clínicas médicas, odontologia e terapias. Um núcleo comum (agenda, equipe, serviços, financeiro) com
@@ -59,8 +59,8 @@ Pré-requisitos: Node 22, pnpm 9 e Postgres (Postgres.app na 5432 ou `pnpm db:up
 pnpm install
 cp apps/api/.env.example apps/api/.env        # JWT_SECRET, DATA_ENCRYPTION_KEY, DEV_USER_*
 cp apps/web/.env.example apps/web/.env.local
-createdb agendei && createdb agendei_test
-pnpm --filter @agendei/contracts build
+createdb skedulei && createdb skedulei_test
+pnpm --filter @skedulei/contracts build
 pnpm dev
 ```
 
@@ -75,9 +75,9 @@ Sem `RESEND_API_KEY`, os links de confirmação e de senha aparecem no log da AP
 | `pnpm dev` | Tudo em modo watch |
 | `pnpm build` / `pnpm typecheck` / `pnpm lint` | Build e qualidade |
 | `pnpm test` | Testes de unidade (contracts + API) |
-| `pnpm --filter @agendei/api test:e2e` | API inteira contra Postgres real (banco `agendei_test`): `organizations` (onboarding, equipe, convites, perfis, isolamento, RLS), `agenda` (clientes, agenda, conflitos, bloqueios, permissões, agendamento online), `finance` (caixa, comandas, taxas, comissões, resumo), `ledger` (contas a pagar/receber, DRE, fluxo, importação de clientes), `app` (login, cadastro, 2FA, exclusão de conta) e `conta` (sessões, senha, exportação) |
-| `pnpm --filter @agendei/web test:e2e` | Fluxos principais no navegador (Playwright, celular **e** desktop): cadastro, onboarding, serviços, equipe, login, agenda, ficha do cliente, agendamento online e cancelamento, caixa de ponta a ponta, contas/DRE/fluxo/importação de clientes. Sobe API/web próprios nas portas 3210/3211 com o banco `agendei_e2e_web` zerado. `E2E_SKIP_BUILD=1` reaproveita o último build. Primeira vez: `pnpm --filter @agendei/web exec playwright install chromium` |
-| `pnpm --filter @agendei/api migration:generate src/migrations/Nome` | Nova migration a partir das entidades |
+| `pnpm --filter @skedulei/api test:e2e` | API inteira contra Postgres real (banco `skedulei_test`): `organizations` (onboarding, equipe, convites, perfis, isolamento, RLS), `agenda` (clientes, agenda, conflitos, bloqueios, permissões, agendamento online), `finance` (caixa, comandas, taxas, comissões, resumo), `ledger` (contas a pagar/receber, DRE, fluxo, importação de clientes), `app` (login, cadastro, 2FA, exclusão de conta) e `conta` (sessões, senha, exportação) |
+| `pnpm --filter @skedulei/web test:e2e` | Fluxos principais no navegador (Playwright, celular **e** desktop): cadastro, onboarding, serviços, equipe, login, agenda, ficha do cliente, agendamento online e cancelamento, caixa de ponta a ponta, contas/DRE/fluxo/importação de clientes. Sobe API/web próprios nas portas 3210/3211 com o banco `skedulei_e2e_web` zerado. `E2E_SKIP_BUILD=1` reaproveita o último build. Primeira vez: `pnpm --filter @skedulei/web exec playwright install chromium` |
+| `pnpm --filter @skedulei/api migration:generate src/migrations/Nome` | Nova migration a partir das entidades |
 
 Em dev o schema sincroniza sozinho (`TYPEORM_SYNC=true`); em produção só por migrations, aplicadas na subida da API.
 

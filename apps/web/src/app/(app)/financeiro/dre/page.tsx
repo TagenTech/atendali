@@ -1,6 +1,6 @@
 'use client';
 
-import { formatBRL, formatDateShort, pct } from '@agendei/contracts';
+import { formatBRL, formatDateShort, pct } from '@skedulei/contracts';
 import { HBars } from '@/components/finance/charts';
 import { FinanceTabs } from '@/components/finance/finance-tabs';
 import { PeriodPicker, usePeriod } from '@/components/finance/period';

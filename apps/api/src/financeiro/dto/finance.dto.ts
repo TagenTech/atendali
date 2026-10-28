@@ -13,7 +13,7 @@ import {
   type OrderItemInput,
   type PaymentMethod,
   type UpdateOrderRequest,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { EmptyToNull, IsIsoDate } from '../../common/validators/br.validators';
 
 const trim = () => Transform(({ value }) => (typeof value === 'string' ? value.trim() : value));

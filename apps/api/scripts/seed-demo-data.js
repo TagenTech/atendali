@@ -2,13 +2,13 @@
  * Enche as contas demo (criadas por seed-demo.js) com movimento simulado dos últimos 30 dias:
  * equipe, clientes, agenda (passado, hoje e próximos dias), caixa, comandas, comissões, contas a pagar,
  * estoque, pacotes, clube, vales, pontos e avaliações. Só roda em negócio sem comandas fechadas.
- *   node scripts/seed-demo-data.js [http://localhost:3200/v1] [postgres://…/agendei]
+ *   node scripts/seed-demo-data.js [http://localhost:3200/v1] [postgres://…/skedulei]
  */
 const { Client: Pg } = require('pg');
-const { SEGMENT_PRESETS, SEGMENTS, ORG_HEADER } = require('@agendei/contracts');
+const { SEGMENT_PRESETS, SEGMENTS, ORG_HEADER } = require('@skedulei/contracts');
 
 const API = process.argv[2] ?? 'http://localhost:3200/v1';
-const DB = process.argv[3] ?? process.env.DATABASE_URL ?? 'postgres://postgres:postgres@localhost:5432/agendei';
+const DB = process.argv[3] ?? process.env.DATABASE_URL ?? 'postgres://postgres:postgres@localhost:5432/skedulei';
 require('./demo-guard').assertLocal(DB);
 require('./demo-guard').assertLocal(API);
 const PASSWORD = 'senha-forte-123';
@@ -58,7 +58,7 @@ const dateOf = (d) => new Date(d.getTime() - 3 * 3600_000).toISOString().slice(0
 
 async function populate(segment, pg) {
   const preset = SEGMENT_PRESETS[segment];
-  const email = `demo-${segment.toLowerCase().replace(/_/g, '-')}@agendei.test`;
+  const email = `demo-${segment.toLowerCase().replace(/_/g, '-')}@skedulei.test`;
   const token = (await call('POST', '/auth/login', { body: { email, password: PASSWORD } })).accessToken;
   const org = (await call('GET', '/organizations', { token }))[0];
   const o = { token, org: org.id };
@@ -127,29 +127,29 @@ async function populate(segment, pg) {
 
   // Datas: as comandas, pagamentos, comissões e recebíveis passam para o dia do atendimento.
   await pg.query(
-    `WITH m AS (SELECT oi.order_id, MIN(a.starts_at) st FROM agendei_order_items oi JOIN agendei_appointments a ON a.id = oi.appointment_id
+    `WITH m AS (SELECT oi.order_id, MIN(a.starts_at) st FROM skedulei_order_items oi JOIN skedulei_appointments a ON a.id = oi.appointment_id
                 WHERE oi.organization_id = $1 AND a.starts_at < NOW() GROUP BY 1)
-     UPDATE agendei_orders o SET opened_at = m.st, closed_at = m.st + INTERVAL '50 minutes' FROM m WHERE o.id = m.order_id`,
+     UPDATE skedulei_orders o SET opened_at = m.st, closed_at = m.st + INTERVAL '50 minutes' FROM m WHERE o.id = m.order_id`,
     [org.id],
   );
   await pg.query(
-    `UPDATE agendei_order_payments p SET created_at = o.closed_at FROM agendei_orders o
+    `UPDATE skedulei_order_payments p SET created_at = o.closed_at FROM skedulei_orders o
       WHERE p.order_id = o.id AND o.organization_id = $1 AND o.closed_at < NOW() - INTERVAL '2 hours'`,
     [org.id],
   );
   await pg.query(
-    `UPDATE agendei_receivables r SET expected_date = r.expected_date - (r.created_at::date - p.created_at::date),
+    `UPDATE skedulei_receivables r SET expected_date = r.expected_date - (r.created_at::date - p.created_at::date),
             received_date = CASE WHEN r.received_date IS NULL THEN NULL ELSE r.received_date - (r.created_at::date - p.created_at::date) END,
             created_at = p.created_at
-       FROM agendei_order_payments p WHERE r.order_payment_id = p.id AND r.organization_id = $1 AND p.created_at::date < r.created_at::date`,
+       FROM skedulei_order_payments p WHERE r.order_payment_id = p.id AND r.organization_id = $1 AND p.created_at::date < r.created_at::date`,
     [org.id],
   );
   await pg.query(
-    `UPDATE agendei_commission_entries c SET created_at = o.closed_at FROM agendei_orders o
+    `UPDATE skedulei_commission_entries c SET created_at = o.closed_at FROM skedulei_orders o
       WHERE c.order_id = o.id AND o.organization_id = $1 AND o.closed_at < NOW() - INTERVAL '2 hours'`,
     [org.id],
   );
-  await pg.query(`UPDATE agendei_cash_sessions SET opened_at = (SELECT MIN(opened_at) FROM agendei_orders WHERE organization_id = $1) WHERE organization_id = $1 AND closed_at IS NOT NULL`, [org.id]);
+  await pg.query(`UPDATE skedulei_cash_sessions SET opened_at = (SELECT MIN(opened_at) FROM skedulei_orders WHERE organization_id = $1) WHERE organization_id = $1 AND closed_at IS NOT NULL`, [org.id]);
 
   // Fechamento de comissão de uma pessoa (as outras ficam "a pagar").
   await soft(() => call('POST', '/org/commissions/payouts', { ...o, body: { memberId: pros[1].id } }));
@@ -228,7 +228,7 @@ async function populate(segment, pg) {
   } finally {
     await pg.end();
   }
-  console.log(`\nPronto. Entre em ${WEB}/login com demo-<segmento>@agendei.test / ${PASSWORD}`);
+  console.log(`\nPronto. Entre em ${WEB}/login com demo-<segmento>@skedulei.test / ${PASSWORD}`);
 })().catch((e) => {
   console.error(e.message);
   process.exit(1);

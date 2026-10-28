@@ -1,6 +1,6 @@
 'use client';
 
-import { ROLE_INFO, SEGMENT_PRESETS } from '@agendei/contracts';
+import { ROLE_INFO, SEGMENT_PRESETS } from '@skedulei/contracts';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';

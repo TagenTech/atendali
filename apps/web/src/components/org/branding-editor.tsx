@@ -1,6 +1,6 @@
 'use client';
 
-import { BRAND_COLOR_KEYS, BRAND_COLORS, BRAND_IMAGE_MAX_BYTES, BRAND_IMAGE_MAX_SIDE, TAGLINE_MAX, type BrandColor } from '@agendei/contracts';
+import { BRAND_COLOR_KEYS, BRAND_COLORS, BRAND_IMAGE_MAX_BYTES, BRAND_IMAGE_MAX_SIDE, TAGLINE_MAX, type BrandColor } from '@skedulei/contracts';
 import { ExternalLink, ImagePlus, Trash2 } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';

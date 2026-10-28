@@ -4,11 +4,11 @@ import { defineConfig, devices } from '@playwright/test';
  * Testes de navegador dos fluxos principais.
  * Sobe uma API e um web próprios (portas 3210/3211) com um banco zerado a cada execução,
  * sem mexer no banco nem nos servidores de desenvolvimento.
- *   pnpm --filter @agendei/web test:e2e            (E2E_SKIP_BUILD=1 reaproveita o último build)
+ *   pnpm --filter @skedulei/web test:e2e            (E2E_SKIP_BUILD=1 reaproveita o último build)
  */
 const API_PORT = 3210;
 const WEB_PORT = 3211;
-const DATABASE_URL = process.env.E2E_WEB_DATABASE_URL ?? 'postgres://postgres:postgres@localhost:5432/agendei_e2e_web';
+const DATABASE_URL = process.env.E2E_WEB_DATABASE_URL ?? 'postgres://postgres:postgres@localhost:5432/skedulei_e2e_web';
 const WEB_URL = `http://localhost:${WEB_PORT}`;
 
 export default defineConfig({

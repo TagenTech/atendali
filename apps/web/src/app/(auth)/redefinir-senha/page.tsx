@@ -1,6 +1,6 @@
 'use client';
 
-import { passwordProblem } from '@agendei/contracts';
+import { passwordProblem } from '@skedulei/contracts';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';

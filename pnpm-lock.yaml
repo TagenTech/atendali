@@ -23,7 +23,7 @@ importers:
 
   apps/api:
     dependencies:
-      '@agendei/contracts':
+      '@skedulei/contracts':
         specifier: workspace:^
         version: link:../../packages/contracts
       '@nestjs/common':
@@ -144,7 +144,7 @@ importers:
 
   apps/web:
     dependencies:
-      '@agendei/contracts':
+      '@skedulei/contracts':
         specifier: workspace:^
         version: link:../../packages/contracts
       '@hookform/resolvers':

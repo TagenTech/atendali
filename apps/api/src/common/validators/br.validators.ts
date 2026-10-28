@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import { registerDecorator, ValidationOptions } from 'class-validator';
-import { isIsoDate, isValidPhone, normalizePhone } from '@agendei/contracts';
+import { isIsoDate, isValidPhone, normalizePhone } from '@skedulei/contracts';
 
 /** '' e espaços viram null — o formulário manda campo vazio para "apagar". */
 export const EmptyToNull = () =>

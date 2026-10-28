@@ -2,8 +2,8 @@ import type { DataSource } from 'typeorm';
 import { Organization } from '../organizations/entities/organization.entity';
 
 /** Papel sem login e sem BYPASSRLS que a API assume (SET LOCAL ROLE) dentro das rotas de negócio. */
-export const TENANT_ROLE = 'agendei_tenant';
-const POLICY = 'agendei_tenant_isolation';
+export const TENANT_ROLE = 'skedulei_tenant';
+const POLICY = 'skedulei_tenant_isolation';
 const ORG_ID = `NULLIF(current_setting('app.org_id', true), '')::uuid`;
 
 /**

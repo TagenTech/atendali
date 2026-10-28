@@ -1,6 +1,6 @@
 'use client';
 
-import { formatBRL, formatDuration, Permission, type ServiceDto } from '@agendei/contracts';
+import { formatBRL, formatDuration, Permission, type ServiceDto } from '@skedulei/contracts';
 import { Clock, Globe, Plus, Search } from 'lucide-react';
 import * as React from 'react';
 import { PageHeader } from '@/components/layout/page-header';

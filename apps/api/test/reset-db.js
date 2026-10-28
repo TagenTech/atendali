@@ -1,11 +1,11 @@
 // Recria do zero o banco usado pelos testes de navegador (Playwright).
-//   node apps/api/test/reset-db.js postgres://postgres:postgres@localhost:5432/agendei_e2e_web
+//   node apps/api/test/reset-db.js postgres://postgres:postgres@localhost:5432/skedulei_e2e_web
 const { Client } = require('pg');
 
 async function main() {
   const url = new URL(process.argv[2]);
   const name = url.pathname.slice(1);
-  if (!/^agendei_[a-z0-9_]*e2e[a-z0-9_]*$/.test(name)) throw new Error(`Banco não parece de teste: ${name}`);
+  if (!/^skedulei_[a-z0-9_]*e2e[a-z0-9_]*$/.test(name)) throw new Error(`Banco não parece de teste: ${name}`);
   url.pathname = '/postgres';
   const admin = new Client({ connectionString: url.toString() });
   await admin.connect();

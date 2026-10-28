@@ -1,6 +1,6 @@
 'use client';
 
-import { formatBRL, whatsappLink, type OrderDto, type ReviewRequestDto } from '@agendei/contracts';
+import { formatBRL, whatsappLink, type OrderDto, type ReviewRequestDto } from '@skedulei/contracts';
 import { Copy, MessageCircle, Minus, Plus, Sparkles, Star } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';

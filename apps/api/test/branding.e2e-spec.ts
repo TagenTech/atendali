@@ -1,7 +1,7 @@
-/** Personalização da página pública: logo, fundo, cor e frase (banco agendei_test). */
+/** Personalização da página pública: logo, fundo, cor e frase (banco skedulei_test). */
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { ORG_HEADER } from '@agendei/contracts';
+import { ORG_HEADER } from '@skedulei/contracts';
 import { createTestApp, newOrg, registerUser } from './helpers';
 
 type Session = Awaited<ReturnType<typeof registerUser>>;
@@ -20,17 +20,17 @@ describe('Personalização visual (e2e)', () => {
   beforeAll(async () => {
     app = await createTestApp();
     http = request(app.getHttpServer());
-    dona = await registerUser(http, 'Dona Visual', 'dona-visual@agendei.test');
+    dona = await registerUser(http, 'Dona Visual', 'dona-visual@skedulei.test');
     const org = await http
       .post('/v1/organizations')
       .set(dona.auth)
-      .send(newOrg('Salão Visual', { team: [{ name: 'Pro Visual', email: 'pro-visual@agendei.test', role: 'PROFISSIONAL', bookable: true }] }))
+      .send(newOrg('Salão Visual', { team: [{ name: 'Pro Visual', email: 'pro-visual@skedulei.test', role: 'PROFISSIONAL', bookable: true }] }))
       .expect(201);
     orgId = org.body.id;
     slug = org.body.slug;
     const outbox = (await http.get('/v1/dev/outbox').expect(200)).body as { to: string; link?: string }[];
-    const token = outbox.find((m) => m.to === 'pro-visual@agendei.test' && m.link?.includes('/convite?'))!.link!.split('token=')[1];
-    pro = await registerUser(http, 'Pro', 'pro-visual@agendei.test');
+    const token = outbox.find((m) => m.to === 'pro-visual@skedulei.test' && m.link?.includes('/convite?'))!.link!.split('token=')[1];
+    pro = await registerUser(http, 'Pro', 'pro-visual@skedulei.test');
     await http.post('/v1/invites/accept').set(pro.auth).send({ token }).expect(201);
   });
 
@@ -105,7 +105,7 @@ describe('Personalização visual (e2e)', () => {
   });
 
   it('remover apaga a imagem; outro negócio não mexe nas imagens deste', async () => {
-    const outra = await registerUser(http, 'Outra Visual', 'outra-visual@agendei.test');
+    const outra = await registerUser(http, 'Outra Visual', 'outra-visual@skedulei.test');
     const other = (await http.post('/v1/organizations').set(outra.auth).send(newOrg('Outro Visual')).expect(201)).body;
     await http.put('/v1/org/branding/cover').set({ ...outra.auth, [ORG_HEADER]: other.id }).send({ dataUrl: png }).expect(200);
     await http.put('/v1/org/branding/cover').set({ ...outra.auth, [ORG_HEADER]: orgId }).send({ dataUrl: png }).expect(403);

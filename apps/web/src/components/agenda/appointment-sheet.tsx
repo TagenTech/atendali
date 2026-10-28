@@ -11,7 +11,7 @@ import {
   zonedToUtc,
   type AppointmentDto,
   type AppointmentStatus,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { CalendarClock, Clock, Globe, Megaphone, MessageCircle, Receipt, Scissors, UserRound } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

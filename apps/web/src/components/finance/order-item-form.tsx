@@ -1,6 +1,6 @@
 'use client';
 
-import { Feature, formatBRL, formatDateShort, OrderItemKind, type OrderDto, type OrderItemInput } from '@agendei/contracts';
+import { Feature, formatBRL, formatDateShort, OrderItemKind, type OrderDto, type OrderItemInput } from '@skedulei/contracts';
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';

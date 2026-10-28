@@ -1,10 +1,10 @@
 # Análise de segurança — OWASP
 
-> **Histórico:** o conteúdo abaixo da seção "Auditoria de lançamento — Agendei" é da análise original do Turmei (23/10/2026,
+> **Histórico:** o conteúdo abaixo da seção "Auditoria de lançamento — Skedulei" é da análise original do Turmei (23/10/2026,
 > professor/aluno). As proteções que vieram junto (cifra de CPF, 2FA, sessões, CSP com nonce, SSRF, CSV, open redirect)
 > continuam valendo e têm testes; os termos "professor" e "aluno" lá equivalem a "conta" e "cliente/paciente" aqui.
 
-## Auditoria de lançamento — Agendei (28/10/2026)
+## Auditoria de lançamento — Skedulei (28/10/2026)
 
 **Escopo:** API NestJS, web Next.js, `packages/contracts`, scripts, dependências e configuração de deploy, no estado
 anterior ao primeiro push. **Referências:** OWASP Top 10 (2021) e OWASP API Security Top 10 (2023).
@@ -43,11 +43,11 @@ dos demais erros no cadastro e a troca de senha exige a senha atual na validaç�
 | P2 | A09 | **Sem trilha de auditoria financeira por negócio.** Estorno, sangria, fechamento de caixa, desconto e pagamento de comissão não deixam registro de *quem* fez | Média | Tabela `audit_log` no mesmo `TenantDb` + tela de atividade (proposta em [LANCAMENTO.md §6](LANCAMENTO.md#6-recomendações-de-segurança-pós-lançamento-imediato)) |
 | P3 | A04 | **Sem captcha** na página pública, no cadastro e no contato | Média | Cloudflare Turnstile |
 
-### Situação por categoria (Agendei)
+### Situação por categoria (Skedulei)
 
 | OWASP | Estado | Evidência |
 |---|---|---|
-| **A01** Controle de acesso | ✅ | JWT em toda rota (pública só com `@Public()`); `OrgGuard` exige cadastro ativo no negócio + permissão por rota; **RLS no Postgres** (`TenantInterceptor` + papel `agendei_tenant`) além do filtro `organization_id` em toda consulta; profissional só mexe na própria agenda; testes e2e de isolamento (`organizations`, `agenda`, `finance`, `retention`, `branding`) |
+| **A01** Controle de acesso | ✅ | JWT em toda rota (pública só com `@Public()`); `OrgGuard` exige cadastro ativo no negócio + permissão por rota; **RLS no Postgres** (`TenantInterceptor` + papel `skedulei_tenant`) além do filtro `organization_id` em toda consulta; profissional só mexe na própria agenda; testes e2e de isolamento (`organizations`, `agenda`, `finance`, `retention`, `branding`) |
 | **A02** Criptografia | ✅ | bcrypt custo 12; refresh token opaco só como SHA-256, rotativo, com detecção de reuso; tokens de e-mail e de reserva só como hash; CPF, observações de saúde e segredo do 2FA em **AES-256-GCM** (`DATA_ENCRYPTION_KEY` fora do banco); HSTS; cookie `httpOnly`/`Secure`/`SameSite=Lax` |
 | **A03** Injeção | ✅ | TypeORM parametrizado (SQL manual só em DDL fixo e `DELETE … $1`); `ValidationPipe({ whitelist: true })` em todos os DTOs; React escapa; e-mail com `escapeHtml`; CSV neutraliza `= + - @`; imagens: só PNG/JPG/WebP **conferidos pelos bytes** (SVG recusado), servidas com `nosniff` |
 | **A04** Design inseguro | ⚠️ | limites por rota; teto de reservas por telefone (A2); gift card com 12 caracteres sorteados por `crypto.randomInt`; cadastro revela "já existe conta" por decisão consciente (limitado a 10/h); sem captcha (P3) |
@@ -63,7 +63,7 @@ dos demais erros no cadastro e a troca de senha exige a senha atual na validaç�
 ```bash
 pnpm audit --prod                 # dependências
 pnpm verify                       # tipos, lint, regras, API e2e, build e Playwright
-pnpm --filter @agendei/api test:e2e -- agenda     # inclui o teto de reservas por telefone
+pnpm --filter @skedulei/api test:e2e -- agenda     # inclui o teto de reservas por telefone
 ```
 
 ---
@@ -218,5 +218,5 @@ todos os segredos (JWT, VAPID, OAuth, Resend, senha do banco), não basta apagar
 ```bash
 pnpm audit                                   # dependências
 pnpm test                                    # inclui anti-SSRF, open redirect, bloqueio de login
-pnpm --filter @agendei/api test:e2e          # isolamento, CSV, cabeçalhos, 2FA, revogação, CPF cifrado
+pnpm --filter @skedulei/api test:e2e          # isolamento, CSV, cabeçalhos, 2FA, revogação, CPF cifrado
 ```

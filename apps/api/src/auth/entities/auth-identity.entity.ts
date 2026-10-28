@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import type { AuthProvider } from '@agendei/contracts';
+import type { AuthProvider } from '@skedulei/contracts';
 import { User } from '../../users/entities/user.entity';
 
 /** Conta social ligada ao professor (um professor pode ter Google + Microsoft + senha). */

@@ -8,7 +8,7 @@ import type {
   UpdateOrganizationRequest,
   UpdateServiceRequest,
   UpdateUnitRequest,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as orgApi from '@/lib/api/org';
 import { orgKeys, useOrg } from '@/lib/org';

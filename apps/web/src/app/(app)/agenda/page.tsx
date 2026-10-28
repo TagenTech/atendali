@@ -1,6 +1,6 @@
 'use client';
 
-import { addDays, formatDateLong, formatDateShort, startOfWeek, todayIn, WEEKDAYS, WEEKDAYS_SHORT, zonedToUtc, type AppointmentDto } from '@agendei/contracts';
+import { addDays, formatDateLong, formatDateShort, startOfWeek, todayIn, WEEKDAYS, WEEKDAYS_SHORT, zonedToUtc, type AppointmentDto } from '@skedulei/contracts';
 import { ChevronLeft, ChevronRight, Hourglass, Lock, Plus } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';

@@ -1,4 +1,4 @@
-import { loyaltyOf, type BrandingDto, paymentMethodsOf, permissionsOf, vocabularyFor, type MemberDto, type OrganizationDto, type ServiceDto, type UnitDto } from '@agendei/contracts';
+import { loyaltyOf, type BrandingDto, paymentMethodsOf, permissionsOf, vocabularyFor, type MemberDto, type OrganizationDto, type ServiceDto, type UnitDto } from '@skedulei/contracts';
 import type { Member } from './entities/member.entity';
 import type { Organization } from './entities/organization.entity';
 import type { ServiceItem } from './entities/service-item.entity';

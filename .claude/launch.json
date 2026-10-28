@@ -6,7 +6,7 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [
         "--filter",
-        "@agendei/api",
+        "@skedulei/api",
         "start:dev"
       ],
       "port": 3200
@@ -16,7 +16,7 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [
         "--filter",
-        "@agendei/web",
+        "@skedulei/web",
         "dev"
       ],
       "port": 3201
@@ -39,7 +39,7 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [
         "--filter",
-        "@agendei/web",
+        "@skedulei/web",
         "exec",
         "next",
         "dev",
@@ -53,7 +53,7 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [
         "--filter",
-        "@agendei/api",
+        "@skedulei/api",
         "exec",
         "ts-node",
         "-r",
@@ -64,7 +64,7 @@
       "env": {
         "NODE_ENV": "test",
         "PORT": "3210",
-        "DATABASE_URL": "postgres://postgres:postgres@localhost:5432/agendei_e2e_web",
+        "DATABASE_URL": "postgres://postgres:postgres@localhost:5432/skedulei_e2e_web",
         "TYPEORM_SYNC": "true",
         "TS_NODE_TRANSPILE_ONLY": "1",
         "JWT_SECRET": "playwright-secret-playwright-secret-0001",

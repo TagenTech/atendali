@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PASSWORD_COMMON_MESSAGE, PASSWORD_MIN_LENGTH, isCommonPassword, safeNext } from '@agendei/contracts';
+import { PASSWORD_COMMON_MESSAGE, PASSWORD_MIN_LENGTH, isCommonPassword, safeNext } from '@skedulei/contracts';
 import { Mail, User } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

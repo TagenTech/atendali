@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { DEFAULT_TIMEZONE, type BrandColor, PHONE_MAX_LENGTH, type CommissionBase, type Feature, type LoyaltyRule, type PaymentMethodConfig, type Segment } from '@agendei/contracts';
+import { DEFAULT_TIMEZONE, type BrandColor, PHONE_MAX_LENGTH, type CommissionBase, type Feature, type LoyaltyRule, type PaymentMethodConfig, type Segment } from '@skedulei/contracts';
 
 /** Negócio (conta SaaS). Todo dado de negócio tem `organizationId` e é filtrado por ele. */
 @Entity('organizations')

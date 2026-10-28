@@ -1,5 +1,5 @@
 import { expect, type Browser, type BrowserContext, type Page } from '@playwright/test';
-import type { Permission } from '@agendei/contracts';
+import type { Permission } from '@skedulei/contracts';
 
 export const PASSWORD = 'senha-forte-123';
 export const ALL_FEATURES = ['COMISSOES', 'ESTOQUE', 'PACOTES', 'ASSINATURAS', 'VALES', 'FIDELIDADE'];
@@ -65,7 +65,7 @@ export interface SeededOrg {
 
 /** Negócio de barbearia com todos os módulos ligados, 2 profissionais e dados mínimos. */
 export async function createBusiness(context: BrowserContext, stamp: string, segment = 'BARBEARIA'): Promise<SeededOrg> {
-  const owner = await signUp(context, 'Dono Regressão', `dono-reg+${stamp}@agendei.test`);
+  const owner = await signUp(context, 'Dono Regressão', `dono-reg+${stamp}@skedulei.test`);
   const hours = [[], ...Array(5).fill([{ start: '09:00', end: '19:00' }]), [{ start: '09:00', end: '14:00' }]];
   const created = await context.request.post('/api/v1/organizations', {
     headers: bearer(owner),
@@ -92,7 +92,7 @@ export async function createBusiness(context: BrowserContext, stamp: string, seg
 
 /** Convida alguém com o perfil, cadastra a pessoa num contexto novo e aceita o convite. Devolve o contexto já logado. */
 export async function addMember(browser: Browser, org: SeededOrg, owner: BrowserContext, role: string, name: string, stamp: string) {
-  const email = `${role.toLowerCase()}-reg+${stamp}@agendei.test`;
+  const email = `${role.toLowerCase()}-reg+${stamp}@skedulei.test`;
   const invited = await owner.request.post('/api/v1/org/members', {
     headers: bearer(org.owner, org.id),
     data: { name, email, role, bookable: role === 'PROFISSIONAL' },

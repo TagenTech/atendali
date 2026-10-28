@@ -1,6 +1,6 @@
 export type Theme = 'light' | 'dark' | 'system';
 
-const KEY = 'agendei_theme';
+const KEY = 'skedulei_theme';
 
 export function getStoredTheme(): Theme {
   try {

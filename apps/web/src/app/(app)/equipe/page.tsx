@@ -1,6 +1,6 @@
 'use client';
 
-import { formatPhone, initials, MEMBER_STATUS_LABEL, MemberStatus, Permission, ROLE_INFO, type MemberDto } from '@agendei/contracts';
+import { formatPhone, initials, MEMBER_STATUS_LABEL, MemberStatus, Permission, ROLE_INFO, type MemberDto } from '@skedulei/contracts';
 import { CalendarCheck2, Plus } from 'lucide-react';
 import * as React from 'react';
 import { PageHeader } from '@/components/layout/page-header';

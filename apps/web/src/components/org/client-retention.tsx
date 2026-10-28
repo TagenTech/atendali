@@ -1,6 +1,6 @@
 'use client';
 
-import { Feature, formatDateShort, MEMBERSHIP_STATE_LABEL, PACKAGE_STATUS_LABEL, Permission } from '@agendei/contracts';
+import { Feature, formatDateShort, MEMBERSHIP_STATE_LABEL, PACKAGE_STATUS_LABEL, Permission } from '@skedulei/contracts';
 import { Gift, Sparkles, Ticket } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';

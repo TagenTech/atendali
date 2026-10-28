@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import type { CategoryType, PaymentMethod, ReceivableSource } from '@agendei/contracts';
+import type { CategoryType, PaymentMethod, ReceivableSource } from '@skedulei/contracts';
 import { Organization } from '../../organizations/entities/organization.entity';
 import { OrderPayment } from './order-payment.entity';
 

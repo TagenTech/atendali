@@ -24,7 +24,7 @@ import type {
   UpdateMembershipPlanRequest,
   UpdatePackagePlanRequest,
   UpdateProductRequest,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { api } from './client';
 
 const json = (body: unknown) => ({ body: JSON.stringify(body) });

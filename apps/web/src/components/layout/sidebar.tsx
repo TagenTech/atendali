@@ -1,6 +1,6 @@
 'use client';
 
-import { initials } from '@agendei/contracts';
+import { initials } from '@skedulei/contracts';
 import { LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -23,7 +23,7 @@ export function Sidebar() {
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col border-r border-border bg-card lg:flex">
       <div className="flex items-center gap-2.5 px-5 pb-3 pt-5">
         <LogoMark className="size-9" />
-        <span className="font-display text-xl font-black">Agendei</span>
+        <span className="font-display text-xl font-black">Skedulei</span>
       </div>
       <div className="px-3">
         <OrgSwitcher />

@@ -8,7 +8,7 @@ import {
   PAYMENT_METHOD_LABEL,
   paymentFee,
   type PaymentMethod,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { CheckCircle2, Lock, Trash2, Undo2 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';

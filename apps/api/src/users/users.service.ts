@@ -8,7 +8,7 @@ import {
   type CompleteProfileRequest,
   type UserDto,
   type UpdateSettingsRequest,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { AuthIdentity } from '../auth/entities/auth-identity.entity';
 import { blindIndex, encryptField } from '../common/crypto/field-crypto';
 import { User } from './entities/user.entity';

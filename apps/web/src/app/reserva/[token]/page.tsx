@@ -1,6 +1,6 @@
 'use client';
 
-import { APPOINTMENT_STATUS_LABEL, formatDateLong, ONLINE_BOOKING, whatsappLink, zonedParts } from '@agendei/contracts';
+import { APPOINTMENT_STATUS_LABEL, formatDateLong, ONLINE_BOOKING, whatsappLink, zonedParts } from '@skedulei/contracts';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { CalendarCheck2, CalendarX2, MapPin, MessageCircle } from 'lucide-react';
 import Link from 'next/link';

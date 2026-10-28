@@ -1,12 +1,12 @@
 'use client';
 
-import type { Feature, OrganizationDto, OrganizationSummaryDto, Permission, Vocabulary } from '@agendei/contracts';
+import type { Feature, OrganizationDto, OrganizationSummaryDto, Permission, Vocabulary } from '@skedulei/contracts';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as React from 'react';
 import { setActiveOrganization } from './api/client';
 import * as orgApi from './api/org';
 
-const KEY = 'agendei_org';
+const KEY = 'skedulei_org';
 const listeners = new Set<() => void>();
 
 function readStoredOrg(): string | null {

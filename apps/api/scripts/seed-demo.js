@@ -3,7 +3,7 @@
  *   node scripts/seed-demo.js [http://localhost:3200/v1]
  * Só para desenvolvimento: a senha é fixa e pública.
  */
-const { SEGMENT_PRESETS, SEGMENTS, FEATURES, defaultBusinessHours, ORG_HEADER } = require('@agendei/contracts');
+const { SEGMENT_PRESETS, SEGMENTS, FEATURES, defaultBusinessHours, ORG_HEADER } = require('@skedulei/contracts');
 
 const API = process.argv[2] ?? 'http://localhost:3200/v1';
 require('./demo-guard').assertLocal(API);
@@ -36,7 +36,7 @@ async function session(name, email) {
 async function seed(segment) {
   const preset = SEGMENT_PRESETS[segment];
   const slug = segment.toLowerCase().replace(/_/g, '-');
-  const email = `demo-${slug}@agendei.test`;
+  const email = `demo-${slug}@skedulei.test`;
   const token = await session(`Demo ${preset.label}`, email);
   let orgs = await call('GET', '/organizations', { token });
   let org = orgs[0];

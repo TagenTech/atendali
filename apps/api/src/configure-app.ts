@@ -39,7 +39,7 @@ export function configureApp(app: NestExpressApplication) {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   if (swagger) {
-    const doc = SwaggerModule.createDocument(app, new DocumentBuilder().setTitle('Agendei API').setVersion('1.0').addBearerAuth().build());
+    const doc = SwaggerModule.createDocument(app, new DocumentBuilder().setTitle('Skedulei API').setVersion('1.0').addBearerAuth().build());
     SwaggerModule.setup(`${prefix}/api/docs`, app, doc);
   }
   return { prefix, port: config.get<number>('port') ?? 3200 };

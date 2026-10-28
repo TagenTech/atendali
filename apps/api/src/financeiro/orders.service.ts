@@ -17,7 +17,7 @@ import {
   zonedToUtc,
   type OrderDto,
   type OrderSummaryDto,
-} from '@agendei/contracts';
+} from '@skedulei/contracts';
 import { Appointment } from '../agenda/entities/appointment.entity';
 import { Client } from '../agenda/entities/client.entity';
 import { Member } from '../organizations/entities/member.entity';

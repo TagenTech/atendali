@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
-import type { DeleteAccountRequest, MfaCodeRequest, MfaVerifyRequest } from '@agendei/contracts';
+import type { DeleteAccountRequest, MfaCodeRequest, MfaVerifyRequest } from '@skedulei/contracts';
 
 export class MfaCodeDto implements MfaCodeRequest {
   @ApiProperty({ example: '123456' })
