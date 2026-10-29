@@ -1,18 +1,13 @@
 import { cn } from '@/lib/utils';
 
 /**
- * Marca do Skedulei: três horários empilhados numa coluna de agenda (o do meio deslocado, como num encaixe) e o
- * ponto âmbar do "marcado". Fica nítida em 16 px e funciona em fundo escuro (o quadrado mantém a cor).
+ * Marca do Skedulei: prancheta com relógio e check em roxo/lavanda (public/logo.png). O tile creme mantém a
+ * logo legível em fundo escuro e segue o formato do ícone do app.
  */
 export function LogoMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 512 512" className={cn('size-12', className)} aria-hidden>
-      <rect width="512" height="512" rx="112" fill="#0f6b73" />
-      <rect x="120" y="132" width="216" height="68" rx="34" fill="#fff" />
-      <rect x="176" y="222" width="216" height="68" rx="34" fill="#fff" fillOpacity={0.72} />
-      <rect x="120" y="312" width="150" height="68" rx="34" fill="#fff" fillOpacity={0.48} />
-      <circle cx="352" cy="346" r="34" fill="#f2a63b" />
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/logo.png" alt="" className={cn('size-12 rounded-[24%] bg-[#fbf3e8] object-contain p-[4%]', className)} />
   );
 }
 

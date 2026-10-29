@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     images: [{ url: '/capa.png', width: 1200, height: 630 }],
   },
   icons: {
-    icon: [{ url: '/logo.svg', type: 'image/svg+xml' }],
+    icon: [{ url: '/logo.png', type: 'image/png' }],
     apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180' }],
   },
 };
@@ -30,8 +30,8 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fbf8ff' },
-    { media: '(prefers-color-scheme: dark)', color: '#17131f' },
+    { media: '(prefers-color-scheme: light)', color: '#fbf3e8' },
+    { media: '(prefers-color-scheme: dark)', color: '#150e1f' },
   ],
 };
 

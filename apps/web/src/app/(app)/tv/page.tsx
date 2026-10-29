@@ -40,7 +40,7 @@ export default function TvPage() {
 
   if (!data) {
     return (
-      <div className="grid min-h-dvh place-items-center bg-[#0a3f45] text-white/60" aria-busy="true">
+      <div className="grid min-h-dvh place-items-center bg-[#3d1750] text-white/60" aria-busy="true">
         Carregando…
       </div>
     );
@@ -50,7 +50,7 @@ export default function TvPage() {
   const calling = data.calling;
 
   return (
-    <div className="min-h-dvh bg-[#0a3f45] p-6 text-white lg:p-10">
+    <div className="min-h-dvh bg-[#3d1750] p-6 text-white lg:p-10">
       <header className="mb-8 flex items-end justify-between gap-4 border-b border-white/15 pb-5">
         <h1 className="truncate font-display text-3xl font-extrabold lg:text-4xl">{data.organizationName}</h1>
         <div className="flex items-center gap-3">

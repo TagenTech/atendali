@@ -80,15 +80,15 @@ function printRecord(p: {
     .join('');
   w.document.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${escapeHtml(p.kindLabel)}</title>
 <style>
-  body { font-family: Georgia, 'Times New Roman', serif; color: #12262e; margin: 32px auto; max-width: 640px; }
+  body { font-family: Georgia, 'Times New Roman', serif; color: #2f2140; margin: 32px auto; max-width: 640px; }
   header { border-bottom: 1px solid #dce5e4; padding-bottom: 16px; margin-bottom: 24px; }
-  .org { font-size: 13px; color: #0f6b73; }
+  .org { font-size: 13px; color: #672d7a; }
   h1 { font-size: 22px; margin: 8px 0 4px; }
   .meta { font-size: 13px; color: #566b70; }
   h2 { font-family: system-ui, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #566b70; margin: 20px 0 4px; }
   p { white-space: pre-wrap; margin: 0; line-height: 1.5; }
   .sign { margin-top: 64px; text-align: center; font-size: 13px; }
-  .sign span { display: block; width: 220px; border-top: 1px solid #12262e; margin: 0 auto 8px; }
+  .sign span { display: block; width: 220px; border-top: 1px solid #2f2140; margin: 0 auto 8px; }
   footer { margin-top: 40px; border-top: 1px solid #dce5e4; padding-top: 16px; font-size: 12px; color: #566b70; }
 </style></head><body>
 <header>

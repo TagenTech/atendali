@@ -136,7 +136,7 @@ export function BrandingEditor() {
               <input
                 type="color"
                 aria-label="Outra cor"
-                value={brandHex(color) ?? '#0f6b73'}
+                value={brandHex(color) ?? '#672d7a'}
                 onChange={(e) => pickHex(e.target.value)}
                 className="absolute inset-0 size-full cursor-pointer opacity-0"
               />

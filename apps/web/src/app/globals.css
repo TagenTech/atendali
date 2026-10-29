@@ -2,31 +2,32 @@
 
 /*
  * Skedulei — design tokens.
- * Direção "horário marcado": papel frio, tinta azul-petróleo, petróleo como cor de ação e âmbar só como ponteiro
- * ("agora" / confirmação). Superfícies separadas por linha fina, quase sem sombra; raios pequenos e hierárquicos.
- * Obs.: o token `--pink*` guarda o âmbar de destaque (nome mantido para não mexer em todos os componentes).
+ * Direção "horário marcado": papel creme (#fbf3e8), roxo profundo (#672d7a) como cor de ação e lavanda/pervinca
+ * como destaque (o check e o traço da marca). Superfícies separadas por linha fina, quase sem sombra; raios pequenos
+ * e hierárquicos.
+ * Obs.: o token `--pink*` guarda o violeta de destaque (nome mantido para não mexer em todos os componentes).
  */
 :root {
   color-scheme: light;
-  --background: #f4f7f6;
-  --foreground: #12262e;
+  --background: #fbf3e8;
+  --foreground: #2f2140;
   --card: #ffffff;
-  --card-foreground: #12262e;
-  --muted: #eaf0ef;
-  --muted-foreground: #566b70;
-  --border: #dce5e4;
-  --input: #c5d2d1;
-  --ring: #0f6b73;
+  --card-foreground: #2f2140;
+  --muted: #f3e9db;
+  --muted-foreground: #6f5a78;
+  --border: #e7dbc8;
+  --input: #d8c9b5;
+  --ring: #672d7a;
 
-  --primary: #0f6b73;
-  --primary-hover: #0b5a61;
+  --primary: #672d7a;
+  --primary-hover: #552464;
   --primary-foreground: #ffffff;
-  --primary-soft: #ddeeee;
-  --primary-soft-foreground: #0a4e55;
+  --primary-soft: #f2e3f7;
+  --primary-soft-foreground: #4a1f5c;
 
-  --pink: #b9650f;
-  --pink-soft: #fbebd6;
-  --pink-soft-foreground: #7f4509;
+  --pink: #8256d8;
+  --pink-soft: #efe5fc;
+  --pink-soft-foreground: #5938a8;
 
   --success: #1b8a5a;
   --success-soft: #dff3e8;
@@ -43,14 +44,14 @@
   --sky-soft: #e0eef7;
   --peach-soft: #fbe9da;
 
-  --ink-deep: #0a3f45;
-  --shadow-soft: 0 1px 2px rgb(18 38 46 / 0.05);
-  --shadow-float: 0 1px 2px rgb(11 70 77 / 0.3);
-  --nav-bg: rgb(255 255 255 / 0.92);
+  --ink-deep: #3d1750;
+  --shadow-soft: 0 1px 2px rgb(47 33 64 / 0.05);
+  --shadow-float: 0 1px 2px rgb(103 45 122 / 0.28);
+  --nav-bg: rgb(255 252 248 / 0.92);
   /* Gráficos (validados: faixa de luminosidade, croma e daltonismo) */
-  --chart-1: #0f6b73;
-  --chart-2: #d9822b;
-  --chart-grid: #dce5e4;
+  --chart-1: #672d7a;
+  --chart-2: #c980eb;
+  --chart-grid: #e7dbc8;
 
   /* Paleta pastel (fundo + texto escuro, contraste AA) */
   --stu-lavanda: #e6e6fb; --stu-lavanda-fg: #3f3fa8;
@@ -76,23 +77,23 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --background: #0d191e;
-    --foreground: #e9f1f2;
-    --card: #142228;
-    --card-foreground: #e9f1f2;
-    --muted: #1b2e35;
-    --muted-foreground: #93a9ae;
-    --border: #243840;
-    --input: #2e4750;
-    --ring: #5cc4cc;
-    --primary: #4fb8c0;
-    --primary-hover: #6cc9d0;
-    --primary-foreground: #06262a;
-    --primary-soft: #12353a;
-    --primary-soft-foreground: #a6e3e7;
-    --pink: #f0a85a;
-    --pink-soft: #3a2a17;
-    --pink-soft-foreground: #f6c98f;
+    --background: #150e1f;
+    --foreground: #f0e9f6;
+    --card: #201730;
+    --card-foreground: #f0e9f6;
+    --muted: #2a2038;
+    --muted-foreground: #a891b8;
+    --border: #3a2c4a;
+    --input: #483a58;
+    --ring: #c980eb;
+    --primary: #cf92ec;
+    --primary-hover: #ddabf2;
+    --primary-foreground: #2d0f3d;
+    --primary-soft: #3a2448;
+    --primary-soft-foreground: #eccbf8;
+    --pink: #b193f2;
+    --pink-soft: #322443;
+    --pink-soft-foreground: #d5c3f8;
     --success: #4fd3a1;
     --success-soft: #1c3a30;
     --success-soft-foreground: #8ae6c1;
@@ -104,13 +105,13 @@
     --danger-soft-foreground: #f7a9a9;
     --sky-soft: #1d2a3a;
     --peach-soft: #3a2a22;
-    --ink-deep: #071c21;
+    --ink-deep: #0b0613;
     --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3);
     --shadow-float: 0 1px 2px rgb(0 0 0 / 0.4);
-    --nav-bg: rgb(20 34 40 / 0.9);
-    --chart-1: #4fb8c0;
-    --chart-2: #f0a85a;
-    --chart-grid: #243840;
+    --nav-bg: rgb(21 14 31 / 0.9);
+    --chart-1: #cf92ec;
+    --chart-2: #9874f0;
+    --chart-grid: #3a2c4a;
     --stu-lavanda: #2c2c5e; --stu-lavanda-fg: #cfcfff;
     --stu-rosa: #4a2338; --stu-rosa-fg: #ffc2dc;
     --stu-menta: #1b3d31; --stu-menta-fg: #9ee8c8;
@@ -124,23 +125,23 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --background: #0d191e;
-  --foreground: #e9f1f2;
-  --card: #142228;
-  --card-foreground: #e9f1f2;
-  --muted: #1b2e35;
-  --muted-foreground: #93a9ae;
-  --border: #243840;
-  --input: #2e4750;
-  --ring: #5cc4cc;
-  --primary: #4fb8c0;
-  --primary-hover: #6cc9d0;
-  --primary-foreground: #06262a;
-  --primary-soft: #12353a;
-  --primary-soft-foreground: #a6e3e7;
-  --pink: #f0a85a;
-  --pink-soft: #3a2a17;
-  --pink-soft-foreground: #f6c98f;
+  --background: #150e1f;
+  --foreground: #f0e9f6;
+  --card: #201730;
+  --card-foreground: #f0e9f6;
+  --muted: #2a2038;
+  --muted-foreground: #a891b8;
+  --border: #3a2c4a;
+  --input: #483a58;
+  --ring: #c980eb;
+  --primary: #cf92ec;
+  --primary-hover: #ddabf2;
+  --primary-foreground: #2d0f3d;
+  --primary-soft: #3a2448;
+  --primary-soft-foreground: #eccbf8;
+  --pink: #b193f2;
+  --pink-soft: #322443;
+  --pink-soft-foreground: #d5c3f8;
   --success: #4fd3a1;
   --success-soft: #1c3a30;
   --success-soft-foreground: #8ae6c1;
@@ -152,13 +153,13 @@
   --danger-soft-foreground: #f7a9a9;
   --sky-soft: #1d2a3a;
   --peach-soft: #3a2a22;
-  --ink-deep: #071c21;
+  --ink-deep: #0b0613;
   --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3);
   --shadow-float: 0 1px 2px rgb(0 0 0 / 0.4);
-  --nav-bg: rgb(20 34 40 / 0.9);
-  --chart-1: #4fb8c0;
-  --chart-2: #f0a85a;
-  --chart-grid: #243840;
+  --nav-bg: rgb(21 14 31 / 0.9);
+  --chart-1: #cf92ec;
+  --chart-2: #9874f0;
+  --chart-grid: #3a2c4a;
   --stu-lavanda: #2c2c5e; --stu-lavanda-fg: #cfcfff;
   --stu-rosa: #4a2338; --stu-rosa-fg: #ffc2dc;
   --stu-menta: #1b3d31; --stu-menta-fg: #9ee8c8;

@@ -17,9 +17,9 @@ export function AuthLayout({ title, subtitle, children }: { title: string; subti
           </p>
         </div>
         <ul className="space-y-2 text-sm text-white/70">
-          <li className="flex items-center gap-3"><span className="h-px w-8 bg-[#f2a63b]" />Agenda por profissional, no celular e no computador</li>
-          <li className="flex items-center gap-3"><span className="h-px w-8 bg-[#f2a63b]" />Página própria de agendamento online</li>
-          <li className="flex items-center gap-3"><span className="h-px w-8 bg-[#f2a63b]" />Comanda, caixa, comissões e DRE</li>
+          <li className="flex items-center gap-3"><span className="h-px w-8 bg-[#c980eb]" />Agenda por profissional, no celular e no computador</li>
+          <li className="flex items-center gap-3"><span className="h-px w-8 bg-[#c980eb]" />Página própria de agendamento online</li>
+          <li className="flex items-center gap-3"><span className="h-px w-8 bg-[#c980eb]" />Comanda, caixa, comissões e DRE</li>
         </ul>
       </aside>
       <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-6 py-10 lg:max-w-md">

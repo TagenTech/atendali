@@ -1,27 +1,27 @@
 @import 'tailwindcss';
 
-/* Skedulei — mesmos tokens do app ("meiga": lavanda, rosa, menta, manteiga e coral). */
+/* Skedulei — mesmos tokens do app (identidade da marca: creme, roxo profundo, lavanda e pervinca). */
 :root {
   color-scheme: light;
-  --background: #fbf8ff;
-  --foreground: #2d2640;
+  --background: #fbf3e8;
+  --foreground: #2f2140;
   --card: #ffffff;
-  --card-foreground: #2d2640;
-  --muted: #f4f0fb;
-  --muted-foreground: #6f6787;
-  --border: #ece6f7;
-  --input: #e4dcf3;
-  --ring: #a99bf7;
+  --card-foreground: #2f2140;
+  --muted: #f3e9db;
+  --muted-foreground: #6f5a78;
+  --border: #e7dbc8;
+  --input: #d8c9b5;
+  --ring: #672d7a;
 
-  --primary: #6c5ae6;
-  --primary-hover: #5d4bd8;
+  --primary: #672d7a;
+  --primary-hover: #552464;
   --primary-foreground: #ffffff;
-  --primary-soft: #eeeafe;
-  --primary-soft-foreground: #4f3fc4;
+  --primary-soft: #f2e3f7;
+  --primary-soft-foreground: #4a1f5c;
 
-  --pink: #e8689f;
-  --pink-soft: #fde8f1;
-  --pink-soft-foreground: #b03a6e;
+  --pink: #8256d8;
+  --pink-soft: #efe5fc;
+  --pink-soft-foreground: #5938a8;
 
   --success: #1f9e70;
   --success-soft: #ddf6ec;
@@ -34,9 +34,9 @@
   --sky-soft: #e3f1fd;
   --peach-soft: #ffe9dc;
 
-  --shadow-soft: 0 1px 2px rgb(76 56 140 / 0.04), 0 6px 20px -8px rgb(76 56 140 / 0.12);
-  --shadow-float: 0 10px 30px -10px rgb(108 90 230 / 0.45);
-  --nav-bg: rgb(255 255 255 / 0.86);
+  --shadow-soft: 0 1px 2px rgb(103 45 122 / 0.04), 0 6px 20px -8px rgb(103 45 122 / 0.12);
+  --shadow-float: 0 10px 30px -10px rgb(103 45 122 / 0.4);
+  --nav-bg: rgb(255 252 248 / 0.86);
 
   /* Paleta pastel (fundo + texto escuro, contraste AA) */
   --stu-lavanda: #e9e4ff; --stu-lavanda-fg: #4f3fc4;
@@ -52,23 +52,23 @@
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --background: #17131f;
-    --foreground: #f3eefb;
-    --card: #211c2c;
-    --card-foreground: #f3eefb;
-    --muted: #2a2437;
-    --muted-foreground: #a69fb8;
-    --border: #322b40;
-    --input: #3b3349;
-    --ring: #8b7cf6;
-    --primary: #9f91ff;
-    --primary-hover: #b2a6ff;
-    --primary-foreground: #1b1430;
-    --primary-soft: #2c2545;
-    --primary-soft-foreground: #c9c0ff;
-    --pink: #f7a6c9;
-    --pink-soft: #3a2232;
-    --pink-soft-foreground: #f9bfd8;
+    --background: #150e1f;
+    --foreground: #f0e9f6;
+    --card: #201730;
+    --card-foreground: #f0e9f6;
+    --muted: #2a2038;
+    --muted-foreground: #a891b8;
+    --border: #3a2c4a;
+    --input: #483a58;
+    --ring: #c980eb;
+    --primary: #cf92ec;
+    --primary-hover: #ddabf2;
+    --primary-foreground: #2d0f3d;
+    --primary-soft: #3a2448;
+    --primary-soft-foreground: #eccbf8;
+    --pink: #b193f2;
+    --pink-soft: #322443;
+    --pink-soft-foreground: #d5c3f8;
     --success: #4fd3a1;
     --success-soft: #1c3a30;
     --success-soft-foreground: #8ae6c1;
@@ -78,8 +78,8 @@
     --sky-soft: #1d2a3a;
     --peach-soft: #3a2a22;
     --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -10px rgb(0 0 0 / 0.5);
-    --shadow-float: 0 10px 30px -10px rgb(159 145 255 / 0.45);
-    --nav-bg: rgb(33 28 44 / 0.88);
+    --shadow-float: 0 10px 30px -10px rgb(207 146 236 / 0.4);
+    --nav-bg: rgb(21 14 31 / 0.88);
     --stu-lavanda: #34295e; --stu-lavanda-fg: #d3caff;
     --stu-rosa: #4a2338; --stu-rosa-fg: #ffc2dc;
     --stu-menta: #1b3d31; --stu-menta-fg: #9ee8c8;
