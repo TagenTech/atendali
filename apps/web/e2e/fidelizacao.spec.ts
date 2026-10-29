@@ -57,13 +57,14 @@ test.afterAll(async () => {
 });
 
 test('liga os módulos e define a regra de pontos', async () => {
-  await page.goto('/configuracoes');
+  await page.goto('/configuracoes?aba=modulos');
   for (const name of [/Pacotes de sessões/, /Vale-presente/, /Programa de fidelidade/]) {
     // Teclado: no celular a lista é longa e o clique cai sob a barra/toast.
     await page.getByRole('switch', { name }).focus();
     await page.keyboard.press('Space');
     await expect(page.getByRole('switch', { name })).toHaveAttribute('aria-checked', 'true');
   }
+  await page.getByRole('link', { name: 'Pagamentos', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Pontos de fidelidade' })).toBeVisible();
   await page.getByRole('switch', { name: /Programa de pontos/ }).click();
   await page.getByRole('button', { name: 'Salvar' }).last().click();

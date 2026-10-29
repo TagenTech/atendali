@@ -17,7 +17,7 @@ const roles: Record<string, { ctx: BrowserContext; page: Page }> = {};
 
 const ALL_ROUTES = [
   '/inicio', '/agenda', '/clientes', '/clientes/importar', '/caixa', '/financeiro', '/relatorios', '/financeiro/contas', '/financeiro/dre', '/financeiro/fluxo',
-  '/comissoes', '/servicos', '/estoque', '/fidelidade', '/avaliacoes', '/atividade', '/tv', '/equipe', '/configuracoes', '/mais', '/mais/perfil', '/mais/seguranca',
+  '/comissoes', '/servicos', '/estoque', '/fidelidade', '/avaliacoes', '/atividade', '/tv', '/equipe', '/configuracoes', '/configuracoes?aba=agendamento', '/configuracoes?aba=unidades', '/configuracoes?aba=pagamentos', '/configuracoes?aba=modulos', '/mais', '/mais/perfil', '/mais/seguranca',
 ];
 
 test.beforeAll(async ({ browser }, info) => {

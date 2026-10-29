@@ -18,7 +18,8 @@ import {
   type UnitDto,
 } from '@skedulei/contracts';
 import { Link2, MapPin, Plus, ShieldAlert } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/layout/page-header';
@@ -40,24 +41,15 @@ import { useOrg } from '@/lib/org';
 import { useUnits, useUpdateOrganization } from '@/lib/queries/org';
 import { cn } from '@/lib/utils';
 
-function sectionId(title: string) {
-  return title
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-}
-
 function Section({ title, description, children, action }: { title: string; description?: string; children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <section id={sectionId(title)} className="scroll-mt-28 grid grid-cols-[minmax(0,1fr)] gap-4 xl:grid-cols-[16rem_minmax(0,1fr)] xl:gap-8">
-      <div className="flex items-start justify-between gap-3 xl:block">
+    <section className="space-y-3">
+      <div className="flex items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-extrabold">{title}</h2>
-          {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
+          {description ? <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p> : null}
         </div>
-        {action ? <div className="xl:mt-3">{action}</div> : null}
+        {action}
       </div>
       <div>{children}</div>
     </section>
@@ -301,32 +293,31 @@ function Payments() {
 
   return (
     <Card className="space-y-5">
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[34rem] text-sm">
-          <thead className="text-left text-xs font-semibold text-muted-foreground">
-            <tr>
-              <th className="py-2 font-bold">Forma</th>
-              <th className="py-2 font-bold">Taxa</th>
-              <th className="py-2 font-bold">Taxa fixa</th>
-              <th className="py-2 font-bold">Recebe em</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {rows.map((r, i) => (
-              <tr key={r.method}>
-                <td className="py-2 pr-3">
-                  <label className="flex items-center gap-2 font-semibold">
-                    <input type="checkbox" checked={r.enabled} onChange={(e) => set(i, { enabled: e.target.checked })} className="size-4 accent-[var(--primary)]" />
-                    {PAYMENT_METHOD_LABEL[r.method]}
-                  </label>
-                </td>
-                <td className="w-32 py-2 pr-2">
+      <div className="text-sm">
+        <div className="hidden grid-cols-[minmax(0,1fr)_8rem_9rem_7rem] gap-3 pb-2 text-xs font-bold text-muted-foreground sm:grid">
+          <span>Forma</span>
+          <span>Taxa</span>
+          <span>Taxa fixa</span>
+          <span>Recebe em</span>
+        </div>
+        <div className="divide-y divide-border">
+          {rows.map((r, i) => (
+            <div key={r.method} className="space-y-2 py-3 sm:grid sm:grid-cols-[minmax(0,1fr)_8rem_9rem_7rem] sm:items-center sm:gap-3 sm:space-y-0 sm:py-2">
+              <label className="flex items-center gap-2 font-semibold">
+                <input type="checkbox" checked={r.enabled} onChange={(e) => set(i, { enabled: e.target.checked })} className="size-4 accent-[var(--primary)]" />
+                {PAYMENT_METHOD_LABEL[r.method]}
+              </label>
+              <div className="grid grid-cols-3 gap-2 sm:contents">
+                <div>
+                  <span className="mb-1 block text-xs text-muted-foreground sm:hidden">Taxa</span>
                   <PercentInput aria-label={`Taxa de ${PAYMENT_METHOD_LABEL[r.method]}`} value={r.feeBps} max={20} onChange={(v) => set(i, { feeBps: v ?? 0 })} className="h-10" />
-                </td>
-                <td className="w-36 py-2 pr-2">
+                </div>
+                <div>
+                  <span className="mb-1 block text-xs text-muted-foreground sm:hidden">Taxa fixa</span>
                   <MoneyInput aria-label={`Taxa fixa de ${PAYMENT_METHOD_LABEL[r.method]}`} value={r.feeFixedCents} onChange={(v) => set(i, { feeFixedCents: v ?? 0 })} className="h-10" />
-                </td>
-                <td className="w-28 py-2">
+                </div>
+                <div>
+                  <span className="mb-1 block text-xs text-muted-foreground sm:hidden">Recebe em</span>
                   <Input
                     aria-label={`Dias para receber ${PAYMENT_METHOD_LABEL[r.method]}`}
                     type="number"
@@ -337,11 +328,11 @@ function Payments() {
                     className="h-10"
                     trailing={<span className="text-xs text-muted-foreground">dias</span>}
                   />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
       <fieldset className="space-y-2">
         <legend className="text-sm font-semibold">Comissão calculada sobre</legend>
@@ -382,9 +373,19 @@ function Payments() {
   );
 }
 
-export default function ConfiguracoesPage() {
+const TABS = [
+  { key: 'negocio', label: 'Negócio' },
+  { key: 'agendamento', label: 'Agendamento online' },
+  { key: 'unidades', label: 'Unidades' },
+  { key: 'pagamentos', label: 'Pagamentos' },
+  { key: 'fichas', label: 'Fichas e termos' },
+  { key: 'modulos', label: 'Módulos' },
+] as const;
+
+function Settings() {
   const { can, org } = useOrg();
   const router = useRouter();
+  const params = useSearchParams();
   const allowed = can(Permission.ORG_MANAGE);
 
   React.useEffect(() => {
@@ -392,57 +393,98 @@ export default function ConfiguracoesPage() {
   }, [allowed, router]);
   if (!allowed) return null;
 
-  const hasLoyalty = org.features.includes(FeatureKey.FIDELIDADE);
   const hasForms = org.features.includes(FeatureKey.ANAMNESE) || org.features.includes(FeatureKey.TERMOS);
-  const nav = ['Dados do negócio', 'Aparência da página', 'Lembretes', 'Taxa de agendamento', 'Unidades', 'Pagamentos e comissão', ...(hasLoyalty ? ['Pontos de fidelidade'] : []), ...(hasForms ? ['Fichas e termos'] : []), 'Módulos'];
+  const tabs = TABS.filter((t) => t.key !== 'fichas' || hasForms);
+  const asked = params.get('aba');
+  const current = tabs.find((t) => t.key === asked)?.key ?? 'negocio';
 
   return (
     <>
       <PageHeader title="Negócio" subtitle="Configurações" />
-      <nav aria-label="Seções" className="sticky top-0 z-10 -mt-1 mb-6 border-b border-border bg-background/95 backdrop-blur">
-        <ul className="no-scrollbar flex gap-1 overflow-x-auto px-5 py-2">
-          {nav.map((t) => (
-            <li key={t} className="shrink-0">
-              <a href={`#${sectionId(t)}`} className="block rounded-full px-3 py-1.5 text-sm font-semibold text-muted-foreground hover:bg-muted hover:text-foreground">
-                {t}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-      <div className="space-y-12 px-5">
-        <Section title="Dados do negócio" description="Aparecem na página de agendamento e nos recibos.">
-          <BusinessInfo />
-        </Section>
-        <Section title="Aparência da página" description="Logo, imagem de fundo e cor que o cliente vê ao agendar online.">
-          <BrandingEditor />
-        </Section>
-        <Section title="Lembretes" description="Reduzem faltas: o cliente confirma ou libera o horário sozinho.">
-          <Reminders />
-        </Section>
-        <Section title="Taxa de agendamento" description="Cobrança de sinal ao marcar online, para reduzir faltas. Ainda não está disponível.">
-          <BookingFee />
-        </Section>
-        <Section title="Unidades" description="Endereço e horário de funcionamento de cada local.">
-          <Units />
-        </Section>
-        <Section title="Pagamentos e comissão" description="Taxas da maquininha e prazos de recebimento. A comissão de cada pessoa fica na Equipe; a de cada serviço, nos serviços.">
-          <Payments />
-        </Section>
-        {org.features.includes(FeatureKey.FIDELIDADE) ? (
-          <Section title="Pontos de fidelidade" description="Quanto cada real pago rende e quanto vale um resgate. Vale para as próximas comandas.">
-            <Loyalty />
-          </Section>
-        ) : null}
-        {org.features.includes(FeatureKey.ANAMNESE) || org.features.includes(FeatureKey.TERMOS) ? (
-          <Section title="Fichas e termos" description="Modelos de anamnese e de termo de consentimento que você envia ao paciente. Mudar um modelo não altera o que já foi enviado.">
-            <TemplatesEditor />
-          </Section>
-        ) : null}
-        <Section title="Módulos" description="Ligue só o que o seu negócio usa — o resto some das telas. Os marcados com escudo guardam dados de saúde.">
-          <Modules />
-        </Section>
+      <div className="px-5 lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10">
+        <nav aria-label="Seções" className="-mx-5 mb-6 border-b border-border px-5 lg:sticky lg:top-6 lg:mx-0 lg:mb-0 lg:self-start lg:border-b-0 lg:px-0">
+          <ul className="no-scrollbar flex gap-1 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible lg:pb-0">
+            {tabs.map((t) => {
+              const active = t.key === current;
+              return (
+                <li key={t.key} className="shrink-0" ref={active ? (el) => el?.scrollIntoView({ inline: 'center', block: 'nearest' }) : undefined}>
+                  <Link
+                    href={`/configuracoes?aba=${t.key}`}
+                    scroll={false}
+                    aria-current={active ? 'page' : undefined}
+                    className={cn(
+                      'block rounded-full px-4 py-2 text-sm font-semibold transition-colors lg:rounded-2xl lg:border-l-[3px] lg:py-2.5',
+                      active
+                        ? 'bg-primary-soft text-primary-soft-foreground lg:border-primary'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground lg:border-transparent',
+                    )}
+                  >
+                    {t.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        <div className="min-w-0 max-w-4xl space-y-10">
+          {current === 'negocio' ? (
+            <>
+              <Section title="Dados do negócio" description="Aparecem na página de agendamento e nos recibos.">
+                <BusinessInfo />
+              </Section>
+              <Section title="Aparência da página" description="Logo, imagem de fundo e cor que o cliente vê ao agendar online.">
+                <BrandingEditor />
+              </Section>
+            </>
+          ) : null}
+          {current === 'agendamento' ? (
+            <>
+              <Section title="Lembretes" description="Reduzem faltas: o cliente confirma ou libera o horário sozinho.">
+                <Reminders />
+              </Section>
+              <Section title="Taxa de agendamento" description="Cobrança de sinal ao marcar online, para reduzir faltas. Ainda não está disponível.">
+                <BookingFee />
+              </Section>
+            </>
+          ) : null}
+          {current === 'unidades' ? (
+            <Section title="Unidades" description="Endereço e horário de funcionamento de cada local.">
+              <Units />
+            </Section>
+          ) : null}
+          {current === 'pagamentos' ? (
+            <>
+              <Section title="Pagamentos e comissão" description="Taxas da maquininha e prazos de recebimento. A comissão de cada pessoa fica na Equipe; a de cada serviço, nos serviços.">
+                <Payments />
+              </Section>
+              {org.features.includes(FeatureKey.FIDELIDADE) ? (
+                <Section title="Pontos de fidelidade" description="Quanto cada real pago rende e quanto vale um resgate. Vale para as próximas comandas.">
+                  <Loyalty />
+                </Section>
+              ) : null}
+            </>
+          ) : null}
+          {current === 'fichas' ? (
+            <Section title="Fichas e termos" description="Modelos de anamnese e de termo de consentimento que você envia ao paciente. Mudar um modelo não altera o que já foi enviado.">
+              <TemplatesEditor />
+            </Section>
+          ) : null}
+          {current === 'modulos' ? (
+            <Section title="Módulos" description="Ligue só o que o seu negócio usa — o resto some das telas. Os marcados com escudo guardam dados de saúde.">
+              <Modules />
+            </Section>
+          ) : null}
+        </div>
       </div>
     </>
+  );
+}
+
+export default function ConfiguracoesPage() {
+  return (
+    <React.Suspense fallback={null}>
+      <Settings />
+    </React.Suspense>
   );
 }

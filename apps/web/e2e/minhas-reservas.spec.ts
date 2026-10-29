@@ -120,7 +120,7 @@ test.describe('responsável × paciente e Minhas reservas', () => {
   test('a opção de cobrar taxa de agendamento existe, mas fica desligada ("em breve")', async ({ page, context }) => {
     const o = await createBusiness(context, `${stamp}fee`);
     expect(o.id).toBeTruthy();
-    await page.goto('/configuracoes');
+    await page.goto('/configuracoes?aba=agendamento');
     const fee = page.getByRole('switch', { name: /Cobrar taxa de agendamento/ });
     await expect(fee).toBeVisible();
     await expect(fee).toBeDisabled();

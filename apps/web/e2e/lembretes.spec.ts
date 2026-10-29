@@ -36,7 +36,7 @@ test.describe('lembretes', () => {
 
   test('configurações: a chave de lembretes liga e desliga', async ({ page, context }) => {
     await createBusiness(context, `${stamp}b`);
-    await page.goto('/configuracoes');
+    await page.goto('/configuracoes?aba=agendamento');
     const sw = page.getByRole('switch', { name: /Lembretes por e-mail/ });
     await expect(sw).toHaveAttribute('aria-checked', 'true');
     await sw.press('Space');

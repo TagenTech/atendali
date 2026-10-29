@@ -10,7 +10,7 @@ mkdirSync(out, { recursive: true });
 
 const sizes = { desktop: { width: 1440, height: 900 }, celular: { width: 390, height: 844 } };
 const publicRoutes = ['/', '/login', '/cadastro', `/demo-${segment}`, '/contato', '/termos'];
-const appRoutes = ['/inicio', '/agenda', '/clientes', '/servicos', '/equipe', '/caixa', '/financeiro', '/relatorios', '/configuracoes', '/mais', '/comissoes', '/estoque', '/fidelidade', '/avaliacoes', '/atividade'];
+const appRoutes = ['/inicio', '/agenda', '/clientes', '/servicos', '/equipe', '/caixa', '/financeiro', '/relatorios', '/configuracoes', '/mais', '/comissoes', '/estoque', '/fidelidade', '/avaliacoes', '/atividade', '/configuracoes?aba=agendamento', '/configuracoes?aba=unidades', '/configuracoes?aba=pagamentos', '/configuracoes?aba=modulos'];
 
 const browser = await chromium.launch();
 for (const [name, viewport] of Object.entries(sizes)) {
@@ -23,7 +23,7 @@ for (const [name, viewport] of Object.entries(sizes)) {
     if (only && !only.includes(route)) return;
     await page.goto(BASE + route, { waitUntil: 'networkidle' }).catch(() => {});
     await page.waitForTimeout(600);
-    const file = `${out}/${name}${route.replace(/\//g, '_') || '_raiz'}.png`;
+    const file = `${out}/${name}${route.replace(/[\/?=]/g, '_') || '_raiz'}.png`;
     await page.screenshot({ path: file, fullPage: route !== '/agenda' });
     console.log(name, route, '→', file);
   };

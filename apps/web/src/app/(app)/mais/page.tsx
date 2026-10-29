@@ -63,6 +63,31 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
+function Tile({ icon: Icon, label, href }: { icon: LucideIcon; label: string; href: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-2.5 rounded-2xl border border-border bg-card p-2.5 transition-colors hover:bg-muted active:bg-muted"
+    >
+      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary-soft-foreground">
+        <Icon className="size-[18px]" />
+      </span>
+      <span className="min-w-0 text-[13px] font-bold leading-tight">{label}</span>
+    </Link>
+  );
+}
+
+function TileGroup({ title, children }: { title: string; children: React.ReactNode }) {
+  const items = React.Children.toArray(children).filter(Boolean);
+  if (!items.length) return null;
+  return (
+    <section>
+      <h2 className="mb-2 px-1 text-sm font-extrabold text-foreground">{title}</h2>
+      <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-3 lg:gap-3">{items}</div>
+    </section>
+  );
+}
+
 export default function MaisPage() {
   const { user, logout } = useAuth();
   const { can, has, vocab } = useOrg();
@@ -72,7 +97,7 @@ export default function MaisPage() {
   return (
     <>
       <PageHeader title="Mais" />
-      <div className="space-y-5 px-5 lg:max-w-2xl">
+      <div className="space-y-6 px-5 lg:max-w-3xl">
         {user ? (
           <Link href="/mais/perfil" className="block">
             <Card className="flex items-center gap-4 transition-colors hover:bg-muted">
@@ -97,25 +122,35 @@ export default function MaisPage() {
           <InstallCard dismissible={false} />
         </div>
 
-        <Group title="Negócio">
+        <Card className="p-2">
           <OrgSwitcher />
-          {can(Permission.CASH_OPERATE) ? <Row icon={Wallet} label="Caixa e comandas" href="/caixa" /> : null}
-          {can(Permission.FINANCE_VIEW) ? <Row icon={ChartNoAxesCombined} label="Financeiro" href="/financeiro" /> : null}
-          {can(Permission.REPORTS_VIEW) ? <Row icon={ChartPie} label="Relatórios" href="/relatorios" /> : null}
-          {can(Permission.FINANCE_VIEW) || can(Permission.COMMISSIONS_OWN) ? <Row icon={HandCoins} label="Comissões" href="/comissoes" /> : null}
-          {can(Permission.SERVICES_VIEW) ? <Row icon={Scissors} label={vocab.services} href="/servicos" /> : null}
-          {can(Permission.SERVICES_VIEW) && has(Feature.ESTOQUE) ? <Row icon={Boxes} label="Estoque" href="/estoque" /> : null}
+        </Card>
+
+        <TileGroup title="Rotina">
+          {can(Permission.CASH_OPERATE) ? <Tile icon={Wallet} label="Caixa e comandas" href="/caixa" /> : null}
+          {can(Permission.FINANCE_VIEW) || can(Permission.COMMISSIONS_OWN) ? <Tile icon={HandCoins} label="Comissões" href="/comissoes" /> : null}
+          {can(Permission.CLIENTS_VIEW) ? <Tile icon={Star} label="Avaliações" href="/avaliacoes" /> : null}
+        </TileGroup>
+
+        <TileGroup title="Gestão">
+          {can(Permission.FINANCE_VIEW) ? <Tile icon={ChartNoAxesCombined} label="Financeiro" href="/financeiro" /> : null}
+          {can(Permission.REPORTS_VIEW) ? <Tile icon={ChartPie} label="Relatórios" href="/relatorios" /> : null}
+          {can(Permission.AUDIT_VIEW) ? <Tile icon={ShieldCheck} label="Atividade" href="/atividade" /> : null}
+        </TileGroup>
+
+        <TileGroup title="Catálogo">
+          {can(Permission.SERVICES_VIEW) ? <Tile icon={Scissors} label={vocab.services} href="/servicos" /> : null}
+          {can(Permission.SERVICES_VIEW) && has(Feature.ESTOQUE) ? <Tile icon={Boxes} label="Estoque" href="/estoque" /> : null}
           {can(Permission.SERVICES_VIEW) && [Feature.PACOTES, Feature.ASSINATURAS, Feature.VALES, Feature.FIDELIDADE].some(has) ? (
-            <Row icon={Gift} label="Pacotes e clube" href="/fidelidade" />
+            <Tile icon={Gift} label="Pacotes e clube" href="/fidelidade" />
           ) : null}
-          {can(Permission.AGENDA_VIEW_ALL) ? <Row icon={Monitor} label="Painel de TV" href="/tv" /> : null}
-          {can(Permission.CLIENTS_VIEW) ? <Row icon={Star} label="Avaliações" href="/avaliacoes" /> : null}
-          {can(Permission.AUDIT_VIEW) ? <Row icon={ShieldCheck} label="Atividade" href="/atividade" /> : null}
-          {can(Permission.TEAM_VIEW) ? <Row icon={UsersRound} label="Equipe" href="/equipe" /> : null}
-          {can(Permission.ORG_MANAGE) ? (
-            <Row icon={Building2} label="Dados, unidades e módulos" href="/configuracoes" />
-          ) : null}
-        </Group>
+        </TileGroup>
+
+        <TileGroup title="Negócio">
+          {can(Permission.TEAM_VIEW) ? <Tile icon={UsersRound} label="Equipe" href="/equipe" /> : null}
+          {can(Permission.ORG_MANAGE) ? <Tile icon={Building2} label="Configurações" href="/configuracoes" /> : null}
+          {can(Permission.AGENDA_VIEW_ALL) ? <Tile icon={Monitor} label="Painel de TV" href="/tv" /> : null}
+        </TileGroup>
 
         <Group title="Minha conta">
           <Row icon={Download} label="Exportar meus dados" onClick={() => void downloadFile('/me/export', 'skedulei-meus-dados.json')} />

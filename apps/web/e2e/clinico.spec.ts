@@ -93,7 +93,7 @@ test.describe('módulo clínico: prontuário, anamnese e termo', () => {
   test('configurações: modelos de ficha editáveis e módulos sem tela aparecem como "Em breve"', async ({ page, context }) => {
     const org = await createBusiness(context, `${stamp}b`, 'CLINICA_MEDICA');
     await context.request.patch('/api/v1/org', { headers: { authorization: `Bearer ${org.owner.token}`, 'x-organization-id': org.id }, data: { features: ['ANAMNESE', 'TERMOS', 'PRONTUARIO'] } });
-    await page.goto('/configuracoes');
+    await page.goto('/configuracoes?aba=fichas');
     if (test.info().project.name === 'celular') await expectNoHorizontalScroll(page, 'configurações com modelos'); // a tabela de taxas já alargou esta tela
     // Os modelos de exemplo aparecem sozinhos e dá para renomear.
     await page.getByRole('button', { name: 'Editar Anamnese' }).click();
@@ -106,6 +106,7 @@ test.describe('módulo clínico: prontuário, anamnese e termo', () => {
     await expect(page.getByText('Modelo salvo')).toBeVisible();
     await expect(page.getByText('Anamnese pediátrica')).toBeVisible();
 
+    await page.getByRole('link', { name: 'Módulos', exact: true }).click();
     const fotos = page.getByRole('switch', { name: /Fotos antes e depois/ });
     await expect(fotos).toBeDisabled();
     await expect(page.getByText('Em breve').first()).toBeVisible();
