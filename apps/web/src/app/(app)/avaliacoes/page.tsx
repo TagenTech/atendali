@@ -40,7 +40,7 @@ export default function AvaliacoesPage() {
         {isLoading ? (
           <Skeleton className="h-40 rounded-3xl" />
         ) : !data?.items.length ? (
-          <EmptyState title="Nenhuma avaliação ainda" description="Depois de fechar uma comanda, peça a avaliação por ali — o link vai pronto para o WhatsApp." />
+          <EmptyState inline title="Nenhuma avaliação ainda" description="Depois de fechar uma comanda, peça a avaliação por ali — o link vai pronto para o WhatsApp." />
         ) : (
           <>
             <KpiStrip cols={2}>

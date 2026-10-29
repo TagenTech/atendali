@@ -10,7 +10,7 @@ mkdirSync(out, { recursive: true });
 
 const sizes = { desktop: { width: 1440, height: 900 }, celular: { width: 390, height: 844 } };
 const publicRoutes = ['/', '/login', '/cadastro', `/demo-${segment}`, '/contato', '/termos'];
-const appRoutes = ['/inicio', '/agenda', '/clientes', '/servicos', '/equipe', '/caixa', '/financeiro', '/relatorios', '/configuracoes', '/mais'];
+const appRoutes = ['/inicio', '/agenda', '/clientes', '/servicos', '/equipe', '/caixa', '/financeiro', '/relatorios', '/configuracoes', '/mais', '/comissoes', '/estoque', '/fidelidade', '/avaliacoes', '/atividade'];
 
 const browser = await chromium.launch();
 for (const [name, viewport] of Object.entries(sizes)) {

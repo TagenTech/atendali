@@ -64,7 +64,7 @@ export default function AtividadePage() {
         {isLoading ? (
           <Skeleton className="h-48 rounded-3xl" />
         ) : !data?.length ? (
-          <EmptyState title="Nada por aqui" description="Nenhuma ação desse tipo nos últimos dias." />
+          <EmptyState inline title="Nada por aqui" description="Nenhuma ação desse tipo nos últimos dias." />
         ) : (
           <Ledger>
             <div className="hidden overflow-x-auto lg:block">

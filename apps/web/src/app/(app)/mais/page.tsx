@@ -76,7 +76,7 @@ export default function MaisPage() {
         {user ? (
           <Link href="/mais/perfil" className="block">
             <Card className="flex items-center gap-4 transition-colors hover:bg-muted">
-              <span className="grid size-16 shrink-0 place-items-center rounded-[1.4rem] bg-gradient-to-br from-[#8f7cf8] to-[#f28db8] font-display text-2xl font-extrabold text-white">
+              <span className="grid size-16 shrink-0 place-items-center rounded-2xl bg-primary font-display text-2xl font-extrabold text-primary-foreground">
                 {initials(user.name)}
               </span>
               <div className="min-w-0 flex-1">
@@ -84,7 +84,7 @@ export default function MaisPage() {
                 <p className="truncate text-muted-foreground">{user.email}</p>
                 {!user.profileComplete ? (
                   <span className="mt-1 inline-block rounded-full bg-primary-soft px-2.5 py-0.5 text-xs font-bold text-primary-soft-foreground">
-                    ✨ Finalizar cadastro
+                    Finalizar cadastro
                   </span>
                 ) : null}
               </div>
@@ -99,27 +99,27 @@ export default function MaisPage() {
 
         <Group title="Negócio">
           <OrgSwitcher />
-          {can(Permission.CASH_OPERATE) ? <Row icon={Wallet} label="Caixa e comandas" href="/caixa" tone="bg-warning-soft text-warning-soft-foreground" /> : null}
-          {can(Permission.FINANCE_VIEW) ? <Row icon={ChartNoAxesCombined} label="Financeiro" href="/financeiro" tone="bg-success-soft text-success-soft-foreground" /> : null}
-          {can(Permission.REPORTS_VIEW) ? <Row icon={ChartPie} label="Relatórios" href="/relatorios" tone="bg-sky-soft text-[var(--stu-ceu-fg)]" /> : null}
+          {can(Permission.CASH_OPERATE) ? <Row icon={Wallet} label="Caixa e comandas" href="/caixa" /> : null}
+          {can(Permission.FINANCE_VIEW) ? <Row icon={ChartNoAxesCombined} label="Financeiro" href="/financeiro" /> : null}
+          {can(Permission.REPORTS_VIEW) ? <Row icon={ChartPie} label="Relatórios" href="/relatorios" /> : null}
           {can(Permission.FINANCE_VIEW) || can(Permission.COMMISSIONS_OWN) ? <Row icon={HandCoins} label="Comissões" href="/comissoes" /> : null}
-          {can(Permission.SERVICES_VIEW) ? <Row icon={Scissors} label={vocab.services} href="/servicos" tone="bg-pink-soft text-pink-soft-foreground" /> : null}
-          {can(Permission.SERVICES_VIEW) && has(Feature.ESTOQUE) ? <Row icon={Boxes} label="Estoque" href="/estoque" tone="bg-warning-soft text-warning-soft-foreground" /> : null}
+          {can(Permission.SERVICES_VIEW) ? <Row icon={Scissors} label={vocab.services} href="/servicos" /> : null}
+          {can(Permission.SERVICES_VIEW) && has(Feature.ESTOQUE) ? <Row icon={Boxes} label="Estoque" href="/estoque" /> : null}
           {can(Permission.SERVICES_VIEW) && [Feature.PACOTES, Feature.ASSINATURAS, Feature.VALES, Feature.FIDELIDADE].some(has) ? (
-            <Row icon={Gift} label="Pacotes e clube" href="/fidelidade" tone="bg-pink-soft text-pink-soft-foreground" />
+            <Row icon={Gift} label="Pacotes e clube" href="/fidelidade" />
           ) : null}
-          {can(Permission.AGENDA_VIEW_ALL) ? <Row icon={Monitor} label="Painel de TV" href="/tv" tone="bg-sky-soft text-[var(--stu-ceu-fg)]" /> : null}
-          {can(Permission.CLIENTS_VIEW) ? <Row icon={Star} label="Avaliações" href="/avaliacoes" tone="bg-warning-soft text-warning-soft-foreground" /> : null}
-          {can(Permission.AUDIT_VIEW) ? <Row icon={ShieldCheck} label="Atividade" href="/atividade" tone="bg-primary-soft text-primary-soft-foreground" /> : null}
-          {can(Permission.TEAM_VIEW) ? <Row icon={UsersRound} label="Equipe" href="/equipe" tone="bg-success-soft text-success-soft-foreground" /> : null}
+          {can(Permission.AGENDA_VIEW_ALL) ? <Row icon={Monitor} label="Painel de TV" href="/tv" /> : null}
+          {can(Permission.CLIENTS_VIEW) ? <Row icon={Star} label="Avaliações" href="/avaliacoes" /> : null}
+          {can(Permission.AUDIT_VIEW) ? <Row icon={ShieldCheck} label="Atividade" href="/atividade" /> : null}
+          {can(Permission.TEAM_VIEW) ? <Row icon={UsersRound} label="Equipe" href="/equipe" /> : null}
           {can(Permission.ORG_MANAGE) ? (
-            <Row icon={Building2} label="Dados, unidades e módulos" href="/configuracoes" tone="bg-sky-soft text-[var(--stu-ceu-fg)]" />
+            <Row icon={Building2} label="Dados, unidades e módulos" href="/configuracoes" />
           ) : null}
         </Group>
 
         <Group title="Minha conta">
           <Row icon={Download} label="Exportar meus dados" onClick={() => void downloadFile('/me/export', 'skedulei-meus-dados.json')} />
-          <Row icon={ShieldCheck} label="Segurança da conta" href="/mais/seguranca" hint={user && !user.mfaEnabled ? '2FA' : undefined} tone="bg-success-soft text-success-soft-foreground" />
+          <Row icon={ShieldCheck} label="Segurança da conta" href="/mais/seguranca" hint={user && !user.mfaEnabled ? '2FA' : undefined} />
           <Row icon={KeyRound} label={user?.hasPassword === false ? 'Criar senha' : 'Alterar senha'} onClick={() => setPasswordOpen(true)} />
           <Row icon={LifeBuoy} label="Relatar um problema" href="/contato" />
         </Group>

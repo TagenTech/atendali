@@ -65,18 +65,18 @@ export default function FinanceiroPage() {
                       <thead className="text-left text-xs font-semibold text-muted-foreground">
                         <tr>
                           <th className="py-2 font-bold">Profissional</th>
-                          <th className="py-2 text-right font-bold">Itens</th>
-                          <th className="py-2 text-right font-bold">Faturou</th>
-                          <th className="py-2 text-right font-bold">Comissão</th>
+                          <th className="whitespace-nowrap py-2 pl-3 text-right font-bold">Itens</th>
+                          <th className="whitespace-nowrap py-2 pl-3 text-right font-bold">Faturou</th>
+                          <th className="whitespace-nowrap py-2 pl-3 text-right font-bold">Comissão</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border">
                         {s.byProfessional.map((p) => (
                           <tr key={p.memberId}>
                             <td className="py-2 font-semibold">{p.name}</td>
-                            <td className="py-2 text-right tabular">{p.items}</td>
-                            <td className="py-2 text-right tabular">{formatBRL(p.revenueCents)}</td>
-                            <td className="py-2 text-right tabular">{formatBRL(p.commissionsCents)}</td>
+                            <td className="whitespace-nowrap py-2 pl-3 text-right tabular">{p.items}</td>
+                            <td className="whitespace-nowrap py-2 pl-3 text-right tabular">{formatBRL(p.revenueCents)}</td>
+                            <td className="whitespace-nowrap py-2 pl-3 text-right tabular">{formatBRL(p.commissionsCents)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -89,16 +89,16 @@ export default function FinanceiroPage() {
                     <thead className="text-left text-xs font-semibold text-muted-foreground">
                       <tr>
                         <th className="py-2 font-bold">{vocab.service} / item</th>
-                        <th className="py-2 text-right font-bold">Qtd.</th>
-                        <th className="py-2 text-right font-bold">Faturou</th>
+                        <th className="whitespace-nowrap py-2 pl-3 text-right font-bold">Qtd.</th>
+                        <th className="whitespace-nowrap py-2 pl-3 text-right font-bold">Faturou</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
                       {s.byService.map((x) => (
                         <tr key={x.name}>
                           <td className="py-2">{x.name}</td>
-                          <td className="py-2 text-right tabular">{x.quantity}</td>
-                          <td className="py-2 text-right tabular">{formatBRL(x.revenueCents)}</td>
+                          <td className="whitespace-nowrap py-2 pl-3 text-right tabular">{x.quantity}</td>
+                          <td className="whitespace-nowrap py-2 pl-3 text-right tabular">{formatBRL(x.revenueCents)}</td>
                         </tr>
                       ))}
                     </tbody>

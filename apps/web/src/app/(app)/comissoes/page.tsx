@@ -75,6 +75,7 @@ export default function ComissoesPage() {
   const { balances, entries, advances, payouts } = useCommissions(all || can(Permission.COMMISSIONS_OWN));
   const payout = useFinanceMutation((orgId, memberId: string) => fin.createPayout(orgId, memberId));
   const [advancing, setAdvancing] = React.useState(false);
+  const [showAllEntries, setShowAllEntries] = React.useState(false);
   const [confirming, setConfirming] = React.useState<string | null>(null);
   const tz = org.timezone;
   const day = (iso: string) => formatDateShort(zonedParts(new Date(iso), tz).date, false);
@@ -212,7 +213,7 @@ export default function ComissoesPage() {
           <section>
             <h2 className="mb-2 px-1 text-sm font-extrabold text-foreground">Lançamentos</h2>
             <Ledger className="divide-y divide-border">
-              {(entries.data ?? []).slice(0, 50).map((e) => (
+              {(entries.data ?? []).slice(0, showAllEntries ? 100 : 12).map((e) => (
                 <div key={e.id} className="flex items-center gap-3 px-4 py-3 text-sm">
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-semibold">{e.description}</span>
@@ -228,6 +229,11 @@ export default function ComissoesPage() {
               ))}
               {!entries.data?.length ? <p className="p-4 text-center text-muted-foreground">Sem lançamentos.</p> : null}
             </Ledger>
+            {(entries.data?.length ?? 0) > 12 ? (
+              <Button variant="ghost" size="sm" className="mt-2 w-full" onClick={() => setShowAllEntries((v) => !v)}>
+                {showAllEntries ? 'Ver menos' : `Ver mais ${Math.min(entries.data!.length, 100) - 12}`}
+              </Button>
+            ) : null}
           </section>
 
           <div className="space-y-6">
