@@ -92,7 +92,7 @@ export function ClientRetention({ clientId }: { clientId: string }) {
       {showPoints && loyalty.data ? (
         <Card className="p-4">
           <Title icon={Sparkles}>Pontos</Title>
-          <p className="font-display text-3xl font-black tabular">{loyalty.data.balance}</p>
+          <p className="font-display text-3xl font-extrabold tabular">{loyalty.data.balance}</p>
           {loyalty.data.entries.length ? (
             <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
               {loyalty.data.entries.slice(0, 4).map((e) => (

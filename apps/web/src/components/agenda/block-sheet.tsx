@@ -54,7 +54,7 @@ export function BlockSheet({ day, onOpenChange }: { day: AgendaDayDto; onOpenCha
     <Sheet open onOpenChange={onOpenChange} title="Bloquear horário" description="Folga, almoço, curso ou feriado: ninguém agenda por cima.">
       <form onSubmit={submit} className="space-y-4" noValidate>
         <Field label="Para quem" htmlFor="bl-member" error={errors['bl-member']}>
-          <select id="bl-member" value={memberId} onChange={(e) => (setMemberId(e.target.value), clear('bl-member'))} className="h-13 w-full rounded-2xl border-2 border-input bg-card px-3">
+          <select id="bl-member" value={memberId} onChange={(e) => (setMemberId(e.target.value), clear('bl-member'))} className="h-13 w-full rounded-2xl border border-input bg-card px-3">
             {all ? <option value="">Unidade inteira</option> : null}
             {day.professionals.map((p) => (
               <option key={p.id} value={p.id}>
@@ -81,7 +81,7 @@ export function BlockSheet({ day, onOpenChange }: { day: AgendaDayDto; onOpenCha
 
       {day.blocks.length ? (
         <section className="mt-6 space-y-2">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Bloqueios deste dia</h3>
+          <h3 className="text-sm font-extrabold text-foreground">Bloqueios deste dia</h3>
           {day.blocks.map((b) => (
             <div key={b.id} className="flex items-center gap-3 rounded-2xl border border-border p-3 text-sm">
               <span className="flex-1">

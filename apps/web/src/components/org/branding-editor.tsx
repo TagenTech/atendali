@@ -1,6 +1,16 @@
 'use client';
 
-import { BRAND_COLOR_KEYS, BRAND_COLORS, BRAND_IMAGE_MAX_BYTES, BRAND_IMAGE_MAX_SIDE, TAGLINE_MAX, type BrandColor } from '@skedulei/contracts';
+import {
+  BRAND_COLOR_KEYS,
+  BRAND_COLORS,
+  BRAND_IMAGE_MAX_BYTES,
+  BRAND_IMAGE_MAX_SIDE,
+  TAGLINE_MAX,
+  brandHex,
+  canonicalizeBrandColor,
+  isBrandColor,
+  type BrandColorValue,
+} from '@skedulei/contracts';
 import { ExternalLink, ImagePlus, Trash2 } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
@@ -68,9 +78,11 @@ export function BrandingEditor() {
   const { org } = useOrg();
   const update = useUpdateOrganization();
   const b = org.branding;
-  const [color, setColor] = React.useState<BrandColor | null>(b.brandColor);
+  const [color, setColor] = React.useState<BrandColorValue | null>(b.brandColor);
   const [tagline, setTagline] = React.useState(b.tagline ?? '');
   const dirty = color !== b.brandColor || tagline.trim() !== (b.tagline ?? '');
+  const custom = color !== null && !isBrandColor(color);
+  const pickHex = (hex: string) => setColor(canonicalizeBrandColor(hex));
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,7 +126,32 @@ export function BrandingEditor() {
                 className={cn('size-10 rounded-full border-4 transition-transform', color === k ? 'scale-110 border-foreground' : 'border-card')}
               />
             ))}
+            <label
+              className={cn(
+                'relative size-10 cursor-pointer overflow-hidden rounded-full border-4 transition-transform focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring',
+                custom ? 'scale-110 border-foreground' : 'border-card',
+              )}
+              title="Outra cor"
+            >
+              <input
+                type="color"
+                aria-label="Outra cor"
+                value={brandHex(color) ?? '#0f6b73'}
+                onChange={(e) => pickHex(e.target.value)}
+                className="absolute inset-0 size-full cursor-pointer opacity-0"
+              />
+              <span
+                className="block size-full"
+                style={
+                  custom
+                    ? { backgroundColor: color }
+                    : { background: 'conic-gradient(#d64545, #e07a1f, #e8c547, #1f9d6b, #2b6fd6, #6c5ae6, #d6409f, #d64545)' }
+                }
+                aria-hidden
+              />
+            </label>
           </div>
+          <p className="pl-1 text-sm text-muted-foreground">O círculo colorido abre o seletor — arraste para qualquer tom.</p>
         </fieldset>
         <Field label="Frase de boas-vindas" htmlFor="brand-tagline" hint={`${tagline.length}/${TAGLINE_MAX} · aparece embaixo do nome do negócio`}>
           <Input id="brand-tagline" value={tagline} maxLength={TAGLINE_MAX} placeholder="Ex.: Cuidamos de você com carinho" onChange={(e) => setTagline(e.target.value)} />

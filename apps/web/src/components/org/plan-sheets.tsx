@@ -24,7 +24,7 @@ function ServiceSelect({ id, value, onChange, optional, disabled }: { id: string
       value={value}
       disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
-      className="h-13 w-full rounded-2xl border-2 border-input bg-card px-4 text-base outline-none focus:border-primary focus:ring-4 focus:ring-primary-soft disabled:opacity-60"
+      className="h-13 w-full rounded-2xl border border-input bg-card px-4 text-base outline-none focus:border-primary focus:ring-4 focus:ring-primary-soft disabled:opacity-60"
     >
       <option value="">{optional ? `Qualquer ${vocab.service.toLowerCase()}` : 'Escolha…'}</option>
       {(data ?? []).filter((s) => s.active).map((s) => (

@@ -11,7 +11,7 @@ const buttonVariants = cva(
       variant: {
         primary: 'bg-primary text-primary-foreground shadow-float hover:bg-primary-hover',
         soft: 'bg-primary-soft text-primary-soft-foreground hover:brightness-95',
-        outline: 'border-2 border-border bg-card text-foreground hover:bg-muted',
+        outline: 'border border-input bg-card text-foreground hover:bg-muted',
         ghost: 'text-foreground hover:bg-muted',
         danger: 'bg-danger-soft text-danger-soft-foreground hover:brightness-95',
       },

@@ -22,4 +22,26 @@ describe('LoginAttempts', () => {
   it('mascara e-mail para log', () => {
     expect(maskEmail('filipe@gmail.com')).toBe('fi***@gmail.com');
   });
+
+  it('janela vencida recomeça a contagem e e-mail sem domínio não quebra a máscara', () => {
+    let t = 0;
+    const g = new LoginAttempts(() => t);
+    for (let i = 0; i < 4; i++) g.fail('c@x.com');
+    t += 16 * 60_000;
+    expect(g.fail('c@x.com')).toBe(false);
+    expect(maskEmail('semdominio')).toBe('se***@');
+  });
+
+  it('com muitas contas na memória, remove só as que já passaram da janela', () => {
+    let t = 0;
+    const g = new LoginAttempts(() => t);
+    for (let i = 0; i < 10_000; i++) g.fail(`velho${i}@x.com`);
+    t += 16 * 60_000;
+    // Uma conta bloqueada e recente não pode sair na limpeza.
+    for (let i = 0; i < 5; i++) g.fail('recente@x.com');
+    expect(g.lockedFor('recente@x.com')).toBe(15);
+    g.fail('gatilho@x.com');
+    expect(g.lockedFor('recente@x.com')).toBe(15);
+    expect((g as unknown as { map: Map<string, unknown> }).map.size).toBeLessThan(100);
+  });
 });

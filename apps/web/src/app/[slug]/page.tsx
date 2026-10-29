@@ -2,8 +2,10 @@
 
 import {
   addDays,
+  brandHex,
   formatBRL,
   formatDuration,
+  formatRating,
   ONLINE_BOOKING,
   todayIn,
   WEEKDAYS_SHORT,
@@ -11,7 +13,6 @@ import {
   zonedParts,
   type PublicOrgDto,
 } from '@skedulei/contracts';
-import { BRAND_COLORS, formatRating, type BrandColor } from '@skedulei/contracts';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, CalendarCheck2, Check, Clock, MapPin, MessageCircle, UserRound, Users } from 'lucide-react';
 import Link from 'next/link';
@@ -39,8 +40,8 @@ const DAYS_SHOWN = 21;
 
 function StepTitle({ n, children }: { n: number; children: React.ReactNode }) {
   return (
-    <h2 className="mb-3 flex items-center gap-2 text-lg font-extrabold">
-      <span className="grid size-7 place-items-center rounded-full bg-primary text-sm text-primary-foreground">{n}</span>
+    <h2 className="mb-3 flex items-center gap-3 border-l-[3px] border-primary pl-3 text-lg font-extrabold">
+      <span className="font-display text-sm font-extrabold tabular-nums text-primary">{n}</span>
       {children}
     </h2>
   );
@@ -75,7 +76,7 @@ export default function BookingPage() {
   if (page.isError) {
     return (
       <main className="grid min-h-dvh place-items-center px-6">
-        <EmptyState emoji="🔎" title="Página não encontrada" description="Confira o link com o estabelecimento." />
+        <EmptyState title="Página não encontrada" description="Confira o link com o estabelecimento." />
       </main>
     );
   }
@@ -142,7 +143,7 @@ export default function BookingPage() {
             </span>
           )}
           <div className="min-w-0 flex-1">
-            <h1 className="truncate text-2xl font-black lg:text-3xl">{org.name}</h1>
+            <h1 className="text-balance text-2xl font-extrabold lg:text-3xl">{org.name}</h1>
             {org.branding.tagline ? <p className={cn('text-sm lg:text-base', cover ? 'text-white/85' : 'text-muted-foreground')}>{org.branding.tagline}</p> : null}
             {org.rating.count > 0 ? (
               <p className="flex items-center gap-2 text-sm">
@@ -205,7 +206,7 @@ export default function BookingPage() {
               <div className="space-y-4">
                 {groups.map(([cat, items]) => (
                   <div key={cat}>
-                    <p className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">{cat}</p>
+                    <p className="mb-2 px-1 text-xs font-bold text-muted-foreground">{cat}</p>
                     <div className={cn('grid gap-2', items.length > 1 && 'sm:grid-cols-2')}>
                       {items.map((s) => (
                         <button
@@ -222,7 +223,7 @@ export default function BookingPage() {
                           )}
                         >
                           {selected.some((x) => x.id === s.id) && selected.length > 1 ? (
-                            <span aria-hidden className="absolute -right-2 -top-2 grid size-6 place-items-center rounded-full bg-primary text-xs font-black text-primary-foreground">
+                            <span aria-hidden className="absolute -right-2 -top-2 grid size-6 place-items-center rounded-full bg-primary text-xs font-extrabold text-primary-foreground">
                               {selected.findIndex((x) => x.id === s.id) + 1}
                             </span>
                           ) : null}
@@ -268,7 +269,7 @@ export default function BookingPage() {
                     onClick={() => (setPro(p.id), setStartsAt(null))}
                     className={cn('flex items-center gap-2 rounded-2xl border-2 px-4 py-3 font-semibold', pro === p.id ? 'border-primary bg-primary-soft' : 'border-border bg-card')}
                   >
-                    <span className="grid size-7 place-items-center rounded-lg text-xs font-black" style={memberColor(p.color)}>
+                    <span className="grid size-7 place-items-center rounded-lg text-xs font-extrabold" style={memberColor(p.color)}>
                       {p.name[0]}
                     </span>
                     {p.name}
@@ -298,7 +299,7 @@ export default function BookingPage() {
                       )}
                     >
                       <span className="text-xs font-bold uppercase">{d === today ? 'hoje' : WEEKDAYS_SHORT[new Date(`${d}T00:00:00Z`).getUTCDay()]}</span>
-                      <span className="font-display text-xl font-black">{dd}</span>
+                      <span className="font-display text-xl font-extrabold">{dd}</span>
                     </button>
                   );
                 })}
@@ -394,12 +395,12 @@ export default function BookingPage() {
               </ul>
             )}
             {selected.length >= 2 ? (
-              <p className="border-t border-border pt-3 font-display text-xl font-black tabular">
+              <p className="border-t border-border pt-3 font-display text-xl font-extrabold tabular">
                 {formatBRL(selected.reduce((t, x) => t + x.priceCents, 0))}
                 <span className="block text-sm font-normal text-muted-foreground">{formatDuration(selected.reduce((t, x) => t + x.durationMinutes, 0))} no total</span>
               </p>
             ) : service?.priceCents ? (
-              <p className="border-t border-border pt-3 font-display text-xl font-black tabular">{formatBRL(service.priceCents)}</p>
+              <p className="border-t border-border pt-3 font-display text-xl font-extrabold tabular">{formatBRL(service.priceCents)}</p>
             ) : null}
             {startsAt ? null : (
               <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
@@ -417,9 +418,9 @@ export default function BookingPage() {
 }
 
 /** Cor de destaque do negócio: troca os tokens de cor primária só nesta página. */
-function brandStyle(key: BrandColor | null): React.CSSProperties | undefined {
-  if (!key) return undefined;
-  const hex = BRAND_COLORS[key].hex;
+function brandStyle(value: string | null): React.CSSProperties | undefined {
+  const hex = brandHex(value);
+  if (!hex) return undefined;
   return {
     '--primary': hex,
     '--primary-hover': `color-mix(in srgb, ${hex} 85%, black)`,

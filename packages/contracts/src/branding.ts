@@ -12,8 +12,33 @@ export const BRAND_COLORS = {
 } as const;
 export type BrandColor = keyof typeof BRAND_COLORS;
 export const BRAND_COLOR_KEYS = Object.keys(BRAND_COLORS) as BrandColor[];
+/** Tom livre da página pública (`#rrggbb`). */
+export type BrandHex = `#${string}`;
+export type BrandColorValue = BrandColor | BrandHex;
+
+const BRAND_HEX_RE = /^#[0-9a-f]{6}$/;
 
 export const isBrandColor = (v: unknown): v is BrandColor => typeof v === 'string' && Object.prototype.hasOwnProperty.call(BRAND_COLORS, v);
+export const isBrandHex = (v: unknown): v is BrandHex => typeof v === 'string' && BRAND_HEX_RE.test(v);
+/** Paleta ou hexadecimal de 6 dígitos. */
+export const isBrandColorValue = (v: unknown): v is BrandColorValue => isBrandColor(v) || isBrandHex(v);
+
+/** Hex da paleta, do tom livre, ou null (padrão do Skedulei). */
+export function brandHex(v: string | null | undefined): string | null {
+  if (!v) return null;
+  if (isBrandColor(v)) return BRAND_COLORS[v].hex;
+  const s = v.trim().toLowerCase();
+  return BRAND_HEX_RE.test(s) ? s : null;
+}
+
+/** Hex da paleta vira a chave correspondente; o resto fica em minúsculas. */
+export function canonicalizeBrandColor(v: string | null): BrandColorValue | null {
+  if (v == null) return null;
+  const s = v.trim().toLowerCase();
+  if (isBrandColor(s)) return s;
+  if (!isBrandHex(s)) return null;
+  return BRAND_COLOR_KEYS.find((k) => BRAND_COLORS[k].hex === s) ?? s;
+}
 
 export const BrandImageKind = { LOGO: 'logo', COVER: 'cover' } as const;
 export type BrandImageKind = (typeof BrandImageKind)[keyof typeof BrandImageKind];
@@ -37,7 +62,7 @@ export interface BrandingDto {
   /** Endereço público da imagem (com versão para trocar o cache); null = sem imagem. */
   logoUrl: string | null;
   coverUrl: string | null;
-  brandColor: BrandColor | null;
+  brandColor: BrandColorValue | null;
   tagline: string | null;
 }
 

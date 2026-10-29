@@ -49,7 +49,7 @@ export function SocialButtons({ label = 'Entrar' }: { label?: string }) {
   const list = process.env.NODE_ENV === 'production' ? data.providers : ALL;
   if (!list.length) return null;
   const cls =
-    'flex h-12 w-full items-center justify-center gap-3 rounded-2xl border-2 border-input bg-card font-semibold transition-colors hover:bg-muted active:scale-[0.98]';
+    'flex h-12 w-full items-center justify-center gap-3 rounded-2xl border border-input bg-card font-semibold transition-colors hover:bg-muted active:scale-[0.98]';
   return (
     <div className="space-y-2.5">
       {list.map((p) =>
@@ -74,7 +74,7 @@ export function SocialButtons({ label = 'Entrar' }: { label?: string }) {
           </button>
         ),
       )}
-      <div className="flex items-center gap-3 py-1 text-xs font-semibold uppercase text-muted-foreground">
+      <div className="flex items-center gap-3 py-1 text-xs font-semibold text-muted-foreground">
         <span className="h-px flex-1 bg-border" /> ou com e-mail <span className="h-px flex-1 bg-border" />
       </div>
     </div>

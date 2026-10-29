@@ -22,8 +22,9 @@ import { NewAppointmentSheet } from '@/components/agenda/new-appointment-sheet';
 import { STATUS_DOT } from '@/components/agenda/status';
 import { ClientDocuments } from '@/components/clinico/client-documents';
 import { ClientRecords } from '@/components/clinico/client-records';
-import { ClientRetention } from '@/components/org/client-retention';
+import { Kpi, KpiStrip } from '@/components/finance/kpi';
 import { FormTopBar, useBack } from '@/components/layout/form-page';
+import { ClientRetention } from '@/components/org/client-retention';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -33,15 +34,6 @@ import { useOrg } from '@/lib/org';
 import { useClient, useRemoveClient } from '@/lib/queries/agenda';
 import { useHydrated } from '@/lib/use-hydrated';
 import { cn } from '@/lib/utils';
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <Card className="p-4">
-      <p className="font-display text-2xl font-black tabular">{value}</p>
-      <p className="text-sm text-muted-foreground">{label}</p>
-    </Card>
-  );
-}
 
 export default function ClientePage() {
   const { id } = useParams<{ id: string }>();
@@ -57,7 +49,7 @@ export default function ClientePage() {
   const canEdit = can(Permission.CLIENTS_MANAGE);
   const tz = org.timezone;
 
-  if (isError) return <EmptyState emoji="🔎" title={`${vocab.client} não encontrado`} description="Pode ter sido removido." />;
+  if (isError) return <EmptyState title={`${vocab.client} não encontrado`} description="Pode ter sido removido." />;
   if (isLoading || !c) return <Skeleton className="m-5 h-96 rounded-3xl" />;
 
   return (
@@ -69,10 +61,10 @@ export default function ClientePage() {
           </Button>
         ) : null}
       </FormTopBar>
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 px-5 pb-8 lg:grid-cols-[22rem_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 items-start gap-6 px-5 pb-8 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <div className="space-y-4">
           <Card className="space-y-3">
-            <p className="font-display text-2xl font-black">{c.name}</p>
+            <p className="font-display text-2xl font-extrabold">{c.name}</p>
             {c.phone ? (
               <p className="flex items-center gap-2 text-sm">
                 <Phone className="size-4 text-muted-foreground" /> {formatPhone(c.phone)}
@@ -100,7 +92,7 @@ export default function ClientePage() {
             ) : null}
             {c.relatives.length ? (
               <div className="space-y-1">
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Mesmo telefone</p>
+                <p className="text-xs font-bold text-muted-foreground">Mesmo telefone</p>
                 <div className="flex flex-wrap gap-1.5">
                   {c.relatives.map((r) => (
                     <Link key={r.id} href={`/clientes/${r.id}`} className="rounded-full bg-muted px-3 py-1 text-sm font-semibold hover:bg-primary-soft">
@@ -135,38 +127,19 @@ export default function ClientePage() {
               ) : null}
             </div>
           </Card>
-          <div className="grid grid-cols-2 gap-3">
-            <Stat label="Atendimentos" value={String(c.stats.done)} />
-            <Stat label="Faltas" value={String(c.stats.noShows)} />
-            <Stat label="Total gasto" value={formatBRL(c.stats.spentCents)} />
-            <Stat label="Última visita" value={c.stats.lastVisit ? formatDateShort(zonedParts(new Date(c.stats.lastVisit), tz).date, false) : '—'} />
-          </div>
-          <ClientRetention clientId={c.id} />
-          <ClientDocuments clientId={c.id} clientName={c.name} phone={c.phone} />
-          <ClientRecords clientId={c.id} />
-          {canEdit ? (
-            <Button
-              variant="danger"
-              size="sm"
-              loading={remove.isPending}
-              onClick={async () => {
-                if (!confirmDelete) return setConfirmDelete(true);
-                try {
-                  await remove.mutateAsync(c.id);
-                  toast.success('Dados apagados');
-                  router.replace('/clientes');
-                } catch (err) {
-                  toast.error(errorText(err));
-                }
-              }}
-            >
-              <Trash2 /> {confirmDelete ? 'Confirmar: apagar dados pessoais' : 'Excluir (LGPD)'}
-            </Button>
-          ) : null}
+          <KpiStrip cols={2}>
+            <Kpi label="Atendimentos" value={String(c.stats.done)} />
+            <Kpi label="Faltas" value={String(c.stats.noShows)} />
+            <Kpi label="Total gasto" value={formatBRL(c.stats.spentCents)} />
+            <Kpi label="Última visita" value={c.stats.lastVisit ? formatDateShort(zonedParts(new Date(c.stats.lastVisit), tz).date, false) : '—'} />
+          </KpiStrip>
         </div>
 
-        <section>
-          <h2 className="mb-2 px-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Histórico</h2>
+        <div className="space-y-6 lg:row-span-2">
+          <ClientRecords clientId={c.id} clientName={c.name} appointments={c.appointments} />
+          <ClientDocuments clientId={c.id} clientName={c.name} phone={c.phone} />
+          <section>
+          <h2 className="mb-2 px-1 text-sm font-extrabold text-foreground">Histórico</h2>
           {c.appointments.length ? (
             <Card className="divide-y divide-border p-0">
               {c.appointments.map((a) => {
@@ -189,9 +162,33 @@ export default function ClientePage() {
               })}
             </Card>
           ) : (
-            <EmptyState emoji="🗓️" title="Sem atendimentos ainda" description="Agende o primeiro horário." />
+            <EmptyState title="Sem atendimentos ainda" description="Agende o primeiro horário." />
           )}
         </section>
+        </div>
+
+        <div className="space-y-4">
+          <ClientRetention clientId={c.id} />
+          {canEdit ? (
+            <Button
+              variant="danger"
+              size="sm"
+              loading={remove.isPending}
+              onClick={async () => {
+                if (!confirmDelete) return setConfirmDelete(true);
+                try {
+                  await remove.mutateAsync(c.id);
+                  toast.success('Dados apagados');
+                  router.replace('/clientes');
+                } catch (err) {
+                  toast.error(errorText(err));
+                }
+              }}
+            >
+              <Trash2 /> {confirmDelete ? 'Confirmar: apagar dados pessoais' : 'Excluir (LGPD)'}
+            </Button>
+          ) : null}
+        </div>
       </div>
       {editing ? <ClientSheet client={c} onOpenChange={setEditing} /> : null}
       {booking ? (

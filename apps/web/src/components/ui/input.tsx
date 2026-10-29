@@ -11,7 +11,7 @@ export function Input({ className, icon, trailing, invalid, ...props }: InputPro
   return (
     <div
       className={cn(
-        'flex h-13 items-center gap-2.5 rounded-2xl border-2 border-input bg-card px-4 transition-colors focus-within:border-primary focus-within:ring-4 focus-within:ring-primary-soft',
+        'flex h-13 items-center gap-2.5 rounded-2xl border border-input bg-card px-4 transition-colors focus-within:border-primary focus-within:ring-[3px] focus-within:ring-primary-soft',
         invalid && 'border-danger focus-within:border-danger focus-within:ring-danger-soft',
         className,
       )}

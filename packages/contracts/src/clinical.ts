@@ -42,6 +42,273 @@ export function canDeleteRecord(createdAt: string, authorMemberId: string, membe
   return authorMemberId === memberId && now - new Date(createdAt).getTime() < RECORD_DELETE_WINDOW_HOURS * 3_600_000;
 }
 
+/** Título do painel ao criar. */
+export const RECORD_SHEET_TITLE: Record<RecordKind, string> = {
+  EVOLUCAO: 'Nova evolução',
+  PRESCRICAO: 'Nova prescrição',
+  ATESTADO: 'Novo atestado',
+};
+
+export const RECORD_KIND_HINT: Record<RecordKind, string> = {
+  EVOLUCAO: 'O que foi visto e o que foi feito neste atendimento.',
+  PRESCRICAO: 'Medicamentos e posologia. Imprima e assine se o conselho exigir papel.',
+  ATESTADO: 'Dias de afastamento. Imprima e assine se o conselho exigir papel.',
+};
+
+export const RX_LINES_MAX = 8;
+export const CERTIFICATE_DAYS_MAX = 365;
+
+export type RecordFieldType = 'text' | 'long' | 'number' | 'select';
+export type RecordFieldGroup = 'vitals';
+
+export interface RecordField {
+  id: string;
+  label: string;
+  type: RecordFieldType;
+  placeholder?: string;
+  hint?: string;
+  options?: readonly string[];
+  required?: boolean;
+  group?: RecordFieldGroup;
+}
+
+export interface RxLine {
+  name: string;
+  dose: string;
+  schedule: string;
+  duration: string;
+}
+
+export interface RecordSection {
+  label: string;
+  value: string;
+}
+
+export interface ComposeRecordInput {
+  kind: RecordKind;
+  segment: Segment;
+  values: Record<string, string>;
+  rx?: readonly RxLine[];
+  patientName?: string;
+}
+
+const F = (id: string, label: string, type: RecordFieldType, extra: Partial<RecordField> = {}): RecordField => ({
+  id,
+  label,
+  type,
+  ...extra,
+});
+
+export function emptyRxLine(): RxLine {
+  return { name: '', dose: '', schedule: '', duration: '' };
+}
+
+/** Uma linha da receita; sem o nome do medicamento, some. */
+export function formatRxLine(line: RxLine): string | null {
+  const name = line.name.trim();
+  if (!name) return null;
+  const dose = line.dose.trim();
+  const schedule = line.schedule.trim();
+  const duration = line.duration.trim();
+  const how = [dose, schedule, duration ? `por ${duration}` : ''].filter(Boolean).join(' ');
+  return how ? `${name} — ${how}` : name;
+}
+
+export function numberedRx(lines: readonly RxLine[]): string {
+  return lines
+    .map(formatRxLine)
+    .filter((s): s is string => !!s)
+    .map((s, i) => `${i + 1}. ${s}`)
+    .join('\n');
+}
+
+const VITAL_FMT: { id: string; prefix: string; suffix?: string }[] = [
+  { id: 'pa', prefix: 'PA' },
+  { id: 'fc', prefix: 'FC' },
+  { id: 'temp', prefix: 'Temp', suffix: '°C' },
+  { id: 'peso', prefix: 'Peso', suffix: 'kg' },
+  { id: 'altura', prefix: 'Altura', suffix: 'cm' },
+];
+
+export function formatVitals(values: Record<string, string>): string | null {
+  const parts = VITAL_FMT.flatMap(({ id, prefix, suffix }) => {
+    const v = (values[id] ?? '').trim();
+    return v ? [`${prefix} ${v}${suffix ? ` ${suffix}` : ''}`] : [];
+  });
+  return parts.length ? parts.join(' · ') : null;
+}
+
+export function composeCertificateBody(days: number, patientName?: string): string {
+  const who = patientName?.trim() ? patientName.trim() : 'o(a) paciente';
+  const n = Math.trunc(days);
+  const afastamento = n === 1 ? '1 dia' : `${n} dias`;
+  return `Atesto, para os devidos fins, que ${who} esteve sob cuidados profissionais nesta data, necessitando de ${afastamento} de afastamento das atividades habituais.`;
+}
+
+export function suggestedRecordTitle(kind: RecordKind, segment: Segment): string {
+  if (kind === 'PRESCRICAO') return 'Receituário';
+  if (kind === 'ATESTADO') return 'Atestado';
+  if (segment === 'CLINICA_MEDICA') return 'Consulta';
+  if (segment === 'ODONTOLOGIA') return 'Atendimento odontológico';
+  if (segment === 'ESTETICA' || segment === 'TERAPIAS') return 'Sessão';
+  return 'Atendimento';
+}
+
+function evolutionFields(segment: Segment): RecordField[] {
+  if (segment === 'CLINICA_MEDICA') {
+    return [
+      F('queixa', 'Queixa', 'long', { required: true, placeholder: 'O que trouxe o paciente hoje?' }),
+      F('exame', 'Exame', 'long', { placeholder: 'Achados do exame físico ou complementar.' }),
+      F('pa', 'PA', 'text', { group: 'vitals', placeholder: '120/80' }),
+      F('fc', 'FC', 'text', { group: 'vitals', placeholder: '80' }),
+      F('temp', 'Temp.', 'text', { group: 'vitals', placeholder: '36,5' }),
+      F('peso', 'Peso', 'text', { group: 'vitals', placeholder: 'kg' }),
+      F('altura', 'Altura', 'text', { group: 'vitals', placeholder: 'cm' }),
+      F('avaliacao', 'Avaliação', 'text', { placeholder: 'Hipótese ou impressão clínica.' }),
+      F('conduta', 'Conduta', 'long', { placeholder: 'Plano, exames, retorno.' }),
+    ];
+  }
+  if (segment === 'ODONTOLOGIA') {
+    return [
+      F('dente', 'Dente ou região', 'text', { placeholder: '26, 11-21, hemiarcada…' }),
+      F('procedimento', 'Procedimento realizado', 'long', { required: true, placeholder: 'O que foi feito nesta sessão.' }),
+      F('anestesia', 'Anestesia', 'text', { placeholder: 'Tipo e tubetes, se houver.' }),
+      F('materiais', 'Materiais', 'text', { placeholder: 'Resina, cimento, brocas…' }),
+      F('proxima', 'Próxima visita', 'text', { placeholder: 'Retorno, próxima etapa.' }),
+      F('notas', 'Observação', 'long'),
+    ];
+  }
+  if (segment === 'ESTETICA') {
+    return [
+      F('area', 'Área', 'text', { placeholder: 'Face, abdômen, axilas…' }),
+      F('procedimento', 'Procedimento', 'long', { required: true, placeholder: 'O que foi feito, parâmetros do aparelho.' }),
+      F('produtos', 'Produtos ou aparelho', 'text', { placeholder: 'Marca, lote, intensidade.' }),
+      F('reacao', 'Reação', 'select', { options: ['Nenhuma', 'Leve, sem conduta extra', 'Orientado retorno'] }),
+      F('proxima', 'Próxima sessão', 'text'),
+      F('notas', 'Observação', 'long'),
+    ];
+  }
+  if (segment === 'TERAPIAS') {
+    return [
+      F('sessao', 'Nº da sessão', 'number', { placeholder: '1' }),
+      F('queixa', 'Queixa do dia', 'long', { required: true, placeholder: 'Como chega nesta sessão.' }),
+      F('conduta', 'Técnicas e conduta', 'long', { placeholder: 'O que foi trabalhado.' }),
+      F('tarefa', 'Orientação', 'long', { placeholder: 'Tarefa, exercício, cuidado em casa.' }),
+    ];
+  }
+  return [
+    F('servico', 'Atendimento', 'text', { placeholder: 'O que foi feito.' }),
+    F('produtos', 'Produtos usados', 'text'),
+    F('observacao', 'Observação', 'long', { required: true, placeholder: 'Como foi a sessão, o que combinaram.' }),
+  ];
+}
+
+/** Campos do formulário: mudam com o tipo da anotação e o segmento do negócio. */
+export function recordFields(kind: RecordKind, segment: Segment): RecordField[] {
+  if (kind === 'PRESCRICAO') {
+    return [
+      F('continuo', 'Uso contínuo', 'select', { options: ['Não', 'Sim'] }),
+      F('orientacao', 'Orientação', 'long', { placeholder: 'Se piorar, retornar. Tomar com água…' }),
+    ];
+  }
+  if (kind === 'ATESTADO') {
+    return [
+      F('dias', 'Dias de afastamento', 'number', { required: true, placeholder: '1' }),
+      F('cid', 'CID', 'text', { placeholder: 'Opcional, se usar.', hint: 'Digite o código — não há busca automática.' }),
+      F('observacao', 'Observação', 'long', { placeholder: 'Restrições ou recomendações.' }),
+    ];
+  }
+  return evolutionFields(segment);
+}
+
+const VITAL_IDS = new Set<string>(VITAL_FMT.map((v) => v.id));
+
+function sanitizeSectionValue(value: string): string {
+  return value.replace(/^### /gm, '').trim();
+}
+
+function section(label: string, value: string): string | null {
+  const v = sanitizeSectionValue(value);
+  return v ? `### ${label}\n${v}` : null;
+}
+
+function certificateDays(values: Record<string, string>): number | null {
+  const raw = (values.dias ?? '').trim();
+  if (!raw) return null;
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 1 || n > CERTIFICATE_DAYS_MAX) return null;
+  return n;
+}
+
+/** Monta o texto cifrado a partir dos campos. Anotações antigas (texto livre) continuam válidas. */
+export function composeRecordContent(input: ComposeRecordInput): string {
+  const fields = recordFields(input.kind, input.segment);
+  const values = input.values;
+  const blocks: string[] = [];
+  if (input.kind === 'ATESTADO') {
+    const days = certificateDays(values);
+    if (days) blocks.push(section('Atestado', composeCertificateBody(days, input.patientName))!);
+  }
+  if (input.kind === 'PRESCRICAO') {
+    const rx = numberedRx(input.rx ?? []);
+    if (rx) blocks.push(section('Medicamentos', rx)!);
+  }
+  let vitalsEmitted = false;
+  for (const f of fields) {
+    if (f.id === 'dias') continue;
+    if (VITAL_IDS.has(f.id)) {
+      if (!vitalsEmitted) {
+        const vitals = formatVitals(values);
+        if (vitals) blocks.push(section('Sinais', vitals)!);
+        vitalsEmitted = true;
+      }
+      continue;
+    }
+    const block = section(f.label, values[f.id] ?? '');
+    if (block) blocks.push(block);
+  }
+  return blocks.join('\n\n');
+}
+
+/** Separa anotações novas (seções `###`) das antigas (texto livre vira "Notas"). */
+export function parseRecordSections(content: string): RecordSection[] {
+  const text = content.trim();
+  if (!text) return [];
+  if (!text.startsWith('### ')) return [{ label: 'Notas', value: text }];
+  return text
+    .split(/\n(?=### )/)
+    .map((block) => {
+      const nl = block.indexOf('\n');
+      const label = (nl === -1 ? block : block.slice(0, nl)).replace(/^### /, '').trim();
+      const value = (nl === -1 ? '' : block.slice(nl + 1)).trim();
+      return { label, value };
+    })
+    .filter((s) => s.label);
+}
+
+/**
+ * Erros do rascunho, chave = id do campo (`queixa`, `dias`, `rx`, `content`).
+ * A tela prefixa com `rec-` para ligar ao input.
+ */
+export function recordDraftErrors(input: ComposeRecordInput): Record<string, string> {
+  const fields = recordFields(input.kind, input.segment);
+  if (input.kind === 'PRESCRICAO' && !numberedRx(input.rx ?? [])) {
+    return { rx: 'Inclua ao menos um medicamento' };
+  }
+  if (input.kind === 'ATESTADO' && certificateDays(input.values) === null) {
+    return { dias: 'Informe os dias de afastamento' };
+  }
+  for (const f of fields) {
+    if (f.required && f.id !== 'dias' && !(input.values[f.id] ?? '').trim()) {
+      return { [f.id]: 'Escreva a anotação' };
+    }
+  }
+  const content = composeRecordContent(input);
+  if (!content) return { content: 'Escreva a anotação' };
+  if (content.length > RECORD_CONTENT_MAX) return { content: `No máximo ${RECORD_CONTENT_MAX} letras` };
+  return {};
+}
+
 // ------------------------------------------------------------------ documentos do paciente
 
 export const DOCUMENT_KINDS = ['ANAMNESE', 'TERMO'] as const;

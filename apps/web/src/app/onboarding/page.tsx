@@ -144,7 +144,7 @@ export default function OnboardingPage() {
         <div className="sticky top-10 space-y-8">
           <div className="flex items-center gap-2.5">
             <LogoMark className="size-10" />
-            <span className="font-display text-2xl font-black">Skedulei</span>
+            <span className="font-display text-2xl font-extrabold">Skedulei</span>
           </div>
           <ol className="space-y-1">
             {STEPS.map((label, i) => (
@@ -187,7 +187,7 @@ export default function OnboardingPage() {
               <LogoMark className="size-9" />
             )}
             <div className="flex-1">
-              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <p className="text-xs font-bold text-muted-foreground">
                 Passo {step + 1} de {STEPS.length} · {STEPS[step]}
               </p>
               <div className="mt-1.5 h-1.5 rounded-full bg-muted">
@@ -209,7 +209,7 @@ export default function OnboardingPage() {
                     onClick={() => pickSegment(s)}
                     aria-pressed={segment === s}
                     className={cn(
-                      'flex items-start gap-4 rounded-3xl border-2 bg-card p-4 text-left shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary',
+                      'flex items-start gap-4 rounded-3xl border-2 bg-card p-4 text-left transition-colors hover:border-primary',
                       segment === s ? 'border-primary bg-primary-soft' : 'border-border',
                     )}
                   >
@@ -240,7 +240,7 @@ export default function OnboardingPage() {
                   <Input id="ob-city" value={city} maxLength={80} onChange={(e) => setCity(e.target.value)} />
                 </Field>
                 <Field label="UF" htmlFor="ob-uf">
-                  <select id="ob-uf" value={uf} onChange={(e) => setUf(e.target.value)} className="h-13 w-full rounded-2xl border-2 border-input bg-card px-3 outline-none focus:border-primary">
+                  <select id="ob-uf" value={uf} onChange={(e) => setUf(e.target.value)} className="h-13 w-full rounded-2xl border border-input bg-card px-3 outline-none focus:border-primary">
                     <option value="">—</option>
                     {UFS.map((u) => (
                       <option key={u}>{u}</option>
@@ -293,7 +293,7 @@ export default function OnboardingPage() {
                         value={s.durationMinutes}
                         aria-label={`Duração de ${s.name} em minutos`}
                         onChange={(e) => setServices(services.map((x, j) => (j === i ? { ...x, durationMinutes: Number(e.target.value) || 0 } : x)))}
-                        className="h-9 w-16 rounded-lg border-2 border-input bg-card px-2 text-center tabular text-foreground outline-none focus:border-primary"
+                        className="h-9 w-16 rounded-lg border border-input bg-card px-2 text-center tabular text-foreground outline-none focus:border-primary"
                       />
                       min
                       <span className="sr-only">({formatDuration(s.durationMinutes)})</span>
@@ -323,14 +323,14 @@ export default function OnboardingPage() {
               <Intro title="Sua equipe" text="Opcional — dá para fazer depois. Quem tem e-mail recebe um convite; sem e-mail, a pessoa só aparece na agenda." />
               <ul className="max-w-3xl space-y-2">
                 {team.map((t, i) => (
-                  <li key={i} className="grid gap-2 rounded-2xl border-2 border-input bg-card p-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_11rem_auto] sm:items-center">
+                  <li key={i} className="grid gap-2 rounded-2xl border border-input bg-card p-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_11rem_auto] sm:items-center">
                     <Input aria-label="Nome" placeholder="Nome" value={t.name} className="h-11" onChange={(e) => setTeam(team.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} />
                     <Input aria-label="E-mail" type="email" placeholder="E-mail (opcional)" value={t.email} className="h-11" onChange={(e) => setTeam(team.map((x, j) => (j === i ? { ...x, email: e.target.value } : x)))} />
                     <select
                       aria-label="Perfil de acesso"
                       value={t.role}
                       onChange={(e) => setTeam(team.map((x, j) => (j === i ? { ...x, role: e.target.value as Role } : x)))}
-                      className="h-11 rounded-2xl border-2 border-input bg-card px-3 outline-none focus:border-primary"
+                      className="h-11 rounded-2xl border border-input bg-card px-3 outline-none focus:border-primary"
                     >
                       {Object.values(Role)
                         .filter((r) => canAssignRole(Role.DONO, r))
@@ -413,7 +413,7 @@ export default function OnboardingPage() {
 function Intro({ title, text }: { title: string; text: string }) {
   return (
     <header className="max-w-2xl">
-      <h1 className="text-3xl font-black lg:text-4xl">{title}</h1>
+      <h1 className="text-3xl font-extrabold lg:text-4xl">{title}</h1>
       <p className="mt-2 text-muted-foreground lg:text-lg">{text}</p>
     </header>
   );

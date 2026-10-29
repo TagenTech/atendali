@@ -1,7 +1,7 @@
 'use client';
 
 import { APPOINTMENT_STATUS_LABEL, MemberStatus, Permission, SEGMENT_PRESETS, todayIn, zonedParts } from '@skedulei/contracts';
-import { BellRing, CalendarDays, ChartNoAxesCombined, Check, ChevronRight, Copy, ExternalLink, Scissors, UsersRound, Wallet, type LucideIcon } from 'lucide-react';
+import { CalendarDays, Check, ChevronRight, Copy, ExternalLink, Scissors, UsersRound, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { STATUS_DOT } from '@/components/agenda/status';
@@ -41,25 +41,17 @@ function Step({ done, title, description, href }: { done: boolean; title: string
 }
 
 function Stat({ icon: Icon, label, value, href }: { icon: LucideIcon; label: string; value: string; href?: string }) {
-  const card = (
-    <Card className={cn('flex items-center gap-4', href && 'transition-colors hover:bg-muted')}>
-      <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-primary-soft text-primary-soft-foreground">
-        <Icon className="size-6" />
-      </span>
+  const body = (
+    <div className={cn('flex items-center gap-3 px-5 py-4', href && 'transition-colors hover:bg-muted/60')}>
+      <Icon className="size-5 shrink-0 text-primary" aria-hidden />
       <span className="min-w-0">
-        <span className="block truncate font-display text-2xl font-black tabular">{value}</span>
-        <span className="block text-sm text-muted-foreground">{label}</span>
+        <span className="block truncate font-display text-2xl font-extrabold leading-none tabular">{value}</span>
+        <span className="mt-1 block text-sm text-muted-foreground">{label}</span>
       </span>
-    </Card>
+    </div>
   );
-  return href ? <Link href={href}>{card}</Link> : card;
+  return href ? <Link href={href}>{body}</Link> : body;
 }
-
-const NEXT: { icon: LucideIcon; title: string; text: string }[] = [
-  { icon: Wallet, title: 'Caixa e comissões', text: 'Comanda, formas de pagamento, fechamento e comissão por profissional.' },
-  { icon: BellRing, title: 'Lembretes automáticos', text: 'Confirmação e lembrete pelo WhatsApp oficial, sem copiar e colar.' },
-  { icon: ChartNoAxesCombined, title: 'Relatórios', text: 'Faturamento, ocupação da agenda, faltas e clientes sumidos.' },
-];
 
 function TodayAgenda() {
   const { org } = useOrg();
@@ -73,7 +65,7 @@ function TodayAgenda() {
   return (
     <section>
       <div className="mb-2 flex items-center justify-between px-1">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Agenda de hoje · {appts.length}</h2>
+        <h2 className="text-sm font-extrabold text-foreground">Agenda de hoje · {appts.length}</h2>
         <Link href="/agenda" className="text-sm font-bold text-primary">
           Abrir agenda
         </Link>
@@ -95,7 +87,7 @@ function TodayAgenda() {
             </Link>
           ))
         ) : (
-          <p className="px-4 py-6 text-center text-muted-foreground">{appts.length ? 'Os horários de hoje já passaram. 🎉' : 'Nenhum horário hoje.'}</p>
+          <p className="px-4 py-6 text-center text-muted-foreground">{appts.length ? 'Os horários de hoje já passaram.' : 'Nenhum horário hoje.'}</p>
         )}
       </Card>
     </section>
@@ -169,9 +161,9 @@ export default function InicioPage() {
 
   return (
     <>
-      <PageHeader title={hello ? `${hello.text}, ${name} ${hello.emoji}` : `Olá, ${name}`} subtitle={org.name} />
+      <PageHeader title={hello ? `${hello.text}, ${name}` : `Olá, ${name}`} subtitle={org.name} />
       <div className="space-y-6 px-5">
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid divide-y divide-border overflow-hidden rounded-3xl border border-border bg-card sm:grid-cols-3 sm:divide-x sm:divide-y-0">
           <Stat icon={Scissors} label={`${vocab.services} ativos`} value={services.data ? String(activeServices) : '…'} href="/servicos" />
           {canTeam ? <Stat icon={UsersRound} label="Pessoas atendendo" value={members.data ? String(professionals) : '…'} href="/equipe" /> : null}
           {canAgenda ? <Stat icon={CalendarDays} label="Agenda" value="Abrir" href="/agenda" /> : null}
@@ -182,7 +174,7 @@ export default function InicioPage() {
             {canAgenda ? <TodayAgenda /> : null}
             {left ? (
               <section>
-                <h2 className="mb-2 px-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Primeiros passos · faltam {left}</h2>
+                <h2 className="mb-2 px-1 text-sm font-extrabold text-foreground">Primeiros passos · faltam {left}</h2>
                 <Card className="p-2">
                   {steps.map((s) => (
                     <Step key={s.title} {...s} />
@@ -194,20 +186,6 @@ export default function InicioPage() {
 
           <div className="space-y-6">
             <BookingLink />
-            <section>
-              <h2 className="mb-2 px-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Chegando em breve</h2>
-              <div className="space-y-2">
-                {NEXT.map(({ icon: Icon, title, text }) => (
-                  <Card key={title} className="flex gap-3 p-4">
-                    <Icon className="mt-0.5 size-5 shrink-0 text-primary" />
-                    <span>
-                      <span className="block font-semibold">{title}</span>
-                      <span className="block text-sm text-muted-foreground">{text}</span>
-                    </span>
-                  </Card>
-                ))}
-              </div>
-            </section>
           </div>
         </div>
       </div>

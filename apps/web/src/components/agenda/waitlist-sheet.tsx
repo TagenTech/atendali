@@ -15,7 +15,7 @@ import { useServices } from '@/lib/queries/org';
 import { clientBody, ClientPicker, type PickedClient } from './client-picker';
 import type { NewAppointmentPrefill } from './new-appointment-sheet';
 
-const selectCls = 'h-13 w-full rounded-2xl border-2 border-input bg-card px-3 outline-none focus:border-primary';
+const selectCls = 'h-13 w-full rounded-2xl border border-input bg-card px-3 outline-none focus:border-primary';
 
 /**
  * Lista de espera: quem quer um horário que não tinha. Quando um horário que combina é
@@ -84,7 +84,7 @@ export function WaitlistSheet({
             {entries.map((w) => {
               const slot = w.openSlot ? zonedParts(new Date(w.openSlot.startsAt), tz) : null;
               return (
-                <li key={w.id} className="space-y-2 rounded-2xl border-2 border-input p-3">
+                <li key={w.id} className="space-y-2 rounded-2xl border border-input p-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="truncate font-semibold">{w.clientName}</p>
@@ -143,7 +143,7 @@ export function WaitlistSheet({
         )}
 
         {adding ? (
-          <form onSubmit={submit} className="space-y-3 rounded-2xl border-2 border-input p-4" noValidate>
+          <form onSubmit={submit} className="space-y-3 rounded-2xl border border-input p-4" noValidate>
             <p className="font-display font-extrabold">Novo pedido</p>
             <ClientPicker value={picked} onChange={(v) => (setPicked(v), setClientError(null))} />
             {clientError ? (

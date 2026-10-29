@@ -59,7 +59,7 @@ test('do atendimento à comanda; caixa fechado avisa e leva a abrir', async () =
   await page.getByRole('button', { name: 'Cadastrar “Cliente Caixa”' }).click();
   await page.getByLabel('Serviço', { exact: true }).selectOption({ label: 'Corte · 40 min · R$ 50,00' });
   await page.getByRole('button', { name: 'Agendar', exact: true }).last().click();
-  await expect(page.getByText('Agendamento marcado ✨')).toBeVisible();
+  await expect(page.getByText('Horário marcado ✨')).toBeVisible();
 
   await page.getByRole('button', { name: /^10:00 Cliente Caixa/ }).click();
   await page.getByRole('button', { name: 'Abrir comanda' }).click();

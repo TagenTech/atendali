@@ -112,7 +112,7 @@ export function CloseCashSheet({ cash, onOpenChange }: { cash: CashSessionDto; o
               <th scope="row" className="py-2 text-left font-bold">
                 Esperado na gaveta
               </th>
-              <td className="py-2 text-right font-display text-lg font-black tabular">{formatBRL(cash.expected.drawerCents)}</td>
+              <td className="py-2 text-right font-display text-lg font-extrabold tabular">{formatBRL(cash.expected.drawerCents)}</td>
             </tr>
           </tbody>
         </table>

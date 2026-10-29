@@ -35,12 +35,12 @@ export function BottomNav() {
                 <span
                   className={cn(
                     'grid h-8 w-14 place-items-center rounded-full transition-all duration-200',
-                    active ? 'bg-primary-soft text-primary-soft-foreground' : 'text-muted-foreground group-active:scale-90',
+                    active ? 'bg-primary-soft text-primary' : 'text-muted-foreground group-active:scale-90',
                   )}
                 >
                   <Icon className="size-[22px]" strokeWidth={active ? 2.4 : 2} />
                 </span>
-                <span className={cn('text-[11px] font-semibold', active ? 'text-primary-soft-foreground' : 'text-muted-foreground')}>
+                <span className={cn('text-[11px] font-semibold', active ? 'text-primary' : 'text-muted-foreground')}>
                   {label}
                 </span>
               </Link>

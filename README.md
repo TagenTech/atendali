@@ -94,8 +94,9 @@ Sem `RESEND_API_KEY`, os links de confirmação e de senha aparecem no log da AP
 |---|---|
 | `pnpm dev` | Tudo em modo watch |
 | `pnpm build` / `pnpm typecheck` / `pnpm lint` | Build e qualidade |
-| `pnpm verify` | **Tudo antes de encerrar uma mudança**: tipos, lint, regras, API e2e, build e Playwright (celular e desktop) |
-| `pnpm test` | Testes de unidade (contracts + API) |
+| `pnpm verify` | **Tudo antes de encerrar uma mudança**: tipos, lint, testes com cobertura ≥ 90%, build e Playwright (celular e desktop) |
+| `pnpm test` | Testes de unidade (contracts, API e web) |
+| `pnpm test:cov` | Todos os testes (unidade + API e2e com Postgres real) **com cobertura mínima de 90%** em linhas, ramos, funções e instruções: contracts, API e web (`src/lib` e os componentes de `finance`, `agenda`, `public` e `org`). Falha se qualquer um ficar abaixo. As demais telas do web são cobertas pelo Playwright |
 | `pnpm --filter @skedulei/api test:e2e` | API inteira contra Postgres real (banco `skedulei_test`): `organizations`, `agenda` (inclui agendamento online), `finance`, `ledger`, `retention` (estoque, pacotes, clube, vale, pontos, avaliações), `branding`, `responsavel-reservas` (responsável × paciente, Minhas reservas), `carrinho`, `clinico`, `lembretes`, `auditoria`, `relatorios`, `app` (login, cadastro, 2FA, exclusão de conta) e `conta` (sessões, senha, exportação) |
 | `pnpm --filter @skedulei/web test:e2e` | Fluxos no navegador (Playwright, celular **e** desktop): cadastro e senhas, onboarding, agenda, agendamento online, carrinho, Minhas reservas, caixa, contas/DRE, fidelização, personalização, módulo clínico, lembretes, atividade, relatórios e a **regressão de telas** (toda tela abre limpa, sem erro de console, 5xx ou rolagem lateral, com cada perfil). Sobe API/web próprios nas portas 3210/3211 com o banco `skedulei_e2e_web` zerado. `E2E_SKIP_BUILD=1` reaproveita o último build. Primeira vez: `pnpm --filter @skedulei/web exec playwright install chromium` |
 | `pnpm --filter @skedulei/web video` | Grava o vídeo do fluxo completo de uma clínica pediátrica (3 atos, com legendas) em `apps/web/videos/` |

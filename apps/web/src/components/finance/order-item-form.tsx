@@ -13,7 +13,7 @@ import { useFieldErrors } from '@/lib/use-field-errors';
 import { useMembers, useServices } from '@/lib/queries/org';
 import { useClientPackages, useMemberships, useMembershipPlans, usePackagePlans, useProducts } from '@/lib/queries/retention';
 
-const selectCls = 'h-13 w-full rounded-2xl border-2 border-input bg-card px-3 outline-none focus:border-primary';
+const selectCls = 'h-13 w-full rounded-2xl border border-input bg-card px-3 outline-none focus:border-primary';
 
 type Kind = OrderItemKind;
 

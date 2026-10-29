@@ -32,7 +32,7 @@ export function ClientPicker({ value, onChange, locked }: { value: PickedClient;
   if (value?.newClient) {
     const nc = value.newClient;
     return (
-      <div className="space-y-2 rounded-2xl border-2 border-input p-3">
+      <div className="space-y-2 rounded-2xl border border-input p-3">
         <div className="flex items-center justify-between">
           <span className="text-sm font-bold text-primary">Novo cadastro</span>
           <button type="button" onClick={() => onChange(null)} className="text-sm font-semibold text-muted-foreground">

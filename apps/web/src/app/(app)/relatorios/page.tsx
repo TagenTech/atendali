@@ -3,6 +3,7 @@
 import { addDays, birthdayMessage, comebackMessage, formatBRL, formatDateShort, formatDuration, todayIn, whatsappLink, type ReportOverview } from '@skedulei/contracts';
 import { Cake, MessageCircle, UserRoundX } from 'lucide-react';
 import * as React from 'react';
+import { Kpi, KpiStrip } from '@/components/finance/kpi';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -23,16 +24,6 @@ const PERIODS: { key: Period; label: string }[] = [
 
 const fmtPct = (v: number | null) => (v === null ? '—' : `${String(v).replace('.', ',')}%`);
 
-function Kpi({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone?: 'warn' }) {
-  return (
-    <Card className="space-y-0.5 p-4">
-      <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p className={tone === 'warn' ? 'font-display text-2xl font-black tabular text-warning' : 'font-display text-2xl font-black tabular'}>{value}</p>
-      {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
-    </Card>
-  );
-}
-
 function Bar({ pct }: { pct: number | null }) {
   return (
     <span className="block h-2 w-full overflow-hidden rounded-full bg-muted" role="img" aria-label={pct === null ? 'sem horário de trabalho' : `${pct}% ocupado`}>
@@ -44,7 +35,7 @@ function Bar({ pct }: { pct: number | null }) {
 function Overview({ o }: { o: ReportOverview }) {
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <KpiStrip cols={4}>
         <Kpi label="Atendimentos" value={String(o.concluded)} hint={`${o.total} no período`} />
         <Kpi label="Ticket médio" value={o.ticketCents === null ? '—' : formatBRL(o.ticketCents)} hint={`Receita ${formatBRL(o.revenueCents)}`} />
         <Kpi label="Faltas" value={fmtPct(o.noShowPct)} hint={`${o.noShows} ${o.noShows === 1 ? 'falta' : 'faltas'}`} tone={o.noShowPct !== null && o.noShowPct >= 15 ? 'warn' : undefined} />
@@ -53,7 +44,7 @@ function Overview({ o }: { o: ReportOverview }) {
         <Kpi label="Clientes atendidos" value={String(o.clientsServed)} hint={`${o.newClients} novos`} />
         <Kpi label="Clientes que voltaram" value={fmtPct(o.returnPct)} hint={`${o.returningClients} já tinham vindo antes`} />
         <Kpi label="Reservas online" value={fmtPct(o.onlineSharePct)} hint="Parte do total de horários" />
-      </div>
+      </KpiStrip>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <section aria-label="Serviços mais feitos">
@@ -119,7 +110,7 @@ function Inactive() {
       {isLoading ? (
         <Skeleton className="h-32 rounded-3xl" />
       ) : !data?.length ? (
-        <EmptyState emoji="💜" title="Ninguém sumido" description={`Nenhum ${vocab.client.toLowerCase()} está há ${days} dias ou mais sem voltar.`} />
+        <EmptyState title="Ninguém sumido" description={`Nenhum ${vocab.client.toLowerCase()} está há ${days} dias ou mais sem voltar.`} />
       ) : (
         <Card className="divide-y divide-border p-0">
           {data.slice(0, 30).map((c) => (
@@ -164,7 +155,7 @@ function Birthdays() {
               <span className="min-w-0 flex-1">
                 <span className="block truncate font-semibold">{b.name}</span>
                 <span className="block text-xs text-muted-foreground">
-                  {b.inDays === 0 ? 'Hoje! 🎉' : b.inDays === 1 ? 'Amanhã' : `${formatDateShort(b.date)} (em ${b.inDays} dias)`}
+                  {b.inDays === 0 ? 'Hoje' : b.inDays === 1 ? 'Amanhã' : `${formatDateShort(b.date)} (em ${b.inDays} dias)`}
                   {b.turns ? ` · faz ${b.turns} anos` : ''}
                 </span>
               </span>

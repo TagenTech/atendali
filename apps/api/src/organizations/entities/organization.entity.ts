@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { DEFAULT_TIMEZONE, type BrandColor, PHONE_MAX_LENGTH, type CommissionBase, type Feature, type LoyaltyRule, type PaymentMethodConfig, type Segment } from '@skedulei/contracts';
+import { DEFAULT_TIMEZONE, type BrandColorValue, PHONE_MAX_LENGTH, type CommissionBase, type Feature, type LoyaltyRule, type PaymentMethodConfig, type Segment } from '@skedulei/contracts';
 
 /** Negócio (conta SaaS). Todo dado de negócio tem `organizationId` e é filtrado por ele. */
 @Entity('organizations')
@@ -43,9 +43,9 @@ export class Organization {
   @Column({ type: 'jsonb', nullable: true })
   loyalty: LoyaltyRule | null;
 
-  /** Cor de destaque da página pública (chave de BRAND_COLORS). */
+  /** Cor de destaque da página pública (chave da paleta ou #rrggbb). */
   @Column({ name: 'brand_color', type: 'varchar', length: 12, nullable: true })
-  brandColor: BrandColor | null;
+  brandColor: BrandColorValue | null;
 
   @Column({ type: 'varchar', length: 160, nullable: true })
   tagline: string | null;

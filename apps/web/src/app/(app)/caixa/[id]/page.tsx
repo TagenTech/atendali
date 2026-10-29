@@ -36,7 +36,7 @@ import { cn } from '@/lib/utils';
 
 function Row({ label, value, strong, muted }: { label: string; value: string; strong?: boolean; muted?: boolean }) {
   return (
-    <div className={cn('flex justify-between gap-3', muted && 'text-muted-foreground', strong && 'font-display text-xl font-black')}>
+    <div className={cn('flex justify-between gap-3', muted && 'text-muted-foreground', strong && 'font-display text-xl font-extrabold')}>
       <span>{label}</span>
       <span className="tabular">{value}</span>
     </div>
@@ -78,7 +78,7 @@ export default function ComandaPage() {
   const [editingClient, setEditingClient] = React.useState(false);
   const [confirmCancel, setConfirmCancel] = React.useState(false);
 
-  if (isError) return <EmptyState emoji="🧾" title="Comanda não encontrada" description="Confira o link." />;
+  if (isError) return <EmptyState title="Comanda não encontrada" description="Confira o link." />;
   if (!o) return <Skeleton className="m-5 h-96 rounded-3xl" />;
 
   const open = o.status === 'ABERTA';
@@ -149,7 +149,7 @@ export default function ComandaPage() {
 
           {/* Itens */}
           <section>
-            <h2 className="mb-2 px-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Itens</h2>
+            <h2 className="mb-2 px-1 text-sm font-extrabold text-foreground">Itens</h2>
             <Card className="divide-y divide-border p-0">
               {o.items.length ? (
                 o.items.map((i) => (
@@ -190,15 +190,17 @@ export default function ComandaPage() {
 
         {/* Totais e pagamento */}
         <div className="space-y-4 xl:sticky xl:top-6 xl:self-start">
-          <Card className="space-y-2">
+          <Card className="divide-y divide-border space-y-0 p-0">
+            <div className="space-y-2 px-4 py-3">
             <Row label="Subtotal" value={formatBRL(o.totals.subtotalCents)} muted />
             {o.totals.discountCents ? <Row label="Descontos" value={`− ${formatBRL(o.totals.discountCents)}`} muted /> : null}
             <Row label="Total" value={formatBRL(o.totals.totalCents)} strong />
             <Row label="Pago" value={formatBRL(o.totals.paidCents)} />
             {open ? <Row label="Falta" value={formatBRL(due)} strong /> : null}
+            </div>
             {open ? (
               <form
-                className="flex items-end gap-2 pt-2"
+                className="flex items-end gap-2 px-4 py-3"
                 onSubmit={async (e) => {
                   e.preventDefault();
                   if (await act((orgId) => fin.updateOrder(orgId, o.id, { discountCents: discount ?? 0 }), 'Desconto aplicado')) setDiscount(null);
@@ -218,10 +220,10 @@ export default function ComandaPage() {
           <ReviewRequest order={o} />
 
           {o.payments.length ? (
-            <Card className="space-y-2">
-              <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Pagamentos</p>
+            <Card className="divide-y divide-border p-0">
+              <p className="px-4 py-3 text-sm font-extrabold text-foreground">Pagamentos</p>
               {o.payments.map((p) => (
-                <div key={p.id} className="flex items-center gap-2 text-sm">
+                <div key={p.id} className="flex items-center gap-2 px-4 py-3 text-sm">
                   <span className="flex-1">
                     {PAYMENT_METHOD_LABEL[p.method]}
                     {p.feeCents ? <span className="text-muted-foreground"> · taxa {formatBRL(p.feeCents)}</span> : null}

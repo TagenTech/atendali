@@ -77,7 +77,7 @@ export function UnitSheet({ open, onOpenChange, unit }: { open: boolean; onOpenC
             <Input id="u-city" value={city} maxLength={80} onChange={(e) => setCity(e.target.value)} />
           </Field>
           <Field label="UF" htmlFor="u-uf">
-            <select id="u-uf" value={state} onChange={(e) => setState(e.target.value)} className="h-13 w-full rounded-2xl border-2 border-input bg-card px-3 outline-none focus:border-primary">
+            <select id="u-uf" value={state} onChange={(e) => setState(e.target.value)} className="h-13 w-full rounded-2xl border border-input bg-card px-3 outline-none focus:border-primary">
               <option value="">—</option>
               {UFS.map((u) => (
                 <option key={u}>{u}</option>

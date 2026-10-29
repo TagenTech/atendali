@@ -28,7 +28,7 @@ function RowsTable({ rows, caption }: { rows: ClientImportRow[]; caption: string
       <Card className="hidden overflow-x-auto p-0 lg:block">
         <table className="w-full text-left text-sm">
           <caption className="sr-only">{caption}</caption>
-          <thead className="bg-muted text-xs uppercase tracking-wider text-muted-foreground">
+          <thead className="border-b border-border text-xs font-semibold text-muted-foreground">
             <tr>
               <th className="px-4 py-3 font-bold">Linha</th>
               <th className="px-4 py-3 font-bold">Nome</th>
@@ -92,7 +92,7 @@ export default function ImportarClientesPage() {
       <>
         <PageHeader title={`Importar ${vocab.clients.toLowerCase()}`} />
         <div className="px-5">
-          <EmptyState emoji="🔒" title="Seu perfil não importa" description="Peça para o dono ou a recepção fazer a importação." />
+          <EmptyState title="Seu perfil não importa" description="Peça para o dono ou a recepção fazer a importação." />
         </div>
       </>
     );

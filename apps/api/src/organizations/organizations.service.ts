@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { DataSource, EntityManager } from 'typeorm';
 import {
   canAssignRole,
+  canonicalizeBrandColor,
   isValidSlug,
   MemberStatus,
   normalizeFeatures,
@@ -157,7 +158,7 @@ export class OrganizationsService {
     if (dto.document !== undefined) o.document = dto.document;
     if (dto.features !== undefined) o.features = normalizeFeatures(dto.features);
     if (dto.paymentMethods !== undefined) o.paymentMethods = paymentMethodsOf(dto.paymentMethods);
-    if (dto.brandColor !== undefined) o.brandColor = dto.brandColor;
+    if (dto.brandColor !== undefined) o.brandColor = canonicalizeBrandColor(dto.brandColor);
     if (dto.tagline !== undefined) o.tagline = dto.tagline;
     if (dto.commissionBase !== undefined) o.commissionBase = dto.commissionBase;
     if (dto.remindersEnabled !== undefined) o.remindersEnabled = dto.remindersEnabled;

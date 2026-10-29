@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
+import { Ledger } from '@/components/ui/ledger';
 import { Input } from '@/components/ui/input';
 import { Sheet } from '@/components/ui/sheet';
 import { SwitchRow } from '@/components/ui/switch-row';
@@ -80,7 +81,7 @@ function TemplateSheet({ kind, template, onOpenChange }: { kind: DocumentKind; t
                 </Field>
                 <div className="grid gap-2 sm:grid-cols-2">
                   <Field label="Tipo de resposta" htmlFor={`tpl-t-${q.id}`}>
-                    <select id={`tpl-t-${q.id}`} value={q.type} onChange={(e) => patch(i, { type: e.target.value as QuestionType })} className="h-13 w-full rounded-2xl border-2 border-input bg-card px-3">
+                    <select id={`tpl-t-${q.id}`} value={q.type} onChange={(e) => patch(i, { type: e.target.value as QuestionType })} className="h-13 w-full rounded-2xl border border-input bg-card px-3">
                       {(Object.keys(QUESTION_TYPE_LABEL) as QuestionType[]).map((t) => (
                         <option key={t} value={t}>
                           {QUESTION_TYPE_LABEL[t]}
@@ -140,17 +141,21 @@ function Group({ kind }: { kind: DocumentKind }) {
           <Plus /> Novo modelo
         </Button>
       </p>
-      {list.data?.map((t) => (
-        <Card key={t.id} className="flex items-center gap-3 py-3">
-          <span className="min-w-0 flex-1">
-            <span className="block truncate font-semibold">{t.title}</span>
-            <span className="block text-xs text-muted-foreground">{kind === 'ANAMNESE' ? `${t.questions.length} perguntas` : 'Termo'}{t.active ? '' : ' · desligado'}</span>
-          </span>
-          <Button size="sm" variant="ghost" aria-label={`Editar ${t.title}`} onClick={() => setEditing({ template: t })}>
-            <Pencil />
-          </Button>
-        </Card>
-      ))}
+      {list.data?.length ? (
+        <Ledger className="divide-y divide-border">
+          {list.data.map((t) => (
+            <div key={t.id} className="flex items-center gap-3 px-4 py-3">
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-semibold">{t.title}</span>
+                <span className="block text-xs text-muted-foreground">{kind === 'ANAMNESE' ? `${t.questions.length} perguntas` : 'Termo'}{t.active ? '' : ' · desligado'}</span>
+              </span>
+              <Button size="sm" variant="ghost" aria-label={`Editar ${t.title}`} onClick={() => setEditing({ template: t })}>
+                <Pencil />
+              </Button>
+            </div>
+          ))}
+        </Ledger>
+      ) : null}
       {editing ? <TemplateSheet key={editing.template?.id ?? 'new'} kind={kind} template={editing.template} onOpenChange={(v) => !v && setEditing(null)} /> : null}
     </div>
   );

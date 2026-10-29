@@ -32,7 +32,7 @@ export function SwitchRow({
         haptic(8);
         onCheckedChange(!checked);
       }}
-      className={cn('flex w-full items-center gap-4 rounded-2xl border-2 border-input bg-card p-4 text-left transition-colors', disabled && 'cursor-not-allowed opacity-60')}
+      className={cn('flex w-full items-center gap-4 rounded-2xl border border-input bg-card p-4 text-left transition-colors', disabled && 'cursor-not-allowed opacity-60')}
     >
       <span className="flex-1">
         <span className="block font-semibold">

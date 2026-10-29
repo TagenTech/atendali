@@ -57,7 +57,7 @@ test('agenda: clica no horário vazio, marca com cliente novo e conclui', async 
   await page.getByLabel('Serviço', { exact: true }).selectOption({ index: 1 });
   await expect(page.getByLabel('Horário')).toHaveValue('10:00');
   await page.getByRole('button', { name: 'Agendar', exact: true }).last().click();
-  await expect(page.getByText('Agendamento marcado ✨')).toBeVisible();
+  await expect(page.getByText('Horário marcado ✨')).toBeVisible();
 
   const card = page.getByRole('button', { name: /^10:00 Cliente PW — .*\(Agendado\)$/ });
   await expect(card).toBeVisible();
@@ -94,7 +94,7 @@ async function bookAt(time: string, client: string) {
   await page.getByRole('button', { name: `Cadastrar “${client}”` }).click();
   await page.getByLabel('Serviço', { exact: true }).selectOption({ index: 1 });
   await page.getByRole('button', { name: 'Agendar', exact: true }).last().click();
-  await expect(page.getByText('Agendamento marcado ✨')).toBeVisible();
+  await expect(page.getByText('Horário marcado ✨')).toBeVisible();
 }
 
 test('semana: os 7 dias do profissional, com o atendimento no dia certo', async () => {
@@ -142,7 +142,7 @@ test('lista de espera: avisa quando abre vaga', async () => {
   await expect(page.getByLabel('Horário')).toHaveValue('16:00');
   await page.getByLabel('Serviço', { exact: true }).selectOption({ index: 1 });
   await page.getByRole('button', { name: 'Agendar', exact: true }).last().click();
-  await expect(page.getByText('Agendamento marcado ✨')).toBeVisible();
+  await expect(page.getByText('Horário marcado ✨')).toBeVisible();
   await expect(page.getByRole('button', { name: /^16:00 Espera PW/ })).toBeVisible();
   await page.getByRole('button', { name: /^Espera/ }).click();
   await expect(page.getByText('Ninguém esperando vaga.')).toBeVisible();

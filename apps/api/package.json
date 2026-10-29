@@ -19,7 +19,8 @@
     "migration:run": "pnpm typeorm migration:run",
     "migration:run:prod": "typeorm -d dist/data-source.js migration:run",
     "test:e2e": "jest --config ./test/jest-e2e.json --runInBand",
-    "create-user:prod": "node dist/scripts/create-user.js"
+    "create-user:prod": "node dist/scripts/create-user.js",
+    "test:cov": "jest --config ./jest.cov.json --runInBand --coverage"
   },
   "jest": {
     "moduleFileExtensions": [

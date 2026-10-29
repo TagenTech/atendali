@@ -1,53 +1,59 @@
 @import 'tailwindcss';
 
-/* Skedulei — design tokens. Paleta "meiga": lavanda, rosa, menta, manteiga e coral. */
+/*
+ * Skedulei — design tokens.
+ * Direção "horário marcado": papel frio, tinta azul-petróleo, petróleo como cor de ação e âmbar só como ponteiro
+ * ("agora" / confirmação). Superfícies separadas por linha fina, quase sem sombra; raios pequenos e hierárquicos.
+ * Obs.: o token `--pink*` guarda o âmbar de destaque (nome mantido para não mexer em todos os componentes).
+ */
 :root {
   color-scheme: light;
-  --background: #fbf8ff;
-  --foreground: #2d2640;
+  --background: #f4f7f6;
+  --foreground: #12262e;
   --card: #ffffff;
-  --card-foreground: #2d2640;
-  --muted: #f4f0fb;
-  --muted-foreground: #6f6787;
-  --border: #ece6f7;
-  --input: #e4dcf3;
-  --ring: #a99bf7;
+  --card-foreground: #12262e;
+  --muted: #eaf0ef;
+  --muted-foreground: #566b70;
+  --border: #dce5e4;
+  --input: #c5d2d1;
+  --ring: #0f6b73;
 
-  --primary: #6c5ae6;
-  --primary-hover: #5d4bd8;
+  --primary: #0f6b73;
+  --primary-hover: #0b5a61;
   --primary-foreground: #ffffff;
-  --primary-soft: #eeeafe;
-  --primary-soft-foreground: #4f3fc4;
+  --primary-soft: #ddeeee;
+  --primary-soft-foreground: #0a4e55;
 
-  --pink: #e8689f;
-  --pink-soft: #fde8f1;
-  --pink-soft-foreground: #b03a6e;
+  --pink: #b9650f;
+  --pink-soft: #fbebd6;
+  --pink-soft-foreground: #7f4509;
 
-  --success: #1f9e70;
-  --success-soft: #ddf6ec;
-  --success-soft-foreground: #146b4b;
+  --success: #1b8a5a;
+  --success-soft: #dff3e8;
+  --success-soft-foreground: #115c3b;
 
-  --warning: #c98415;
-  --warning-soft: #fff3dc;
-  --warning-soft-foreground: #8a5a0b;
+  --warning: #b7791f;
+  --warning-soft: #fff1d1;
+  --warning-soft-foreground: #7a4f0a;
 
-  --danger: #dc4f4f;
-  --danger-soft: #fde6e6;
-  --danger-soft-foreground: #a33131;
+  --danger: #c73a3a;
+  --danger-soft: #fce4e2;
+  --danger-soft-foreground: #8f2424;
 
-  --sky-soft: #e3f1fd;
-  --peach-soft: #ffe9dc;
+  --sky-soft: #e0eef7;
+  --peach-soft: #fbe9da;
 
-  --shadow-soft: 0 1px 2px rgb(76 56 140 / 0.04), 0 6px 20px -8px rgb(76 56 140 / 0.12);
-  --shadow-float: 0 10px 30px -10px rgb(108 90 230 / 0.45);
-  --nav-bg: rgb(255 255 255 / 0.86);
+  --ink-deep: #0a3f45;
+  --shadow-soft: 0 1px 2px rgb(18 38 46 / 0.05);
+  --shadow-float: 0 1px 2px rgb(11 70 77 / 0.3);
+  --nav-bg: rgb(255 255 255 / 0.92);
   /* Gráficos (validados: faixa de luminosidade, croma e daltonismo) */
-  --chart-1: #6c5ae6;
-  --chart-2: #e8689f;
-  --chart-grid: #ece6f7;
+  --chart-1: #0f6b73;
+  --chart-2: #d9822b;
+  --chart-grid: #dce5e4;
 
   /* Paleta pastel (fundo + texto escuro, contraste AA) */
-  --stu-lavanda: #e9e4ff; --stu-lavanda-fg: #4f3fc4;
+  --stu-lavanda: #e6e6fb; --stu-lavanda-fg: #3f3fa8;
   --stu-rosa: #ffe0ee; --stu-rosa-fg: #a8336a;
   --stu-menta: #d6f5e8; --stu-menta-fg: #146b4b;
   --stu-pessego: #ffe4d3; --stu-pessego-fg: #a04a1c;
@@ -70,23 +76,23 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --background: #17131f;
-    --foreground: #f3eefb;
-    --card: #211c2c;
-    --card-foreground: #f3eefb;
-    --muted: #2a2437;
-    --muted-foreground: #a69fb8;
-    --border: #322b40;
-    --input: #3b3349;
-    --ring: #8b7cf6;
-    --primary: #9f91ff;
-    --primary-hover: #b2a6ff;
-    --primary-foreground: #1b1430;
-    --primary-soft: #2c2545;
-    --primary-soft-foreground: #c9c0ff;
-    --pink: #f7a6c9;
-    --pink-soft: #3a2232;
-    --pink-soft-foreground: #f9bfd8;
+    --background: #0d191e;
+    --foreground: #e9f1f2;
+    --card: #142228;
+    --card-foreground: #e9f1f2;
+    --muted: #1b2e35;
+    --muted-foreground: #93a9ae;
+    --border: #243840;
+    --input: #2e4750;
+    --ring: #5cc4cc;
+    --primary: #4fb8c0;
+    --primary-hover: #6cc9d0;
+    --primary-foreground: #06262a;
+    --primary-soft: #12353a;
+    --primary-soft-foreground: #a6e3e7;
+    --pink: #f0a85a;
+    --pink-soft: #3a2a17;
+    --pink-soft-foreground: #f6c98f;
     --success: #4fd3a1;
     --success-soft: #1c3a30;
     --success-soft-foreground: #8ae6c1;
@@ -98,13 +104,14 @@
     --danger-soft-foreground: #f7a9a9;
     --sky-soft: #1d2a3a;
     --peach-soft: #3a2a22;
-    --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -10px rgb(0 0 0 / 0.5);
-    --shadow-float: 0 10px 30px -10px rgb(159 145 255 / 0.45);
-    --nav-bg: rgb(33 28 44 / 0.88);
-    --chart-1: #8576f2;
-    --chart-2: #dc5a92;
-    --chart-grid: #322b40;
-    --stu-lavanda: #34295e; --stu-lavanda-fg: #d3caff;
+    --ink-deep: #071c21;
+    --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3);
+    --shadow-float: 0 1px 2px rgb(0 0 0 / 0.4);
+    --nav-bg: rgb(20 34 40 / 0.9);
+    --chart-1: #4fb8c0;
+    --chart-2: #f0a85a;
+    --chart-grid: #243840;
+    --stu-lavanda: #2c2c5e; --stu-lavanda-fg: #cfcfff;
     --stu-rosa: #4a2338; --stu-rosa-fg: #ffc2dc;
     --stu-menta: #1b3d31; --stu-menta-fg: #9ee8c8;
     --stu-pessego: #4a2f20; --stu-pessego-fg: #ffc9a6;
@@ -117,23 +124,23 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --background: #17131f;
-  --foreground: #f3eefb;
-  --card: #211c2c;
-  --card-foreground: #f3eefb;
-  --muted: #2a2437;
-  --muted-foreground: #a69fb8;
-  --border: #322b40;
-  --input: #3b3349;
-  --ring: #8b7cf6;
-  --primary: #9f91ff;
-  --primary-hover: #b2a6ff;
-  --primary-foreground: #1b1430;
-  --primary-soft: #2c2545;
-  --primary-soft-foreground: #c9c0ff;
-  --pink: #f7a6c9;
-  --pink-soft: #3a2232;
-  --pink-soft-foreground: #f9bfd8;
+  --background: #0d191e;
+  --foreground: #e9f1f2;
+  --card: #142228;
+  --card-foreground: #e9f1f2;
+  --muted: #1b2e35;
+  --muted-foreground: #93a9ae;
+  --border: #243840;
+  --input: #2e4750;
+  --ring: #5cc4cc;
+  --primary: #4fb8c0;
+  --primary-hover: #6cc9d0;
+  --primary-foreground: #06262a;
+  --primary-soft: #12353a;
+  --primary-soft-foreground: #a6e3e7;
+  --pink: #f0a85a;
+  --pink-soft: #3a2a17;
+  --pink-soft-foreground: #f6c98f;
   --success: #4fd3a1;
   --success-soft: #1c3a30;
   --success-soft-foreground: #8ae6c1;
@@ -145,13 +152,14 @@
   --danger-soft-foreground: #f7a9a9;
   --sky-soft: #1d2a3a;
   --peach-soft: #3a2a22;
-  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -10px rgb(0 0 0 / 0.5);
-  --shadow-float: 0 10px 30px -10px rgb(159 145 255 / 0.45);
-  --nav-bg: rgb(33 28 44 / 0.88);
-  --chart-1: #8576f2;
-  --chart-2: #dc5a92;
-  --chart-grid: #322b40;
-  --stu-lavanda: #34295e; --stu-lavanda-fg: #d3caff;
+  --ink-deep: #071c21;
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-float: 0 1px 2px rgb(0 0 0 / 0.4);
+  --nav-bg: rgb(20 34 40 / 0.9);
+  --chart-1: #4fb8c0;
+  --chart-2: #f0a85a;
+  --chart-grid: #243840;
+  --stu-lavanda: #2c2c5e; --stu-lavanda-fg: #cfcfff;
   --stu-rosa: #4a2338; --stu-rosa-fg: #ffc2dc;
   --stu-menta: #1b3d31; --stu-menta-fg: #9ee8c8;
   --stu-pessego: #4a2f20; --stu-pessego-fg: #ffc9a6;
@@ -190,13 +198,15 @@
   --color-danger-soft-foreground: var(--danger-soft-foreground);
   --color-sky-soft: var(--sky-soft);
   --color-peach-soft: var(--peach-soft);
+  --color-ink-deep: var(--ink-deep);
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-nunito), var(--font-inter), ui-rounded, sans-serif;
+  --font-sans: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-xl: 1rem;
-  --radius-2xl: 1.25rem;
-  --radius-3xl: 1.75rem;
+  /* Escala de raios: controles 12 px, superfícies 16 px, detalhes 10 px. Pílula só em chips, avatares e status. */
+  --radius-xl: 0.625rem;
+  --radius-2xl: 0.75rem;
+  --radius-3xl: 1rem;
 
   --shadow-soft: var(--shadow-soft);
   --shadow-float: var(--shadow-float);
@@ -234,9 +244,13 @@
     -webkit-font-smoothing: antialiased;
     overscroll-behavior-y: none;
   }
+  ::selection {
+    background: var(--primary-soft);
+    color: var(--primary-soft-foreground);
+  }
   h1, h2, h3 {
     font-family: var(--font-display);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.03em;
   }
   input[type='search']::-webkit-search-cancel-button,
   input[type='search']::-webkit-search-decoration {
@@ -246,10 +260,19 @@
     outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
+  /* Select nativo com a mesma ficha dos inputs — clínicas usam teclado e mouse. */
+  select:not([multiple]) {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23566b70' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m4 6 4 4 4-4'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2.25rem;
+    appearance: none;
+  }
 }
 
+/* Números alinhados em colunas; a Schibsted Grotesk alarga os dois-pontos em tnum, então horários usam só os algarismos lining. */
 @utility tabular {
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums;
 }
 
 @utility scrollbar-none {

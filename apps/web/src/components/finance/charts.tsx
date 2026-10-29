@@ -205,7 +205,7 @@ export function FlowColumns({
         <div className="mt-2 overflow-x-auto">
           <table className="w-full min-w-[28rem]">
             <caption className="sr-only">{label}</caption>
-            <thead className="text-left text-xs uppercase tracking-wider text-muted-foreground">
+            <thead className="text-left text-xs font-semibold text-muted-foreground">
               <tr>
                 <th className="py-1 font-bold">Período</th>
                 <th className="py-1 text-right font-bold">Entrou</th>

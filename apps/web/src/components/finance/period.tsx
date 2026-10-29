@@ -54,7 +54,7 @@ export function PeriodPicker({ period }: { period: ReturnType<typeof usePeriod> 
             aria-label="De"
             value={range.from}
             onChange={(e) => e.target.value && setCustom({ from: e.target.value, to: range.to })}
-            className="h-9 rounded-xl border-2 border-input bg-card px-2"
+            className="h-9 rounded-xl border border-input bg-card px-2"
           />
           até
           <input
@@ -62,7 +62,7 @@ export function PeriodPicker({ period }: { period: ReturnType<typeof usePeriod> 
             aria-label="Até"
             value={range.to}
             onChange={(e) => e.target.value && setCustom({ from: range.from, to: e.target.value })}
-            className="h-9 rounded-xl border-2 border-input bg-card px-2"
+            className="h-9 rounded-xl border border-input bg-card px-2"
           />
         </span>
       ) : null}

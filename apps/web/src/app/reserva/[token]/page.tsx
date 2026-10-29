@@ -108,7 +108,7 @@ export default function ReservaPage() {
                   <MapPin className="size-4" /> {g.address}
                 </p>
               ) : null}
-              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{APPOINTMENT_STATUS_LABEL[b.status]}</p>
+              <p className="text-xs font-bold text-muted-foreground">{APPOINTMENT_STATUS_LABEL[b.status]}</p>
 
               {many && !gone && b.canCancel ? (
                 moving === b.id ? (

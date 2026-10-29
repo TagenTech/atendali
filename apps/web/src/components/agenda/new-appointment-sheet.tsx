@@ -27,7 +27,7 @@ export interface NewAppointmentPrefill {
   waitlistId?: string;
 }
 
-const selectCls = 'h-13 w-full rounded-2xl border-2 border-input bg-card px-3 outline-none focus:border-primary';
+const selectCls = 'h-13 w-full rounded-2xl border border-input bg-card px-3 outline-none focus:border-primary';
 
 export function NewAppointmentSheet({ open, onOpenChange, prefill }: { open: boolean; onOpenChange: (v: boolean) => void; prefill: NewAppointmentPrefill }) {
   const { org, vocab, can } = useOrg();
@@ -74,7 +74,7 @@ export function NewAppointmentSheet({ open, onOpenChange, prefill }: { open: boo
         allowOutsideHours: outside,
       });
       if (prefill.waitlistId) await resolveWaitlist.mutateAsync(prefill.waitlistId).catch(() => undefined);
-      toast.success(`${vocab.appointment} marcado ✨`);
+      toast.success('Horário marcado ✨');
       onOpenChange(false);
     } catch (err) {
       setError(errorText(err, 'Não foi possível agendar'));
@@ -82,7 +82,7 @@ export function NewAppointmentSheet({ open, onOpenChange, prefill }: { open: boo
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title={`Novo ${vocab.appointment.toLowerCase()}`}>
+    <Sheet open={open} onOpenChange={onOpenChange} title={`Marcar ${vocab.appointment.toLowerCase()}`}>
       <form onSubmit={submit} className="space-y-4" noValidate>
         <fieldset className="space-y-2">
           <legend className="pl-1 text-sm font-semibold">{vocab.client}</legend>

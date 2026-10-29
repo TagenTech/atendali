@@ -19,9 +19,9 @@ import { toast } from 'sonner';
 import { PageHeader } from '@/components/layout/page-header';
 import { MembershipPlanSheet, PackagePlanSheet } from '@/components/org/plan-sheets';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Chip } from '@/components/ui/chip';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Ledger, LedgerTable, tdClass, thClass, theadClass } from '@/components/ui/ledger';
 import { Skeleton } from '@/components/ui/skeleton';
 import { errorText } from '@/lib/api/client';
 import { useOrg } from '@/lib/org';
@@ -44,7 +44,7 @@ const Pill = ({ tone, children }: { tone: 'ok' | 'warn' | 'off'; children: React
 );
 
 const List = ({ loading, empty, children }: { loading: boolean; empty: React.ReactNode; children: React.ReactNode[] }) =>
-  loading ? <Skeleton className="h-32 rounded-3xl" /> : !children.length ? <>{empty}</> : <Card className="divide-y divide-border p-0">{children}</Card>;
+  loading ? <Skeleton className="h-32 rounded-3xl" /> : !children.length ? <>{empty}</> : <Ledger className="divide-y divide-border">{children}</Ledger>;
 
 export default function FidelidadePage() {
   const { can, has, org } = useOrg();
@@ -102,10 +102,10 @@ export default function FidelidadePage() {
         {tab === 'pacotes' ? (
           <div className="grid gap-5 xl:grid-cols-2">
             <section className="space-y-2">
-              <h2 className="px-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Pacotes à venda</h2>
+              <h2 className="px-1 text-sm font-extrabold text-foreground">Pacotes à venda</h2>
               <List
                 loading={packagePlans.isLoading}
-                empty={<EmptyState emoji="🎟️" title="Nenhum pacote" description="Crie pacotes de sessões e venda pela comanda." action={canEdit ? <Button onClick={() => setPkgSheet({ plan: null, key: Date.now() })}>Criar pacote</Button> : undefined} />}
+                empty={<EmptyState title="Nenhum pacote" description="Crie pacotes de sessões e venda pela comanda." action={canEdit ? <Button onClick={() => setPkgSheet({ plan: null, key: Date.now() })}>Criar pacote</Button> : undefined} />}
               >
                 {(packagePlans.data ?? []).map((p) => (
                   <button key={p.id} type="button" disabled={!canEdit} onClick={() => setPkgSheet({ plan: p, key: Date.now() })} className={cn('flex w-full items-center gap-3 px-4 py-3.5 text-left', !p.active && 'opacity-55')}>
@@ -123,20 +123,61 @@ export default function FidelidadePage() {
               </List>
             </section>
             <section className="space-y-2">
-              <h2 className="px-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Vendidos</h2>
-              <List loading={soldPackages.isLoading} empty={<p className="rounded-3xl border border-dashed border-border p-6 text-center text-muted-foreground">Nenhum pacote vendido ainda.</p>}>
-                {(soldPackages.data ?? []).map((c) => (
-                  <Link key={c.id} href={`/clientes/${c.clientId}`} className="flex items-center gap-3 px-4 py-3.5">
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate font-semibold">{c.clientName}</span>
-                      <span className="text-sm text-muted-foreground">
-                        {c.planName} · {c.sessionsLeft} de {c.sessionsTotal} restantes{c.expiresAt ? ` · até ${formatDateShort(c.expiresAt)}` : ''}
-                      </span>
-                    </span>
-                    <Pill tone={c.status === 'ATIVO' ? 'ok' : 'off'}>{PACKAGE_STATUS_LABEL[c.status]}</Pill>
-                  </Link>
-                ))}
-              </List>
+              <h2 className="px-1 text-sm font-extrabold text-foreground">Vendidos</h2>
+              {soldPackages.isLoading ? (
+                <Skeleton className="h-32 rounded-3xl" />
+              ) : !(soldPackages.data ?? []).length ? (
+                <p className="rounded-3xl border border-dashed border-border p-6 text-center text-muted-foreground">Nenhum pacote vendido ainda.</p>
+              ) : (
+                <Ledger>
+                  <div className="hidden overflow-x-auto lg:block">
+                    <LedgerTable caption="Pacotes vendidos">
+                      <thead className={theadClass}>
+                        <tr>
+                          <th className={thClass}>Pessoa</th>
+                          <th className={thClass}>Pacote</th>
+                          <th className={`${thClass} text-right`}>Sessões</th>
+                          <th className={thClass}>Situação</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {(soldPackages.data ?? []).map((c) => (
+                          <tr key={c.id}>
+                            <td className={`${tdClass} font-semibold`}>
+                              <Link href={`/clientes/${c.clientId}`} className="hover:underline">
+                                {c.clientName}
+                              </Link>
+                            </td>
+                            <td className={`${tdClass} text-sm text-muted-foreground`}>
+                              {c.planName}
+                              {c.expiresAt ? ` · até ${formatDateShort(c.expiresAt)}` : ''}
+                            </td>
+                            <td className={`${tdClass} text-right tabular`}>
+                              {c.sessionsLeft} de {c.sessionsTotal}
+                            </td>
+                            <td className={tdClass}>
+                              <Pill tone={c.status === 'ATIVO' ? 'ok' : 'off'}>{PACKAGE_STATUS_LABEL[c.status]}</Pill>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </LedgerTable>
+                  </div>
+                  <div className="divide-y divide-border lg:hidden">
+                    {(soldPackages.data ?? []).map((c) => (
+                      <Link key={c.id} href={`/clientes/${c.clientId}`} className="flex items-center gap-3 px-4 py-3.5">
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate font-semibold">{c.clientName}</span>
+                          <span className="text-sm text-muted-foreground">
+                            {c.planName} · {c.sessionsLeft} de {c.sessionsTotal} restantes{c.expiresAt ? ` · até ${formatDateShort(c.expiresAt)}` : ''}
+                          </span>
+                        </span>
+                        <Pill tone={c.status === 'ATIVO' ? 'ok' : 'off'}>{PACKAGE_STATUS_LABEL[c.status]}</Pill>
+                      </Link>
+                    ))}
+                  </div>
+                </Ledger>
+              )}
             </section>
           </div>
         ) : null}
@@ -144,10 +185,10 @@ export default function FidelidadePage() {
         {tab === 'clube' ? (
           <div className="grid gap-5 xl:grid-cols-2">
             <section className="space-y-2">
-              <h2 className="px-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Planos</h2>
+              <h2 className="px-1 text-sm font-extrabold text-foreground">Planos</h2>
               <List
                 loading={clubPlans.isLoading}
-                empty={<EmptyState emoji="💜" title="Nenhum plano" description="Crie um plano mensal e receba a mensalidade pela comanda." action={canEdit ? <Button onClick={() => setMemSheet({ plan: null, key: Date.now() })}>Criar plano</Button> : undefined} />}
+                empty={<EmptyState title="Nenhum plano" description="Crie um plano mensal e receba a mensalidade pela comanda." action={canEdit ? <Button onClick={() => setMemSheet({ plan: null, key: Date.now() })}>Criar plano</Button> : undefined} />}
               >
                 {(clubPlans.data ?? []).map((p) => (
                   <button key={p.id} type="button" disabled={!canEdit} onClick={() => setMemSheet({ plan: p, key: Date.now() })} className={cn('flex w-full items-center gap-3 px-4 py-3.5 text-left', !p.active && 'opacity-55')}>
@@ -164,27 +205,75 @@ export default function FidelidadePage() {
               </List>
             </section>
             <section className="space-y-2">
-              <h2 className="px-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Assinantes</h2>
-              <List loading={memberships.isLoading} empty={<p className="rounded-3xl border border-dashed border-border p-6 text-center text-muted-foreground">Ninguém assinou ainda.</p>}>
-                {(memberships.data ?? []).map((m) => (
-                  <div key={m.id} className="flex items-center gap-3 px-4 py-3.5">
-                    <Link href={`/clientes/${m.clientId}`} className="min-w-0 flex-1">
-                      <span className="block truncate font-semibold">{m.clientName}</span>
-                      <span className="text-sm text-muted-foreground">
-                        {m.planName}
-                        {m.paidThrough ? ` · pago até ${formatDateShort(m.paidThrough)}` : ''}
-                        {m.sessionsPerMonth ? ` · ${m.sessionsUsedInCycle}/${m.sessionsPerMonth} no mês` : ''}
-                      </span>
-                    </Link>
-                    <Pill tone={m.state === 'EM_DIA' ? 'ok' : m.state === 'VENCIDA' ? 'warn' : 'off'}>{MEMBERSHIP_STATE_LABEL[m.state]}</Pill>
-                    {canEdit && m.status !== 'CANCELADA' ? (
-                      <Button size="sm" variant="soft" disabled={setStatus.isPending} onClick={() => changeStatus(m, m.status === 'PAUSADA' ? 'ATIVA' : 'PAUSADA')}>
-                        {m.status === 'PAUSADA' ? 'Reativar' : 'Pausar'}
-                      </Button>
-                    ) : null}
+              <h2 className="px-1 text-sm font-extrabold text-foreground">Assinantes</h2>
+              {memberships.isLoading ? (
+                <Skeleton className="h-32 rounded-3xl" />
+              ) : !(memberships.data ?? []).length ? (
+                <p className="rounded-3xl border border-dashed border-border p-6 text-center text-muted-foreground">Ninguém assinou ainda.</p>
+              ) : (
+                <Ledger>
+                  <div className="hidden overflow-x-auto lg:block">
+                    <LedgerTable caption="Assinantes do clube">
+                      <thead className={theadClass}>
+                        <tr>
+                          <th className={thClass}>Pessoa</th>
+                          <th className={thClass}>Plano</th>
+                          <th className={thClass}>Situação</th>
+                          {canEdit ? <th className={thClass} /> : null}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {(memberships.data ?? []).map((m) => (
+                          <tr key={m.id}>
+                            <td className={`${tdClass} font-semibold`}>
+                              <Link href={`/clientes/${m.clientId}`} className="hover:underline">
+                                {m.clientName}
+                              </Link>
+                            </td>
+                            <td className={`${tdClass} text-sm text-muted-foreground`}>
+                              {m.planName}
+                              {m.paidThrough ? ` · pago até ${formatDateShort(m.paidThrough)}` : ''}
+                              {m.sessionsPerMonth ? ` · ${m.sessionsUsedInCycle}/${m.sessionsPerMonth} no mês` : ''}
+                            </td>
+                            <td className={tdClass}>
+                              <Pill tone={m.state === 'EM_DIA' ? 'ok' : m.state === 'VENCIDA' ? 'warn' : 'off'}>{MEMBERSHIP_STATE_LABEL[m.state]}</Pill>
+                            </td>
+                            {canEdit ? (
+                              <td className={`${tdClass} text-right`}>
+                                {m.status !== 'CANCELADA' ? (
+                                  <Button size="sm" variant="soft" disabled={setStatus.isPending} onClick={() => changeStatus(m, m.status === 'PAUSADA' ? 'ATIVA' : 'PAUSADA')}>
+                                    {m.status === 'PAUSADA' ? 'Reativar' : 'Pausar'}
+                                  </Button>
+                                ) : null}
+                              </td>
+                            ) : null}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </LedgerTable>
                   </div>
-                ))}
-              </List>
+                  <div className="divide-y divide-border lg:hidden">
+                    {(memberships.data ?? []).map((m) => (
+                      <div key={m.id} className="flex items-center gap-3 px-4 py-3.5">
+                        <Link href={`/clientes/${m.clientId}`} className="min-w-0 flex-1">
+                          <span className="block truncate font-semibold">{m.clientName}</span>
+                          <span className="text-sm text-muted-foreground">
+                            {m.planName}
+                            {m.paidThrough ? ` · pago até ${formatDateShort(m.paidThrough)}` : ''}
+                            {m.sessionsPerMonth ? ` · ${m.sessionsUsedInCycle}/${m.sessionsPerMonth} no mês` : ''}
+                          </span>
+                        </Link>
+                        <Pill tone={m.state === 'EM_DIA' ? 'ok' : m.state === 'VENCIDA' ? 'warn' : 'off'}>{MEMBERSHIP_STATE_LABEL[m.state]}</Pill>
+                        {canEdit && m.status !== 'CANCELADA' ? (
+                          <Button size="sm" variant="soft" disabled={setStatus.isPending} onClick={() => changeStatus(m, m.status === 'PAUSADA' ? 'ATIVA' : 'PAUSADA')}>
+                            {m.status === 'PAUSADA' ? 'Reativar' : 'Pausar'}
+                          </Button>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </Ledger>
+              )}
             </section>
           </div>
         ) : null}
@@ -192,28 +281,65 @@ export default function FidelidadePage() {
         {tab === 'vales' ? (
           <section className="space-y-2">
             <p className="px-1 text-sm text-muted-foreground">Vendidos pela comanda (item “Vale-presente”). O valor só vira receita quando é usado para pagar.</p>
-            <List loading={gifts.isLoading} empty={<EmptyState emoji="🎁" title="Nenhum vale vendido" description="Na comanda, adicione “Vale-presente” e receba normalmente." />}>
-              {(gifts.data ?? []).map((g) => (
-                <div key={g.id} className="flex items-center gap-3 px-4 py-3.5">
-                  <span className="min-w-0 flex-1">
-                    <span className="block font-mono font-bold tracking-wider">{g.code}</span>
-                    <span className="text-sm text-muted-foreground">
-                      {g.buyerName ? `${g.buyerName} · ` : ''}vence {formatDateShort(g.expiresAt)}
-                    </span>
-                  </span>
-                  <span className="text-right">
-                    <span className="block font-display font-extrabold tabular">{formatBRL(g.balanceCents)}</span>
-                    <span className="text-xs text-muted-foreground tabular">de {formatBRL(g.initialCents)}</span>
-                  </span>
-                  <Pill tone={g.status === 'ATIVO' ? 'ok' : 'off'}>{GIFT_STATUS_LABEL[g.status]}</Pill>
+            {gifts.isLoading ? (
+              <Skeleton className="h-32 rounded-3xl" />
+            ) : !(gifts.data ?? []).length ? (
+              <EmptyState title="Nenhum vale vendido" description="Na comanda, adicione “Vale-presente” e receba normalmente." />
+            ) : (
+              <Ledger>
+                <div className="hidden overflow-x-auto lg:block">
+                  <LedgerTable caption="Vales-presente">
+                    <thead className={theadClass}>
+                      <tr>
+                        <th className={thClass}>Código</th>
+                        <th className={thClass}>Quem comprou</th>
+                        <th className={`${thClass} text-right`}>Saldo</th>
+                        <th className={thClass}>Situação</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {(gifts.data ?? []).map((g) => (
+                        <tr key={g.id}>
+                          <td className={`${tdClass} font-mono font-bold tracking-wider`}>{g.code}</td>
+                          <td className={`${tdClass} text-sm text-muted-foreground`}>
+                            {g.buyerName ? `${g.buyerName} · ` : ''}vence {formatDateShort(g.expiresAt)}
+                          </td>
+                          <td className={`${tdClass} text-right tabular`}>
+                            <span className="font-display font-extrabold">{formatBRL(g.balanceCents)}</span>
+                            <span className="ml-1 text-xs text-muted-foreground">de {formatBRL(g.initialCents)}</span>
+                          </td>
+                          <td className={tdClass}>
+                            <Pill tone={g.status === 'ATIVO' ? 'ok' : 'off'}>{GIFT_STATUS_LABEL[g.status]}</Pill>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </LedgerTable>
                 </div>
-              ))}
-            </List>
+                <div className="divide-y divide-border lg:hidden">
+                  {(gifts.data ?? []).map((g) => (
+                    <div key={g.id} className="flex items-center gap-3 px-4 py-3.5">
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-mono font-bold tracking-wider">{g.code}</span>
+                        <span className="text-sm text-muted-foreground">
+                          {g.buyerName ? `${g.buyerName} · ` : ''}vence {formatDateShort(g.expiresAt)}
+                        </span>
+                      </span>
+                      <span className="text-right">
+                        <span className="block font-display font-extrabold tabular">{formatBRL(g.balanceCents)}</span>
+                        <span className="text-xs text-muted-foreground tabular">de {formatBRL(g.initialCents)}</span>
+                      </span>
+                      <Pill tone={g.status === 'ATIVO' ? 'ok' : 'off'}>{GIFT_STATUS_LABEL[g.status]}</Pill>
+                    </div>
+                  ))}
+                </div>
+              </Ledger>
+            )}
           </section>
         ) : null}
 
         {tab === 'pontos' ? (
-          <Card className="space-y-2 lg:max-w-xl">
+          <Ledger className="space-y-2 px-5 py-4 lg:max-w-xl">
             <h2 className="font-display text-lg font-extrabold">Programa de pontos</h2>
             {org.loyalty.enabled ? (
               <p className="text-muted-foreground">
@@ -227,10 +353,10 @@ export default function FidelidadePage() {
                 Ajustar regras em Negócio →
               </Link>
             ) : null}
-          </Card>
+          </Ledger>
         ) : null}
 
-        {!tab ? <EmptyState emoji="💜" title="Nenhum módulo ligado" description="Ligue pacotes, clube, vales ou pontos em Negócio → Módulos." /> : null}
+        {!tab ? <EmptyState title="Nenhum módulo ligado" description="Ligue pacotes, clube, vales ou pontos em Negócio → Módulos." /> : null}
       </div>
       {pkgSheet ? <PackagePlanSheet key={pkgSheet.key} open onOpenChange={(v) => !v && setPkgSheet(null)} plan={pkgSheet.plan} /> : null}
       {memSheet ? <MembershipPlanSheet key={memSheet.key} open onOpenChange={(v) => !v && setMemSheet(null)} plan={memSheet.plan} /> : null}

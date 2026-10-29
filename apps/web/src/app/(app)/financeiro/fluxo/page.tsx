@@ -4,7 +4,7 @@ import { formatBRL, formatDateShort, PROJECTION_DAYS } from '@skedulei/contracts
 import * as React from 'react';
 import { FlowColumns } from '@/components/finance/charts';
 import { FinanceTabs } from '@/components/finance/finance-tabs';
-import { Kpi } from '@/components/finance/kpi';
+import { Kpi, KpiStrip } from '@/components/finance/kpi';
 import { PeriodPicker, usePeriod } from '@/components/finance/period';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card } from '@/components/ui/card';
@@ -53,11 +53,11 @@ export default function FluxoPage() {
           <Skeleton className="h-96 rounded-3xl" />
         ) : (
           <>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <KpiStrip>
               <Kpi label={realized ? 'Entrou' : 'Vai entrar'} value={formatBRL(f.inCents)} />
               <Kpi label={realized ? 'Saiu' : 'Vai sair'} value={formatBRL(f.outCents)} />
               <Kpi label="Resultado" value={formatBRL(f.netCents)} />
-            </div>
+            </KpiStrip>
             <Card>
               <h2 className="mb-4 text-lg font-extrabold">{realized ? 'Resultado por ' : 'Resultado previsto por '}{f.bucket === 'dia' ? 'dia' : 'semana'}</h2>
               <FlowColumns buckets={f.buckets} label={realized ? 'Fluxo de caixa realizado' : `Fluxo de caixa previsto para ${days} dias`} />

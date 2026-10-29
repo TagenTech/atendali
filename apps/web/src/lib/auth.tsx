@@ -25,7 +25,7 @@ interface AuthContextValue {
 
 const AuthContext = React.createContext<AuthContextValue | null>(null);
 
-const PUBLIC_ENTRY = ['/login', '/login/2fa', '/cadastro', '/esqueci-senha', '/redefinir-senha'];
+const PUBLIC_ENTRY = ['/', '/login', '/login/2fa', '/cadastro', '/esqueci-senha', '/redefinir-senha'];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();

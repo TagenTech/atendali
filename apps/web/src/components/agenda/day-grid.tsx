@@ -144,7 +144,7 @@ export function DayGrid({
   };
 
   return (
-    <div className="overflow-x-auto rounded-3xl border border-border bg-card shadow-soft">
+    <div className="overflow-x-auto rounded-3xl border border-border bg-card">
       <div className="min-w-full" style={{ width: columns.length > 1 ? `max(100%, ${3.5 + columns.length * 10}rem)` : undefined }}>
         {/* Cabeçalho das colunas */}
         <div className="sticky top-0 z-20 flex border-b border-border bg-card/95 backdrop-blur">
@@ -168,6 +168,15 @@ export function DayGrid({
                 {hhmm(m)}
               </span>
             ))}
+            {nowPlace && columns.some((c) => c.date === today) && nowPlace.minutes >= start && nowPlace.minutes <= end ? (
+              <span
+                className="absolute right-1 z-20 rounded bg-pink px-1 py-px text-[10px] font-bold tabular text-white"
+                style={{ top: Math.max(0, top(nowPlace.minutes) - 8) }}
+                aria-hidden
+              >
+                {hhmm(nowPlace.minutes)}
+              </span>
+            ) : null}
           </div>
 
           {columns.map((c, ci) => {
@@ -241,7 +250,7 @@ export function DayGrid({
                       }}
                       aria-label={`${hhmm(s)} ${a.clientName} — ${a.serviceName} (${APPOINTMENT_STATUS_LABEL[a.status]})`}
                       className={cn(
-                        'absolute inset-x-1 z-10 overflow-hidden rounded-xl px-2 py-1 text-left text-xs shadow-soft ring-1 ring-black/5 transition-[filter] hover:brightness-95',
+                        'absolute inset-x-1 z-10 overflow-hidden rounded-lg border-l-[3px] border-l-current px-2 py-1 text-left text-[13px] leading-tight transition-[filter] hover:brightness-95',
                         draggable && 'lg:cursor-grab',
                         dragging?.moved && 'z-30 cursor-grabbing opacity-90 shadow-float ring-2 ring-primary',
                         custom,
@@ -269,8 +278,8 @@ export function DayGrid({
 
                 {nowPlace && c.date === today && nowPlace.minutes >= start && nowPlace.minutes <= end ? (
                   <div className="pointer-events-none absolute inset-x-0 z-10 flex items-center" style={{ top: top(nowPlace.minutes) }} aria-hidden>
-                    <span className="-ml-1 size-2.5 rounded-full bg-danger" />
-                    <span className="h-0.5 flex-1 bg-danger" />
+                    <span className="-ml-1 size-2.5 rounded-full bg-pink" />
+                    <span className="h-0.5 flex-1 bg-pink" />
                   </div>
                 ) : null}
               </div>

@@ -23,7 +23,7 @@ import { useFieldErrors } from '@/lib/use-field-errors';
 import { useFinanceAccounts, useFinanceCategories } from '@/lib/queries/ledger';
 import { useToday } from '@/lib/use-today';
 
-const SELECT = 'h-13 w-full rounded-2xl border-2 border-input bg-card px-3';
+const SELECT = 'h-13 w-full rounded-2xl border border-input bg-card px-3';
 
 function CategorySelect({ id, type, value, onChange }: { id: string; type: 'DESPESA' | 'RECEITA'; value: string; onChange: (v: string) => void }) {
   const { data } = useFinanceCategories();
@@ -263,7 +263,7 @@ export function CategoriesSheet({ onOpenChange }: { onOpenChange: (v: boolean) =
       <div className="space-y-5">
         {(['DESPESA', 'RECEITA'] as const).map((t) => (
           <section key={t} aria-label={t === 'DESPESA' ? 'Despesas' : 'Receitas'} className="space-y-2">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">{t === 'DESPESA' ? 'Despesas' : 'Receitas'}</h3>
+            <h3 className="text-sm font-extrabold text-foreground">{t === 'DESPESA' ? 'Despesas' : 'Receitas'}</h3>
             {(data ?? [])
               .filter((c) => c.type === t)
               .map((c) => (
@@ -308,7 +308,7 @@ export function CategoriesSheet({ onOpenChange }: { onOpenChange: (v: boolean) =
             <Input id="cat-new" maxLength={80} value={name} invalid={!!errors['cat-new']} onChange={(e) => (setName(e.target.value), clear('cat-new'))} />
           </Field>
           <div className="flex gap-2">
-            <select aria-label="Tipo da categoria" value={type} onChange={(e) => setType(e.target.value as 'DESPESA' | 'RECEITA')} className="h-12 flex-1 rounded-2xl border-2 border-input bg-card px-3">
+            <select aria-label="Tipo da categoria" value={type} onChange={(e) => setType(e.target.value as 'DESPESA' | 'RECEITA')} className="h-12 flex-1 rounded-2xl border border-input bg-card px-3">
               <option value="DESPESA">Despesa</option>
               <option value="RECEITA">Receita</option>
             </select>

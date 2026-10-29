@@ -4,7 +4,7 @@ import { initials } from '@skedulei/contracts';
 import { LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LogoMark } from '@/components/brand/logo';
+import { Wordmark } from '@/components/brand/logo';
 import { useAuth } from '@/lib/auth';
 import { useOrg } from '@/lib/org';
 import { cn } from '@/lib/utils';
@@ -21,9 +21,8 @@ export function Sidebar() {
 
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col border-r border-border bg-card lg:flex">
-      <div className="flex items-center gap-2.5 px-5 pb-3 pt-5">
-        <LogoMark className="size-9" />
-        <span className="font-display text-xl font-black">Skedulei</span>
+      <div className="px-5 pb-3 pt-5">
+        <Wordmark />
       </div>
       <div className="px-3">
         <OrgSwitcher />
@@ -39,8 +38,10 @@ export function Sidebar() {
                   href={href}
                   aria-current={active ? 'page' : undefined}
                   className={cn(
-                    'flex items-center gap-3 rounded-2xl px-3 py-2.5 font-semibold transition-colors',
-                    active ? 'bg-primary-soft text-primary-soft-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                    'flex items-center gap-3 rounded-2xl border-l-[3px] px-3 py-2.5 font-semibold transition-colors',
+                    active
+                      ? 'border-primary bg-primary-soft text-primary-soft-foreground'
+                      : 'border-transparent text-muted-foreground hover:bg-muted hover:text-foreground',
                   )}
                 >
                   <Icon className="size-5" strokeWidth={active ? 2.4 : 2} />
@@ -61,7 +62,7 @@ export function Sidebar() {
               isActive(pathname, '/mais') && 'bg-muted',
             )}
           >
-            <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#8f7cf8] to-[#f28db8] text-sm font-black text-white">
+            <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary-soft text-sm font-extrabold text-primary-soft-foreground">
               {initials(user.name)}
             </span>
             <span className="min-w-0">

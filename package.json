@@ -10,8 +10,9 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
+    "test:cov": "turbo run test:cov",
     "clean": "turbo run clean",
-    "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm --filter @skedulei/api test:e2e && pnpm build && pnpm --filter @skedulei/web test:e2e",
+    "verify": "pnpm typecheck && pnpm lint && pnpm test:cov && pnpm build && pnpm --filter @skedulei/web test:e2e",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "api:create-user": "pnpm --filter @skedulei/api create-user"

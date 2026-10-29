@@ -1,12 +1,12 @@
 'use client';
 
-import { AUDIT_ACTION_LABEL, AUDIT_GROUP_KEYS, AUDIT_GROUPS, Permission, ROLE_INFO, type AuditGroup, type Role } from '@skedulei/contracts';
+import { AUDIT_ACTION_LABEL, AUDIT_GROUP_KEYS, AUDIT_GROUPS, Permission, ROLE_INFO, type AuditAction, type AuditGroup, type Role } from '@skedulei/contracts';
 import { ShieldCheck } from 'lucide-react';
 import * as React from 'react';
 import { PageHeader } from '@/components/layout/page-header';
-import { Card } from '@/components/ui/card';
 import { Chip } from '@/components/ui/chip';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Ledger, LedgerTable, tdClass, thClass, theadClass } from '@/components/ui/ledger';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useOrg } from '@/lib/org';
 import { useAudit } from '@/lib/queries/audit';
@@ -20,6 +20,14 @@ const PERIODS = [
 ];
 // Ações que merecem olho atento: dinheiro que volta, some ou muda de valor.
 const WATCH = new Set(['ORDER_CANCELLED', 'ORDER_DISCOUNT', 'PAYMENT_REMOVED', 'ORDER_ITEM_REMOVED', 'PAYABLE_REMOVED', 'RECEIVABLE_REMOVED', 'PAYABLE_REOPENED', 'RECEIVABLE_REOPENED']);
+
+function ActionPill({ action }: { action: AuditAction }) {
+  return (
+    <span className={cn('inline-block rounded-full px-2 py-0.5 text-xs font-bold', WATCH.has(action) ? 'bg-warning-soft text-warning-soft-foreground' : 'bg-muted text-muted-foreground')}>
+      {AUDIT_ACTION_LABEL[action]}
+    </span>
+  );
+}
 
 /** Atividade: quem fez o quê no dinheiro (só o dono). Registro que ninguém edita nem apaga. */
 export default function AtividadePage() {
@@ -56,23 +64,54 @@ export default function AtividadePage() {
         {isLoading ? (
           <Skeleton className="h-48 rounded-3xl" />
         ) : !data?.length ? (
-          <EmptyState emoji="🛡️" title="Nada por aqui" description="Nenhuma ação desse tipo nos últimos dias." />
+          <EmptyState title="Nada por aqui" description="Nenhuma ação desse tipo nos últimos dias." />
         ) : (
-          <Card className="divide-y divide-border p-0">
-            {data.map((e) => (
-              <article key={e.id} className="flex flex-col gap-1 px-4 py-3.5 lg:grid lg:grid-cols-[11rem_minmax(0,1fr)_14rem] lg:items-center lg:gap-4">
-                <span className="text-xs text-muted-foreground lg:text-sm">{when.format(new Date(e.createdAt))}</span>
-                <span className="min-w-0">
-                  <span className={cn('mr-2 inline-block rounded-full px-2 py-0.5 text-xs font-bold', WATCH.has(e.action) ? 'bg-warning-soft text-warning-soft-foreground' : 'bg-muted text-muted-foreground')}>{AUDIT_ACTION_LABEL[e.action]}</span>
-                  <span className="break-words">{e.summary}</span>
-                </span>
-                <span className="text-sm text-muted-foreground lg:text-right">
-                  {e.actorName}
-                  {e.actorRole ? ` · ${ROLE_INFO[e.actorRole as Role]?.label ?? e.actorRole}` : ''}
-                </span>
-              </article>
-            ))}
-          </Card>
+          <Ledger>
+            <div className="hidden overflow-x-auto lg:block">
+              <LedgerTable caption="Registro de atividade">
+                <thead className={theadClass}>
+                  <tr>
+                    <th className={thClass}>Quando</th>
+                    <th className={thClass}>Ação</th>
+                    <th className={thClass}>O que aconteceu</th>
+                    <th className={`${thClass} text-right`}>Quem</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {data.map((e) => (
+                    <tr key={e.id}>
+                      <td className={`${tdClass} whitespace-nowrap text-muted-foreground`}>{when.format(new Date(e.createdAt))}</td>
+                      <td className={tdClass}>
+                        <ActionPill action={e.action} />
+                      </td>
+                      <td className={`${tdClass} max-w-xl`}>{e.summary}</td>
+                      <td className={`${tdClass} text-right text-sm text-muted-foreground`}>
+                        {e.actorName}
+                        {e.actorRole ? ` · ${ROLE_INFO[e.actorRole as Role]?.label ?? e.actorRole}` : ''}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </LedgerTable>
+            </div>
+            <div className="divide-y divide-border lg:hidden">
+              {data.map((e) => (
+                <article key={e.id} className="flex flex-col gap-1 px-4 py-3.5">
+                  <span className="text-xs text-muted-foreground">{when.format(new Date(e.createdAt))}</span>
+                  <span className="min-w-0">
+                    <span className="mr-2">
+                      <ActionPill action={e.action} />
+                    </span>
+                    <span className="break-words">{e.summary}</span>
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    {e.actorName}
+                    {e.actorRole ? ` · ${ROLE_INFO[e.actorRole as Role]?.label ?? e.actorRole}` : ''}
+                  </span>
+                </article>
+              ))}
+            </div>
+          </Ledger>
         )}
       </div>
     </>

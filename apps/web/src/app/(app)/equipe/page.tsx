@@ -20,7 +20,7 @@ const STATUS_TONE: Record<MemberStatus, string> = {
 
 function Avatar({ m }: { m: MemberDto }) {
   return (
-    <span style={memberColor(m.color)} className="grid size-11 shrink-0 place-items-center rounded-2xl font-display font-black">
+    <span style={memberColor(m.color)} className="grid size-11 shrink-0 place-items-center rounded-2xl font-display font-extrabold">
       {initials(m.name)}
     </span>
   );
@@ -63,7 +63,7 @@ export default function EquipePage() {
           <>
             <Card className="hidden overflow-x-auto p-0 lg:block">
               <table className="w-full text-left">
-                <thead className="bg-muted text-xs uppercase tracking-wider text-muted-foreground">
+                <thead className="border-b border-border text-xs font-semibold text-muted-foreground">
                   <tr>
                     <th className="px-5 py-3 font-bold">Pessoa</th>
                     <th className="px-5 py-3 font-bold">Perfil</th>

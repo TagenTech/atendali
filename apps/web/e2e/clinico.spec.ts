@@ -14,14 +14,23 @@ test.describe('módulo clínico: prontuário, anamnese e termo', () => {
     await page.goto(`/clientes/${client.id}`);
     // ---- prontuário
     const prontuario = page.getByRole('region', { name: 'Prontuário' });
-    await expect(prontuario.getByText('Nenhuma anotação ainda.')).toBeVisible();
+    await expect(prontuario.getByText('Ainda não há evolução, prescrição ou atestado.')).toBeVisible();
     await prontuario.getByRole('button', { name: 'Nova anotação' }).click();
     await page.getByRole('button', { name: 'Salvar anotação' }).click();
     await expect(page.getByText('Escreva a anotação')).toBeVisible();
-    await page.getByLabel('Evolução').fill('Febre há 2 dias. Orientado repouso e hidratação.');
+    await page.getByLabel('Queixa').fill('Febre há 2 dias. Orientado repouso e hidratação.');
     await page.getByRole('button', { name: 'Salvar anotação' }).click();
     await expect(page.getByText('Anotação salva')).toBeVisible();
     await expect(prontuario.getByText('Febre há 2 dias. Orientado repouso e hidratação.')).toBeVisible();
+    await prontuario.getByRole('button', { name: 'Nova anotação' }).click();
+    const ficha = page.getByRole('dialog');
+    await ficha.getByRole('button', { name: 'Prescrição' }).click();
+    await ficha.getByRole('button', { name: 'Salvar anotação' }).click();
+    await expect(page.getByText('Inclua ao menos um medicamento')).toBeVisible();
+    await ficha.getByLabel('Medicamento 1').fill('Dipirona 500 mg');
+    await ficha.getByRole('button', { name: 'Salvar anotação' }).click();
+    await expect(page.getByText('Anotação salva')).toBeVisible();
+    await expect(prontuario.getByText(/Dipirona 500 mg/)).toBeVisible();
     if (test.info().project.name === 'celular') await expectNoHorizontalScroll(page, 'ficha com prontuário');
 
     // ---- anamnese pelo link do paciente
@@ -57,7 +66,7 @@ test.describe('módulo clínico: prontuário, anamnese e termo', () => {
     await expect(doc.getByText('Preenchido', { exact: true })).toBeVisible();
     await doc.getByRole('button', { name: /^Ver: Anamnese/ }).click();
     await expect(page.getByText('Tosse e febre')).toBeVisible();
-    await expect(page.getByText('Dipirona')).toBeVisible();
+    await expect(page.getByRole('dialog').getByText('Dipirona', { exact: true })).toBeVisible();
     await page.keyboard.press('Escape');
 
     // ---- termo: exige aceite e nome

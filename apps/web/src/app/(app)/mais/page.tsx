@@ -57,7 +57,7 @@ function Row({
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h2 className="mb-2 px-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">{title}</h2>
+      <h2 className="mb-2 px-1 text-sm font-extrabold text-foreground">{title}</h2>
       <Card className="p-2">{children}</Card>
     </section>
   );
@@ -76,7 +76,7 @@ export default function MaisPage() {
         {user ? (
           <Link href="/mais/perfil" className="block">
             <Card className="flex items-center gap-4 transition-colors hover:bg-muted">
-              <span className="grid size-16 shrink-0 place-items-center rounded-[1.4rem] bg-gradient-to-br from-[#8f7cf8] to-[#f28db8] font-display text-2xl font-black text-white">
+              <span className="grid size-16 shrink-0 place-items-center rounded-[1.4rem] bg-gradient-to-br from-[#8f7cf8] to-[#f28db8] font-display text-2xl font-extrabold text-white">
                 {initials(user.name)}
               </span>
               <div className="min-w-0 flex-1">
@@ -125,7 +125,7 @@ export default function MaisPage() {
         </Group>
 
         <section>
-          <h2 className="mb-2 px-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Aparência</h2>
+          <h2 className="mb-2 px-1 text-sm font-extrabold text-foreground">Aparência</h2>
           <ThemePicker />
         </section>
 

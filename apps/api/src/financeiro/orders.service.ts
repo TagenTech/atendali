@@ -193,7 +193,9 @@ export class OrdersService {
         if (dto.clientId && !(await em.getRepository(Client).exists({ where: { id: dto.clientId, organizationId: org.organizationId } }))) {
           throw new NotFoundException('Cliente não encontrado');
         }
+        // `client` vem carregado: é ele que o TypeORM grava, então trocamos os dois (senão a troca não pega).
         o.clientId = dto.clientId;
+        o.client = dto.clientId ? ({ id: dto.clientId } as Client) : null;
       }
       const discountBefore = o.discountCents;
       if (dto.discountCents !== undefined) o.discountCents = dto.discountCents;

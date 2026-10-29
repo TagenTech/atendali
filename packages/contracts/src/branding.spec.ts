@@ -1,4 +1,4 @@
-import { BRAND_COLORS, isBrandColor, sniffImageMime } from './branding';
+import { BRAND_COLORS, brandHex, canonicalizeBrandColor, isBrandColor, isBrandColorValue, isBrandHex, sniffImageMime } from './branding';
 
 describe('branding', () => {
   it('reconhece png, jpeg e webp pelos bytes', () => {
@@ -12,10 +12,27 @@ describe('branding', () => {
     expect(sniffImageMime(new TextEncoder().encode('<html><script>alert(1)</script>'))).toBeNull();
     expect(sniffImageMime(new Uint8Array())).toBeNull();
   });
-  it('só aceita as cores da paleta', () => {
+  it('só aceita as cores da paleta ou um tom #rrggbb', () => {
     expect(isBrandColor('rosa')).toBe(true);
     expect(isBrandColor('#ff0000')).toBe(false);
     expect(isBrandColor('constructor')).toBe(false);
+    expect(isBrandHex('#ff0000')).toBe(true);
+    expect(isBrandHex('#FF0000')).toBe(false);
+    expect(isBrandHex('#fff')).toBe(false);
+    expect(isBrandColorValue('rosa')).toBe(true);
+    expect(isBrandColorValue('#00aabb')).toBe(true);
+    expect(isBrandColorValue('constructor')).toBe(false);
     expect(Object.values(BRAND_COLORS).every((c) => /^#[0-9a-f]{6}$/.test(c.hex))).toBe(true);
+  });
+
+  it('resolve e normaliza o tom da página pública', () => {
+    expect(brandHex(null)).toBeNull();
+    expect(brandHex('rosa')).toBe('#d6409f');
+    expect(brandHex('#00aabb')).toBe('#00aabb');
+    expect(brandHex('constructor')).toBeNull();
+    expect(canonicalizeBrandColor(null)).toBeNull();
+    expect(canonicalizeBrandColor('azul')).toBe('azul');
+    expect(canonicalizeBrandColor('#d6409f')).toBe('rosa');
+    expect(canonicalizeBrandColor('#112233')).toBe('#112233');
   });
 });

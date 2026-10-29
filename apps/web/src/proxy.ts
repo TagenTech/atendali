@@ -39,14 +39,14 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hasSession = request.cookies.has(REFRESH_COOKIE);
 
-  if (ENTRY.includes(pathname) && hasSession) return NextResponse.redirect(new URL('/inicio', request.url));
-  const isProtected = pathname === '/' || PROTECTED.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  // A raiz é a página comercial: com sessão, vai direto para o app.
+  if ((ENTRY.includes(pathname) || pathname === '/') && hasSession) return NextResponse.redirect(new URL('/inicio', request.url));
+  const isProtected = PROTECTED.some((p) => pathname === p || pathname.startsWith(`${p}/`));
   if (isProtected && !hasSession) {
     const url = new URL('/login', request.url);
-    if (pathname !== '/') url.searchParams.set('next', pathname);
+    url.searchParams.set('next', pathname);
     return NextResponse.redirect(url);
   }
-  if (pathname === '/') return NextResponse.redirect(new URL('/inicio', request.url));
 
   const nonce = btoa(crypto.randomUUID());
   const csp = contentSecurityPolicy(nonce);

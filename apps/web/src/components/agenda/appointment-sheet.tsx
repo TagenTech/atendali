@@ -183,7 +183,7 @@ export function AppointmentSheet({
         {a.status !== 'CANCELADO' && a.status !== 'CONCLUIDO' ? (
           moving ? (
             <form
-              className="space-y-3 rounded-2xl border-2 border-input p-4"
+              className="space-y-3 rounded-2xl border border-input p-4"
               onSubmit={(e) => {
                 e.preventDefault();
                 void run(
@@ -203,7 +203,7 @@ export function AppointmentSheet({
               </div>
               {professionals.length > 1 ? (
                 <Field label="Profissional" htmlFor="mv-member">
-                  <select id="mv-member" value={memberId} onChange={(e) => setMemberId(e.target.value)} className="h-13 w-full rounded-2xl border-2 border-input bg-card px-3">
+                  <select id="mv-member" value={memberId} onChange={(e) => setMemberId(e.target.value)} className="h-13 w-full rounded-2xl border border-input bg-card px-3">
                     {professionals.map((p) => (
                       <option key={p.id} value={p.id}>
                         {p.name}

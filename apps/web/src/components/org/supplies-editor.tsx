@@ -51,7 +51,7 @@ export function SuppliesEditor({ serviceId }: { serviceId: string }) {
                 aria-label="Insumo"
                 value={r.productId}
                 onChange={(e) => patch(i, { productId: e.target.value })}
-                className="h-11 min-w-0 flex-1 rounded-xl border-2 border-input bg-card px-2 outline-none focus:border-primary"
+                className="h-11 min-w-0 flex-1 rounded-xl border border-input bg-card px-2 outline-none focus:border-primary"
               >
                 <option value="">Escolha…</option>
                 {products

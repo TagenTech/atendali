@@ -7,11 +7,13 @@ import { useRouter } from 'next/navigation';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { CloseCashSheet, MovementSheet } from '@/components/finance/cash-sheets';
+import { Kpi, KpiStrip } from '@/components/finance/kpi';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Field } from '@/components/ui/field';
+import { Ledger, LedgerTable, tdClass, thClass, theadClass } from '@/components/ui/ledger';
 import { MoneyInput } from '@/components/ui/money-input';
 import { Skeleton } from '@/components/ui/skeleton';
 import * as fin from '@/lib/api/finance';
@@ -19,12 +21,11 @@ import { errorText } from '@/lib/api/client';
 import { useOrg } from '@/lib/org';
 import { useCash, useFinanceMutation, useOrders } from '@/lib/queries/finance';
 import { useHydrated } from '@/lib/use-hydrated';
-import { cn } from '@/lib/utils';
 
 function OrderRow({ o, tz }: { o: OrderSummaryDto; tz: string }) {
   return (
     <Link href={`/caixa/${o.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/60">
-      <span className="w-12 shrink-0 font-display font-black tabular text-muted-foreground">#{o.number}</span>
+      <span className="w-12 shrink-0 font-display font-extrabold tabular text-muted-foreground">#{o.number}</span>
       <span className="min-w-0 flex-1">
         <span className="block truncate font-semibold">{o.clientName ?? 'Sem cliente'}</span>
         <span className="block text-sm text-muted-foreground">
@@ -37,6 +38,57 @@ function OrderRow({ o, tz }: { o: OrderSummaryDto; tz: string }) {
       </span>
       <ChevronRight className="size-5 text-muted-foreground" />
     </Link>
+  );
+}
+
+function OrderLedger({ orders, tz, caption }: { orders: OrderSummaryDto[]; tz: string; caption: string }) {
+  return (
+    <Ledger>
+      <div className="hidden overflow-x-auto lg:block">
+        <LedgerTable caption={caption}>
+          <thead className={theadClass}>
+            <tr>
+              <th className={thClass}>Nº</th>
+              <th className={thClass}>Cliente</th>
+              <th className={thClass}>Situação</th>
+              <th className={thClass}>Hora</th>
+              <th className={`${thClass} text-right`}>Total</th>
+              <th className={thClass} />
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {orders.map((o) => (
+              <tr key={o.id} className="hover:bg-muted/40">
+                <td className={`${tdClass} font-display font-extrabold tabular text-muted-foreground`}>
+                  <Link href={`/caixa/${o.id}`} className="hover:underline">
+                    #{o.number}
+                  </Link>
+                </td>
+                <td className={`${tdClass} font-semibold`}>
+                  <Link href={`/caixa/${o.id}`}>{o.clientName ?? 'Sem cliente'}</Link>
+                </td>
+                <td className={`${tdClass} text-sm text-muted-foreground`}>{ORDER_STATUS_LABEL[o.status]}</td>
+                <td className={`${tdClass} tabular text-muted-foreground`}>{zonedParts(new Date(o.closedAt ?? o.openedAt), tz).time}</td>
+                <td className={`${tdClass} text-right font-display font-extrabold tabular`}>
+                  {formatBRL(o.totalCents)}
+                  {o.status === 'ABERTA' && o.paidCents ? <span className="ml-1 text-xs font-semibold text-muted-foreground">pago {formatBRL(o.paidCents)}</span> : null}
+                </td>
+                <td className={`${tdClass} text-right`}>
+                  <Link href={`/caixa/${o.id}`} aria-label={`Abrir comanda ${o.number}`} className="inline-grid size-8 place-items-center rounded-xl text-muted-foreground hover:bg-muted">
+                    <ChevronRight className="size-5" />
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </LedgerTable>
+      </div>
+      <div className="divide-y divide-border lg:hidden">
+        {orders.map((o) => (
+          <OrderRow key={o.id} o={o} tz={tz} />
+        ))}
+      </div>
+    </Ledger>
   );
 }
 
@@ -84,22 +136,19 @@ export default function CaixaPage() {
           {isLoading ? (
             <Skeleton className="h-48 rounded-3xl" />
           ) : cash ? (
-            <Card className="space-y-4">
-              <div className="flex items-center gap-2 text-sm font-bold text-success">
+            <div className="space-y-4">
+              <p className="flex items-center gap-2 px-1 text-sm font-bold text-success">
                 <Unlock className="size-4" /> Caixa aberto
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Esperado na gaveta</p>
-                <p className="font-display text-3xl font-black tabular">{formatBRL(cash.expected.drawerCents)}</p>
-              </div>
-              <dl className="grid grid-cols-2 gap-2 text-sm">
+              </p>
+              <KpiStrip cols={2}>
+                <Kpi label="Esperado na gaveta" value={formatBRL(cash.expected.drawerCents)} />
+                <Kpi label="Recebido hoje" value={formatBRL(dayTotal)} hint={`${closedToday.data?.length ?? 0} comandas`} />
+              </KpiStrip>
+              <KpiStrip cols={2}>
                 {(['PIX', 'CARTAO_CREDITO', 'CARTAO_DEBITO', 'DINHEIRO'] as const).map((m) => (
-                  <div key={m} className="rounded-xl bg-muted px-3 py-2">
-                    <dt className="text-muted-foreground">{PAYMENT_METHOD_LABEL[m]}</dt>
-                    <dd className="font-semibold tabular">{formatBRL(cash.expected.byMethod[m])}</dd>
-                  </div>
+                  <Kpi key={m} label={PAYMENT_METHOD_LABEL[m]} value={formatBRL(cash.expected.byMethod[m])} />
                 ))}
-              </dl>
+              </KpiStrip>
               <div className="grid grid-cols-2 gap-2">
                 <Button variant="outline" size="sm" onClick={() => setMoving('SANGRIA')}>
                   <ArrowUpFromLine /> Sangria
@@ -111,7 +160,7 @@ export default function CaixaPage() {
               <Button variant="danger" block onClick={() => setClosing(true)}>
                 <Lock /> Fechar caixa
               </Button>
-            </Card>
+            </div>
           ) : (
             <Card className="space-y-4">
               <div className="flex items-center gap-2 text-sm font-bold text-muted-foreground">
@@ -139,33 +188,33 @@ export default function CaixaPage() {
               </form>
             </Card>
           )}
-          <Card className="flex items-center justify-between">
-            <span>
-              <span className="block text-sm text-muted-foreground">Recebido hoje</span>
-              <span className="font-display text-2xl font-black tabular">{formatBRL(dayTotal)}</span>
-            </span>
-            <span className="text-right text-sm text-muted-foreground">{closedToday.data?.length ?? 0} comandas</span>
-          </Card>
+          {!cash ? (
+            <Ledger className="flex items-center justify-between px-5 py-4">
+              <span>
+                <span className="block text-sm text-muted-foreground">Recebido hoje</span>
+                <span className="font-display text-2xl font-extrabold tabular">{formatBRL(dayTotal)}</span>
+              </span>
+              <span className="text-right text-sm text-muted-foreground">{closedToday.data?.length ?? 0} comandas</span>
+            </Ledger>
+          ) : null}
         </div>
 
         <div className="space-y-6">
           <section>
-            <h2 className="mb-2 px-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Comandas abertas · {open.data?.length ?? 0}</h2>
+            <h2 className="mb-2 px-1 text-sm font-extrabold text-foreground">Comandas abertas · {open.data?.length ?? 0}</h2>
             {open.data?.length ? (
-              <Card className="divide-y divide-border p-0">
-                {open.data.map((o) => (
-                  <OrderRow key={o.id} o={o} tz={tz} />
-                ))}
-              </Card>
+              <OrderLedger orders={open.data} tz={tz} caption="Comandas abertas" />
             ) : (
-              <EmptyState emoji="🧾" title="Nenhuma comanda aberta" description='Na agenda, abra a comanda pelo atendimento ("Abrir comanda") ou crie uma aqui.' className="py-6" />
+              <EmptyState title="Nenhuma comanda aberta" description='Na agenda, abra a comanda pelo atendimento ("Abrir comanda") ou crie uma aqui.' className="py-6" />
             )}
           </section>
           <section>
-            <h2 className="mb-2 px-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Pagas hoje</h2>
-            <Card className={cn('divide-y divide-border p-0', !closedToday.data?.length && 'p-4 text-center text-muted-foreground')}>
-              {closedToday.data?.length ? closedToday.data.map((o) => <OrderRow key={o.id} o={o} tz={tz} />) : 'Nada por enquanto.'}
-            </Card>
+            <h2 className="mb-2 px-1 text-sm font-extrabold text-foreground">Pagas hoje</h2>
+            {closedToday.data?.length ? (
+              <OrderLedger orders={closedToday.data} tz={tz} caption="Comandas pagas hoje" />
+            ) : (
+              <p className="rounded-3xl border border-border bg-card p-4 text-center text-muted-foreground">Nada por enquanto.</p>
+            )}
           </section>
         </div>
       </div>

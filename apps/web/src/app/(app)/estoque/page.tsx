@@ -3,7 +3,7 @@
 import { formatBRL, Permission, PRODUCT_KIND_LABEL, STOCK_MOVEMENT_LABEL, STOCK_STATUS_LABEL, type ProductDto, type StockStatus } from '@skedulei/contracts';
 import { ArrowDownUp, Plus, Search } from 'lucide-react';
 import * as React from 'react';
-import { Kpi } from '@/components/finance/kpi';
+import { Kpi, KpiStrip } from '@/components/finance/kpi';
 import { PageHeader } from '@/components/layout/page-header';
 import { MovementSheet } from '@/components/org/movement-sheet';
 import { ProductSheet } from '@/components/org/product-sheet';
@@ -61,11 +61,11 @@ export default function EstoquePage() {
         }
       />
       <div className="space-y-4 px-5">
-        <div className="grid grid-cols-3 gap-3">
+        <KpiStrip>
           <Kpi label="Valor em estoque" value={report.data ? formatBRL(report.data.totalValueCents) : '—'} />
           <Kpi label="Abaixo do mínimo" value={report.data ? String(report.data.belowMinimum) : '—'} />
           <Kpi label="Zerados" value={report.data ? String(report.data.zeroed) : '—'} />
-        </div>
+        </KpiStrip>
 
         <div className="flex flex-wrap items-center gap-2">
           <Chip active={tab === 'produtos'} onClick={() => setTab('produtos')}>
@@ -90,7 +90,7 @@ export default function EstoquePage() {
           history.isLoading ? (
             <Skeleton className="h-40 rounded-3xl" />
           ) : !history.data?.length ? (
-            <EmptyState emoji="📦" title="Sem movimentações" description="Entradas, saídas e baixas das comandas aparecem aqui." />
+            <EmptyState title="Sem movimentações" description="Entradas, saídas e baixas das comandas aparecem aqui." />
           ) : (
             <Card className="divide-y divide-border p-0">
               {history.data.map((m) => (
@@ -122,7 +122,6 @@ export default function EstoquePage() {
           </div>
         ) : !visible.length ? (
           <EmptyState
-            emoji="📦"
             title={q || onlyLow ? 'Nada encontrado' : 'Nenhum produto ainda'}
             description={q || onlyLow ? 'Tente outro filtro.' : 'Cadastre os produtos que vende e os insumos que usa nos atendimentos.'}
             action={!q && !onlyLow && canEdit ? <Button onClick={() => setEditing({ product: null, key: Date.now() })}>Cadastrar</Button> : undefined}
@@ -131,7 +130,7 @@ export default function EstoquePage() {
           <>
             <Card className="hidden overflow-x-auto p-0 lg:block">
               <table className="w-full text-left">
-                <thead className="bg-muted text-xs uppercase tracking-wider text-muted-foreground">
+                <thead className="border-b border-border text-xs font-semibold text-muted-foreground">
                   <tr>
                     <th className="px-5 py-3 font-bold">Produto</th>
                     <th className="px-5 py-3 font-bold">Tipo</th>

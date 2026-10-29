@@ -52,7 +52,7 @@ export function ReschedulePicker({
               className={cn('flex w-14 shrink-0 flex-col items-center rounded-2xl border-2 py-1.5', date === d ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card')}
             >
               <span className="text-[11px] font-bold uppercase">{d === today ? 'hoje' : WEEKDAYS[new Date(`${d}T00:00:00Z`).getUTCDay()]}</span>
-              <span className="font-display text-lg font-black">{dd}</span>
+              <span className="font-display text-lg font-extrabold">{dd}</span>
             </button>
           );
         })}

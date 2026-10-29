@@ -16,7 +16,8 @@
     "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
-    "test": "jest"
+    "test": "jest",
+    "test:cov": "jest --coverage"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
@@ -30,6 +31,25 @@
     "transform": {
       "^.+\\.ts$": "ts-jest"
     },
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "**/*.ts",
+      "!**/*.spec.ts",
+      "!index.ts"
+    ],
+    "coverageDirectory": "../coverage",
+    "coverageReporters": [
+      "text-summary",
+      "text",
+      "json-summary"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 90,
+        "branches": 90,
+        "functions": 90,
+        "lines": 90
+      }
+    }
   }
 }

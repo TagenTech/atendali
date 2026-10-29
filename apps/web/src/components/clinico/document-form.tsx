@@ -71,7 +71,7 @@ export function DocumentForm({
                 ))}
               </div>
             ) : q.type === 'ESCOLHA' ? (
-              <select id={`q-${q.id}`} value={answers[q.id] ?? ''} onChange={(e) => set(q.id, e.target.value)} className="h-13 w-full rounded-2xl border-2 border-input bg-card px-3">
+              <select id={`q-${q.id}`} value={answers[q.id] ?? ''} onChange={(e) => set(q.id, e.target.value)} className="h-13 w-full rounded-2xl border border-input bg-card px-3">
                 <option value="">Escolha…</option>
                 {(q.options ?? []).map((o) => (
                   <option key={o} value={o}>

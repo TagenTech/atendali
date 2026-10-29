@@ -107,7 +107,7 @@ export default function PerfilPage() {
                 id="pf-uf"
                 value={uf}
                 onChange={(e) => setUf(e.target.value)}
-                className="h-13 w-full rounded-2xl border-2 border-input bg-card px-3 text-base outline-none focus:border-primary"
+                className="h-13 w-full rounded-2xl border border-input bg-card px-3 text-base outline-none focus:border-primary"
               >
                 <option value="">—</option>
                 {UFS.map((u) => (
@@ -121,7 +121,7 @@ export default function PerfilPage() {
         </Card>
 
         <section>
-          <h2 className="mb-2 px-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Acesso</h2>
+          <h2 className="mb-2 px-1 text-sm font-extrabold text-foreground">Acesso</h2>
           <Card className="space-y-3">
             <div className="flex items-center gap-3">
               {user?.emailVerified ? <ShieldCheck className="size-5 text-success" /> : <MailWarning className="size-5 text-warning" />}

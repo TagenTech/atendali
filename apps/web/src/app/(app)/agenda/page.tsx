@@ -111,10 +111,10 @@ function Agenda() {
           <p className="text-sm font-medium text-muted-foreground">
             {subtitle} · {total} {total === 1 ? 'horário' : 'horários'}
           </p>
-          <h1 className="truncate text-3xl font-black">{title}</h1>
+          <h1 className="truncate text-3xl font-extrabold tracking-tight">{title}</h1>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex rounded-2xl border-2 border-input bg-card p-0.5" role="group" aria-label="Visão">
+          <div className="flex rounded-2xl border border-input bg-card p-0.5" role="group" aria-label="Visão">
             {(['dia', 'semana'] as const).map((v) => (
               <button
                 key={v}
@@ -127,7 +127,7 @@ function Agenda() {
               </button>
             ))}
           </div>
-          <div className="flex items-center rounded-2xl border-2 border-input bg-card">
+          <div className="flex items-center rounded-2xl border border-input bg-card">
             <button type="button" aria-label={view === 'semana' ? 'Semana anterior' : 'Dia anterior'} onClick={() => go(addDays(date, -step))} className="grid size-10 place-items-center rounded-l-2xl hover:bg-muted">
               <ChevronLeft className="size-5" />
             </button>
@@ -143,14 +143,14 @@ function Agenda() {
             aria-label="Ir para o dia"
             value={date}
             onChange={(e) => e.target.value && go(e.target.value)}
-            className="h-11 rounded-2xl border-2 border-input bg-card px-3 text-sm"
+            className="h-11 rounded-2xl border border-input bg-card px-3 text-sm max-sm:w-[7.75rem] max-sm:px-2"
           />
-          <Button variant="outline" size="sm" className="relative h-11" onClick={() => setWaiting(true)}>
-            <Hourglass /> Espera
+          <Button variant="outline" size="sm" className="relative h-11 max-sm:px-2.5" onClick={() => setWaiting(true)}>
+            <Hourglass /> <span className="max-sm:sr-only">Espera</span>
             {waitlist.length ? (
               <span
                 className={cn(
-                  'grid min-w-5 place-items-center rounded-full px-1 text-xs font-black',
+                  'grid min-w-5 place-items-center rounded-full px-1 text-xs font-extrabold',
                   openSlots ? 'bg-success text-white' : 'bg-muted text-muted-foreground',
                 )}
               >
@@ -160,11 +160,11 @@ function Agenda() {
             ) : null}
           </Button>
           {day && view === 'dia' ? (
-            <Button variant="outline" size="sm" className="h-11" onClick={() => setBlocking(true)}>
-              <Lock /> Bloquear
+            <Button variant="outline" size="sm" className="h-11 max-sm:px-2.5" onClick={() => setBlocking(true)}>
+              <Lock /> <span className="max-sm:sr-only">Bloquear</span>
             </Button>
           ) : null}
-          <Button size="sm" className="h-11" onClick={() => setCreating({ date, memberId: selected ?? undefined, key: Date.now() })}>
+          <Button size="sm" className="h-11 max-sm:px-3" onClick={() => setCreating({ date, memberId: selected ?? undefined, key: Date.now() })}>
             <Plus /> Agendar
           </Button>
         </div>
@@ -191,7 +191,7 @@ function Agenda() {
         {isLoading || !day ? (
           <Skeleton className="h-[32rem] rounded-3xl" />
         ) : !pros.length ? (
-          <EmptyState emoji="🗓️" title="Ninguém atende ainda" description='Na Equipe, marque "Atende clientes" para quem tem agenda.' />
+          <EmptyState title="Ninguém atende ainda" description='Na Equipe, marque "Atende clientes" para quem tem agenda.' />
         ) : (
           <DayGrid
             day={day}

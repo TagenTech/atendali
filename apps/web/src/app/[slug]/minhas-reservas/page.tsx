@@ -169,7 +169,7 @@ export default function MinhasReservasPage() {
           return (
             <Card key={b.id} className="space-y-3">
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{b.patientName}</p>
+                <p className="text-xs font-bold text-muted-foreground">{b.patientName}</p>
                 <p className="font-display text-lg font-extrabold">{b.serviceName}</p>
                 <p>
                   {capitalize(formatDateLong(p.date, false))} às <strong>{p.time}</strong>

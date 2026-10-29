@@ -66,7 +66,6 @@ export default function ClientesPage() {
           <Skeleton className="h-64 rounded-3xl" />
         ) : !clients.length ? (
           <EmptyState
-            emoji="🙋"
             title={debounced ? 'Ninguém com esse nome' : `Nenhum ${vocab.client.toLowerCase()} ainda`}
             description={debounced ? 'Confira a grafia ou busque pelo celular.' : 'Eles aparecem aqui ao agendar ou ao cadastrar.'}
             action={canEdit && !debounced ? <Button onClick={() => setCreating(true)}>Cadastrar</Button> : undefined}
@@ -75,7 +74,7 @@ export default function ClientesPage() {
           <>
             <Card className="hidden overflow-x-auto p-0 lg:block">
               <table className="w-full text-left">
-                <thead className="bg-muted text-xs uppercase tracking-wider text-muted-foreground">
+                <thead className="border-b border-border text-xs font-semibold text-muted-foreground">
                   <tr>
                     <th className="px-5 py-3 font-bold">Nome</th>
                     <th className="px-5 py-3 font-bold">Celular</th>
@@ -111,7 +110,7 @@ export default function ClientesPage() {
             <Card className="divide-y divide-border p-0 lg:hidden">
               {clients.map((c) => (
                 <Link key={c.id} href={`/clientes/${c.id}`} className="flex items-center gap-3 px-4 py-3">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-primary-soft font-display text-sm font-black text-primary-soft-foreground">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-primary-soft font-display text-sm font-extrabold text-primary-soft-foreground">
                     {initials(c.name)}
                   </span>
                   <span className="min-w-0 flex-1">

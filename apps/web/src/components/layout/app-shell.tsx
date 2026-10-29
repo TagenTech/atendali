@@ -30,8 +30,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (status === 'unavailable') {
     return (
       <EmptyState
-        className="min-h-dvh justify-center"
-        emoji="🔌"
+        className="min-h-dvh justify-center lg:items-center lg:text-center"
         title="Não deu para conectar"
         description="O servidor não respondeu agora. Sua sessão continua salva."
         action={<Button onClick={() => window.location.reload()}>Tentar de novo</Button>}
@@ -58,8 +57,7 @@ function OrgGate({ children }: { children: React.ReactNode }) {
   if (state.status === 'error') {
     return (
       <EmptyState
-        className="min-h-dvh justify-center"
-        emoji="🔌"
+        className="min-h-dvh justify-center lg:items-center lg:text-center"
         title="Não deu para carregar"
         description="Confira sua internet e tente de novo."
         action={<Button onClick={state.retry}>Tentar de novo</Button>}
@@ -79,7 +77,7 @@ function OrgGate({ children }: { children: React.ReactNode }) {
           <main className="mx-auto max-w-lg lg:max-w-2xl lg:py-6">{children}</main>
         ) : (
           <>
-            <main className="mx-auto max-w-lg pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:max-w-6xl lg:px-6 lg:pb-12">{children}</main>
+            <main className="mx-auto max-w-lg pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:max-w-7xl lg:px-8 lg:pb-14">{children}</main>
             <BottomNav />
           </>
         )}

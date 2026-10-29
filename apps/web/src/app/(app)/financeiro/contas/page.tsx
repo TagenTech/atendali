@@ -20,7 +20,7 @@ import * as React from 'react';
 import { toast } from 'sonner';
 import { CategoriesSheet, PayableFormSheet, ReceivableFormSheet, SettleSheet } from '@/components/finance/ledger-sheets';
 import { FinanceTabs } from '@/components/finance/finance-tabs';
-import { Kpi } from '@/components/finance/kpi';
+import { Kpi, KpiStrip } from '@/components/finance/kpi';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -291,17 +291,16 @@ export default function ContasPage() {
             </Button>
           </div>
         )}
-        <div className="grid grid-cols-3 gap-3">
+        <KpiStrip>
           {totals.map(([label, cents]) => (
             <Kpi key={label as string} label={label as string} value={formatBRL((cents as number) ?? 0)} />
           ))}
-        </div>
+        </KpiStrip>
 
         {loading || !m ? (
           <Skeleton className="h-64 rounded-3xl" />
         ) : !view.length ? (
           <EmptyState
-            emoji={isPay ? '🧾' : '💰'}
             title={lateOnly ? 'Nada atrasado' : isPay ? 'Nenhuma conta neste mês' : 'Nenhum recebimento neste mês'}
             description={isPay ? 'Cadastre aluguel, fornecedores e impostos para acompanhar o que vence.' : 'Os pagamentos das comandas aparecem aqui sozinhos, na data em que o dinheiro cai.'}
             action={manage ? <Button onClick={() => setForm(isPay ? { kind: 'pay', p: null } : { kind: 'rec' })}>{isPay ? 'Nova conta' : 'Nova receita'}</Button> : undefined}
@@ -310,7 +309,7 @@ export default function ContasPage() {
           <>
             <Card className="hidden overflow-x-auto p-0 lg:block">
               <table className="w-full text-left">
-                <thead className="bg-muted text-xs uppercase tracking-wider text-muted-foreground">
+                <thead className="border-b border-border text-xs font-semibold text-muted-foreground">
                   <tr>
                     <th className="px-5 py-3 font-bold">{isPay ? 'Vencimento' : 'Previsto'}</th>
                     <th className="px-5 py-3 font-bold">Descrição</th>

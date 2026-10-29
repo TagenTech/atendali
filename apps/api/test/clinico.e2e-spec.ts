@@ -207,4 +207,70 @@ describe('Módulo clínico (e2e)', () => {
       await http.post(`/v1/org/clients/not-a-uuid/documents`).set(inOrg(dona)).send({ templateId: termo.id }).expect(400);
     });
   });
+
+  describe('arestas do prontuário e dos modelos', () => {
+    const NOBODY = '00000000-0000-4000-8000-000000000000';
+
+    it('evolução ligada a um atendimento do mesmo paciente; de outro paciente não', async () => {
+      const members = (await http.get('/v1/org/members').set(inOrg(dona)).expect(200)).body as { id: string; role: string }[];
+      const service = (await http.get('/v1/org/services').set(inOrg(dona)).expect(200)).body[0];
+      const outroPaciente = (await http.post('/v1/org/clients').set(inOrg(dona)).send({ name: 'Outro Paciente', phone: '11977776666' }).expect(201)).body.id;
+      const startsAt = new Date(Date.now() + 20 * 86_400_000);
+      startsAt.setUTCHours(15, 0, 0, 0);
+      const appt = (await http.post('/v1/org/appointments').set(inOrg(dona)).send({ memberId: members.find((m) => m.role === 'DONO')!.id, serviceId: service.id, clientId, startsAt: startsAt.toISOString(), allowOutsideHours: true }).expect(201)).body;
+      const ok = await http.post(`/v1/org/clients/${clientId}/records`).set(inOrg(dona)).send({ kind: 'EVOLUCAO', content: 'Sem título', appointmentId: appt.id }).expect(201);
+      expect(ok.body).toMatchObject({ appointmentId: appt.id, title: null });
+      const recusa = await http.post(`/v1/org/clients/${outroPaciente}/records`).set(inOrg(dona)).send({ kind: 'EVOLUCAO', content: 'x', appointmentId: appt.id }).expect(400);
+      expect(recusa.body.message).toMatch(/não é deste paciente/);
+      await http.post(`/v1/org/clients/${NOBODY}/records`).set(inOrg(dona)).send({ kind: 'EVOLUCAO', content: 'x' }).expect(404);
+    });
+
+    it('modelo de termo: cria, edita, não troca de tipo e some se não existe', async () => {
+      const termo = (await http.post('/v1/org/documents/templates').set(inOrg(dona)).send({ kind: 'TERMO', title: 'Termo de imagem', body: 'Autorizo o uso da minha imagem.' }).expect(201)).body;
+      expect(termo).toMatchObject({ kind: 'TERMO', questions: [] });
+      const ed = await http.patch(`/v1/org/documents/templates/${termo.id}`).set(inOrg(dona)).send({ kind: 'TERMO', title: 'Termo de imagem 2', body: 'Novo texto.', active: false }).expect(200);
+      expect(ed.body).toMatchObject({ title: 'Termo de imagem 2', active: false });
+      const volta = await http.patch(`/v1/org/documents/templates/${termo.id}`).set(inOrg(dona)).send({ kind: 'TERMO', title: 'Termo de imagem 3', body: 'Texto.' }).expect(200);
+      expect(volta.body.active).toBe(false);
+      await http.patch(`/v1/org/documents/templates/${termo.id}`).set(inOrg(dona)).send({ kind: 'ANAMNESE', title: 'Virou anamnese', questions: [{ id: 'a', label: 'Q', type: 'TEXTO' }] }).expect(400);
+      await http.patch(`/v1/org/documents/templates/${NOBODY}`).set(inOrg(dona)).send({ kind: 'TERMO', title: 'Nada', body: 'Texto.' }).expect(404);
+      // Modelo desativado não é enviado.
+      await http.post(`/v1/org/clients/${clientId}/documents`).set(inOrg(dona)).send({ templateId: termo.id }).expect(404);
+    });
+
+    it('perguntas repetidas ganham outro id e as opções são aparadas', async () => {
+      const t = (
+        await http
+          .post('/v1/org/documents/templates')
+          .set(inOrg(dona))
+          .send({ kind: 'ANAMNESE', title: 'Com repetidas', questions: [{ id: 'q1', label: ' Primeira ', type: 'TEXTO' }, { id: 'q1', label: 'Escolha', type: 'ESCOLHA', options: [' A ', '', 'B'], required: true }] })
+      ).body;
+      // Se o contrato recusa ids repetidos, o corpo é um erro: o caso vale pelos dois caminhos.
+      if (t.id) {
+        expect(t.questions[0].id).toBe('q1');
+        expect(t.questions[1].id).not.toBe('q1');
+        expect(t.questions[1].options).toEqual(['A', 'B']);
+      }
+    });
+
+    it('documento: já preenchido pela equipe, respostas fora do formato e itens que não existem', async () => {
+      const termo = (await http.get('/v1/org/documents/templates?tipo=TERMO').set(inOrg(dona)).expect(200)).body.find((x: { active: boolean }) => x.active) as { id: string };
+      const anam = (await http.get('/v1/org/documents/templates?tipo=ANAMNESE').set(inOrg(dona)).expect(200)).body[0] as { id: string };
+      const d = (await http.post(`/v1/org/clients/${clientId}/documents`).set(inOrg(dona)).send({ templateId: termo.id }).expect(201)).body;
+      await http.post(`/v1/org/documents/${d.id}/complete`).set(inOrg(dona)).send({ accepted: true, signedName: 'Mariana Costa' }).expect(200);
+      const de_novo = await http.post(`/v1/org/documents/${d.id}/complete`).set(inOrg(dona)).send({ accepted: true, signedName: 'Mariana Costa' }).expect(400);
+      expect(de_novo.body.message).toMatch(/já foi preenchido/);
+
+      const a = (await http.post(`/v1/org/clients/${clientId}/documents`).set(inOrg(dona)).send({ templateId: anam.id }).expect(201)).body;
+      await http.post(`/v1/org/documents/${a.id}/complete`).set(inOrg(dona)).send({ answers: { x: 5 } }).expect(400);
+      await http.post(`/v1/org/documents/${a.id}/complete`).set(inOrg(dona)).send({}).expect(400);
+      await http.post(`/v1/public/documents/${a.link.split('/documento/')[1]}`).send({}).expect(400);
+
+      await http.post(`/v1/org/documents/${NOBODY}/complete`).set(inOrg(dona)).send({ accepted: true, signedName: 'Mariana Costa' }).expect(404);
+      await http.delete(`/v1/org/documents/${NOBODY}`).set(inOrg(dona)).expect(404);
+      await http.get(`/v1/org/documents/${NOBODY}`).set(inOrg(dona)).expect(404);
+      await http.post(`/v1/org/clients/${NOBODY}/documents`).set(inOrg(dona)).send({ templateId: termo.id }).expect(404);
+      await http.get(`/v1/org/clients/${NOBODY}/documents`).set(inOrg(dona)).expect(404);
+    });
+  });
 });

@@ -34,7 +34,7 @@ function DayChips({ days, today, value, onPick, label }: { days: string[]; today
             className={cn('flex w-16 shrink-0 flex-col items-center rounded-2xl border-2 py-2', value === d ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card')}
           >
             <span className="text-xs font-bold uppercase">{d === today ? 'hoje' : WEEKDAYS_SHORT[new Date(`${d}T00:00:00Z`).getUTCDay()]}</span>
-            <span className="font-display text-xl font-black">{dd}</span>
+            <span className="font-display text-xl font-extrabold">{dd}</span>
           </button>
         );
       })}
@@ -178,8 +178,8 @@ export function CartFlow({
   return (
     <>
       <section>
-        <h2 className="mb-3 flex items-center gap-3 font-display text-xl font-extrabold">
-          <span className="grid size-7 place-items-center rounded-full bg-primary text-sm text-primary-foreground">2</span>
+        <h2 className="mb-3 flex items-center gap-3 border-l-[3px] border-primary pl-3 font-display text-xl font-extrabold">
+          <span className="font-display text-sm font-extrabold tabular-nums text-primary">2</span>
           Como quer encaixar os {selected.length} {org.vocabulary.services.toLowerCase()}?
         </h2>
         <div role="radiogroup" aria-label="Como encaixar" className="grid gap-2 sm:grid-cols-2">
@@ -203,8 +203,8 @@ export function CartFlow({
       </section>
 
       <section>
-        <h2 className="mb-3 flex items-center gap-3 font-display text-xl font-extrabold">
-          <span className="grid size-7 place-items-center rounded-full bg-primary text-sm text-primary-foreground">3</span>
+        <h2 className="mb-3 flex items-center gap-3 border-l-[3px] border-primary pl-3 font-display text-xl font-extrabold">
+          <span className="font-display text-sm font-extrabold tabular-nums text-primary">3</span>
           {mode === 'SEQ' ? 'Dia e horário de início' : 'Dia e horário de cada um'}
         </h2>
         {mode === 'SEQ' ? (
@@ -275,8 +275,8 @@ export function CartFlow({
 
       {ready ? (
         <section>
-          <h2 className="mb-3 flex items-center gap-3 font-display text-xl font-extrabold">
-            <span className="grid size-7 place-items-center rounded-full bg-primary text-sm text-primary-foreground">4</span>
+          <h2 className="mb-3 flex items-center gap-3 border-l-[3px] border-primary pl-3 font-display text-xl font-extrabold">
+            <span className="font-display text-sm font-extrabold tabular-nums text-primary">4</span>
             Seus dados
           </h2>
           <PatientForm clientWord={org.vocabulary.client} today={today} saving={saving} error={error} submitLabel={`Confirmar ${selected.length} ${org.vocabulary.services.toLowerCase()}`} onSubmit={book} />

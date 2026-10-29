@@ -164,7 +164,7 @@ export interface UpdateOrganizationRequest {
   commissionBase?: CommissionBase;
   loyalty?: LoyaltyRule;
   remindersEnabled?: boolean;
-  brandColor?: import('./branding').BrandColor | null;
+  brandColor?: import('./branding').BrandColorValue | null;
   tagline?: string | null;
 }
 

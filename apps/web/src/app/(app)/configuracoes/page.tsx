@@ -294,7 +294,7 @@ function Payments() {
     <Card className="space-y-5">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[34rem] text-sm">
-          <thead className="text-left text-xs uppercase tracking-wider text-muted-foreground">
+          <thead className="text-left text-xs font-semibold text-muted-foreground">
             <tr>
               <th className="py-2 font-bold">Forma</th>
               <th className="py-2 font-bold">Taxa</th>

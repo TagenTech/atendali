@@ -90,10 +90,14 @@ describe('Personalização visual (e2e)', () => {
     await http.get(`/v1/public/orgs/${slug}/brand/logo`).expect(200);
   });
 
-  it('cor da paleta e frase de boas-vindas; valores fora da lista são recusados', async () => {
+  it('cor da paleta, tom livre e frase de boas-vindas; valores inválidos são recusados', async () => {
     const ok = await http.patch('/v1/org').set(inOrg(dona)).send({ brandColor: 'rosa', tagline: '  Cuidamos de você 💜  ' }).expect(200);
     expect(ok.body.branding).toMatchObject({ brandColor: 'rosa', tagline: 'Cuidamos de você 💜' });
-    await http.patch('/v1/org').set(inOrg(dona)).send({ brandColor: '#ff0000' }).expect(400);
+    const hex = await http.patch('/v1/org').set(inOrg(dona)).send({ brandColor: '#FF4400' }).expect(200);
+    expect(hex.body.branding.brandColor).toBe('#ff4400');
+    const snapped = await http.patch('/v1/org').set(inOrg(dona)).send({ brandColor: '#d6409f' }).expect(200);
+    expect(snapped.body.branding.brandColor).toBe('rosa');
+    await http.patch('/v1/org').set(inOrg(dona)).send({ brandColor: '#fff' }).expect(400);
     await http.patch('/v1/org').set(inOrg(dona)).send({ brandColor: 'constructor' }).expect(400);
     await http.patch('/v1/org').set(inOrg(dona)).send({ tagline: 'x'.repeat(161) }).expect(400);
     await http.patch('/v1/org').set(inOrg(pro)).send({ brandColor: 'azul' }).expect(403);

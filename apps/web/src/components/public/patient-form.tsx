@@ -88,7 +88,7 @@ export function PatientForm({
               <Input id="bk-birth" type="date" value={patientBirth} max={today ?? undefined} onChange={(e) => setPatientBirth(e.target.value)} />
             </Field>
             <Field label="Seu parentesco" htmlFor="bk-rel">
-              <select id="bk-rel" value={relationship} onChange={(e) => setRelationship(e.target.value as GuardianRelationship | '')} className="h-13 w-full rounded-2xl border-2 border-input bg-card px-3">
+              <select id="bk-rel" value={relationship} onChange={(e) => setRelationship(e.target.value as GuardianRelationship | '')} className="h-13 w-full rounded-2xl border border-input bg-card px-3">
                 <option value="">Prefiro não informar</option>
                 {GUARDIAN_RELATIONSHIPS.map((r) => (
                   <option key={r} value={r}>

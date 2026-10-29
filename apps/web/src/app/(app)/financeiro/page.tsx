@@ -2,7 +2,7 @@
 
 import { formatBRL, PAYMENT_METHOD_LABEL } from '@skedulei/contracts';
 import { DailyColumns, HBars } from '@/components/finance/charts';
-import { Kpi } from '@/components/finance/kpi';
+import { Kpi, KpiStrip } from '@/components/finance/kpi';
 import { FinanceTabs } from '@/components/finance/finance-tabs';
 import { PeriodPicker, usePeriod } from '@/components/finance/period';
 import { PageHeader } from '@/components/layout/page-header';
@@ -29,17 +29,17 @@ export default function FinanceiroPage() {
           <Skeleton className="h-80 rounded-3xl" />
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
+            <KpiStrip cols={6}>
               <Kpi label="Faturamento" value={formatBRL(s.revenueCents)} hint={s.discountsCents ? `${formatBRL(s.discountsCents)} em descontos` : undefined} />
               <Kpi label="Taxas de pagamento" value={formatBRL(s.feesCents)} />
               <Kpi label="Líquido" value={formatBRL(s.netCents)} />
               <Kpi label="Comissões" value={formatBRL(s.commissionsCents)} />
               <Kpi label="Ticket médio" value={formatBRL(s.averageTicketCents)} />
               <Kpi label="Comandas pagas" value={String(s.orders)} />
-            </div>
+            </KpiStrip>
 
             {!s.orders ? (
-              <EmptyState emoji="📊" title="Sem vendas no período" description="Os números aparecem quando as comandas são pagas no Caixa." />
+              <EmptyState title="Sem vendas no período" description="Os números aparecem quando as comandas são pagas no Caixa." />
             ) : (
               <>
                 {s.byDay.length > 1 ? (
@@ -62,7 +62,7 @@ export default function FinanceiroPage() {
                   <Card className="overflow-x-auto">
                     <h2 className="mb-3 text-lg font-extrabold">Por profissional</h2>
                     <table className="w-full text-sm">
-                      <thead className="text-left text-xs uppercase tracking-wider text-muted-foreground">
+                      <thead className="text-left text-xs font-semibold text-muted-foreground">
                         <tr>
                           <th className="py-2 font-bold">Profissional</th>
                           <th className="py-2 text-right font-bold">Itens</th>
@@ -86,7 +86,7 @@ export default function FinanceiroPage() {
                 <Card className="overflow-x-auto">
                   <h2 className="mb-3 text-lg font-extrabold">Mais vendidos</h2>
                   <table className="w-full text-sm">
-                    <thead className="text-left text-xs uppercase tracking-wider text-muted-foreground">
+                    <thead className="text-left text-xs font-semibold text-muted-foreground">
                       <tr>
                         <th className="py-2 font-bold">{vocab.service} / item</th>
                         <th className="py-2 text-right font-bold">Qtd.</th>

@@ -73,7 +73,7 @@ export function ClientSheet({ client, onOpenChange, onSaved }: { client: ClientD
             <Input id="cl-guardian" value={guardianName} maxLength={120} onChange={(e) => setGuardianName(e.target.value)} />
           </Field>
           <Field label="Parentesco" htmlFor="cl-rel">
-            <select id="cl-rel" value={relationship} disabled={!guardianName.trim()} onChange={(e) => setRelationship(e.target.value as GuardianRelationship | '')} className="h-13 w-full rounded-2xl border-2 border-input bg-card px-3 disabled:opacity-60">
+            <select id="cl-rel" value={relationship} disabled={!guardianName.trim()} onChange={(e) => setRelationship(e.target.value as GuardianRelationship | '')} className="h-13 w-full rounded-2xl border border-input bg-card px-3 disabled:opacity-60">
               <option value="">—</option>
               {GUARDIAN_RELATIONSHIPS.map((r) => (
                 <option key={r} value={r}>

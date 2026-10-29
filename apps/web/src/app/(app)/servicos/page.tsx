@@ -74,7 +74,6 @@ export default function ServicosPage() {
           </div>
         ) : !visible.length ? (
           <EmptyState
-            emoji="✂️"
             title={q ? 'Nada encontrado' : `Nenhum ${vocab.service.toLowerCase()} ainda`}
             description={q ? 'Tente outro nome.' : `Cadastre o que você oferece: nome, duração e preço.`}
             action={!q && canEdit ? <Button onClick={() => open(null)}>Cadastrar</Button> : undefined}
@@ -84,7 +83,7 @@ export default function ServicosPage() {
             {/* Desktop: tabela densa, clicar na linha abre o painel lateral. */}
             <Card className="hidden overflow-x-auto p-0 lg:block">
               <table className="w-full text-left">
-                <thead className="bg-muted text-xs uppercase tracking-wider text-muted-foreground">
+                <thead className="border-b border-border text-xs font-semibold text-muted-foreground">
                   <tr>
                     <th className="px-5 py-3 font-bold">{vocab.service}</th>
                     <th className="px-5 py-3 font-bold">Categoria</th>
@@ -124,7 +123,7 @@ export default function ServicosPage() {
             <div className="space-y-5 lg:hidden">
               {groups.map(([cat, items]) => (
                 <section key={cat}>
-                  <h2 className="mb-2 px-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">{cat}</h2>
+                  <h2 className="mb-2 px-1 text-sm font-extrabold text-foreground">{cat}</h2>
                   <Card className="divide-y divide-border p-0">
                     {items.map((s) => (
                       <button

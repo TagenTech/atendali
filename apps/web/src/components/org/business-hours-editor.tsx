@@ -14,7 +14,7 @@ function TimeInput({ value, onChange, label }: { value: string; onChange: (v: st
       value={value}
       aria-label={label}
       onChange={(e) => onChange(e.target.value)}
-      className="h-10 w-[6.5rem] rounded-xl border-2 border-input bg-card px-2 text-center tabular outline-none focus:border-primary"
+      className="h-10 w-[6.5rem] rounded-xl border border-input bg-card px-2 text-center tabular outline-none focus:border-primary"
     />
   );
 }
@@ -25,7 +25,7 @@ export function BusinessHoursEditor({ value, onChange }: { value: BusinessHours;
   const copyToWeekdays = (day: number) => onChange(value.map((r, i) => (i >= 1 && i <= 5 ? value[day].map((x) => ({ ...x })) : r)));
 
   return (
-    <ul className="divide-y divide-border rounded-2xl border-2 border-input bg-card">
+    <ul className="divide-y divide-border rounded-2xl border border-input bg-card">
       {ORDER.map((day) => {
         const ranges = value[day];
         const open = ranges.length > 0;

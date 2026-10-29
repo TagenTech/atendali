@@ -139,7 +139,7 @@ test('agendar, mudar de status, remarcar e cancelar pela agenda do dono', async 
   await owner.getByRole('button', { name: /^Cliente Regressão/ }).click();
   await owner.getByLabel('Serviço', { exact: true }).selectOption({ index: 1 });
   await owner.getByRole('button', { name: 'Agendar', exact: true }).last().click();
-  await expect(owner.getByText('Agendamento marcado ✨')).toBeVisible();
+  await expect(owner.getByText('Horário marcado ✨')).toBeVisible();
 
   // Cada mudança de status fecha a ficha; reabre pelo horário.
   const reopen = () => owner.getByRole('button', { name: /^14:00 Cliente Regressão/ }).click();

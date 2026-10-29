@@ -10,14 +10,14 @@ import {
   type PatientDocumentDto,
   whatsappLink,
 } from '@skedulei/contracts';
-import { Check, Copy, FileSignature, MessageCircle, Send, Trash2 } from 'lucide-react';
+import { Check, ClipboardList, Copy, FileSignature, MessageCircle, Send, Trash2 } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { DocumentForm } from '@/components/clinico/document-form';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Ledger } from '@/components/ui/ledger';
 import { Sheet } from '@/components/ui/sheet';
 import { errorText } from '@/lib/api/client';
 import { useOrg } from '@/lib/org';
@@ -82,7 +82,7 @@ function SendSheet({ clientId, clientName, phone, onOpenChange, onFill }: { clie
         >
           {options.length ? (
             <Field label="Documento" htmlFor="doc-template">
-              <select id="doc-template" value={templateId || options[0].id} onChange={(e) => setTemplateId(e.target.value)} className="h-13 w-full rounded-2xl border-2 border-input bg-card px-3">
+              <select id="doc-template" value={templateId || options[0].id} onChange={(e) => setTemplateId(e.target.value)} className="h-13 w-full rounded-2xl border border-input bg-card px-3">
                 {options.map((t) => (
                   <option key={t.id} value={t.id}>
                     {DOCUMENT_KIND_LABEL[t.kind]} · {t.title}
@@ -107,7 +107,7 @@ function FillSheet({ clientId, id, onOpenChange }: { clientId: string; id: strin
   const complete = useCompleteDocument(clientId);
   const d = doc.data;
   return (
-    <Sheet open onOpenChange={onOpenChange} title={d ? d.title : 'Documento'} description={d?.status === 'PREENCHIDO' ? 'Documento preenchido' : 'Preencher com o paciente, no balcão'}>
+    <Sheet open placement="center" onOpenChange={onOpenChange} title={d ? d.title : 'Documento'} description={d?.status === 'PREENCHIDO' ? 'Documento preenchido' : 'Preencher com o paciente, no balcão'}>
       {!d ? (
         <p className="text-muted-foreground">Carregando…</p>
       ) : d.status === 'PREENCHIDO' ? (
@@ -155,7 +155,7 @@ function FillSheet({ clientId, id, onOpenChange }: { clientId: string; id: strin
   );
 }
 
-const KIND_ICON: Record<DocumentKind, string> = { ANAMNESE: '📋', TERMO: '✍️' };
+const KIND_ICON: Record<DocumentKind, typeof ClipboardList> = { ANAMNESE: ClipboardList, TERMO: FileSignature };
 
 /** Fichas de anamnese e termos do paciente: enviar o link, preencher no balcão e consultar. */
 export function ClientDocuments({ clientId, clientName, phone }: { clientId: string; clientName: string; phone: string | null }) {
@@ -178,11 +178,12 @@ export function ClientDocuments({ clientId, clientName, phone }: { clientId: str
         ) : null}
       </h2>
       {docs.data?.length ? (
-        <ul className="space-y-2">
-          {docs.data.map((d) => (
-            <li key={d.id}>
-              <Card className="flex flex-wrap items-center gap-2 py-3">
-                <span aria-hidden>{KIND_ICON[d.kind]}</span>
+        <Ledger className="divide-y divide-border">
+          {docs.data.map((d) => {
+            const Icon = KIND_ICON[d.kind];
+            return (
+              <div key={d.id} className="flex flex-wrap items-center gap-2 px-4 py-3">
+                <Icon className="size-4 shrink-0 text-primary" aria-hidden />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-semibold">{d.title}</span>
                   <span className="block text-xs text-muted-foreground">
@@ -214,12 +215,12 @@ export function ClientDocuments({ clientId, clientName, phone }: { clientId: str
                     <Trash2 />
                   </Button>
                 ) : null}
-              </Card>
-            </li>
-          ))}
-        </ul>
+              </div>
+            );
+          })}
+        </Ledger>
       ) : (
-        <Card className="text-sm text-muted-foreground">Nenhum documento enviado ainda.</Card>
+        <Ledger className="px-4 py-4 text-sm text-muted-foreground">Nenhum documento enviado ainda.</Ledger>
       )}
       {sending ? <SendSheet clientId={clientId} clientName={clientName} phone={phone} onOpenChange={setSending} onFill={setOpen} /> : null}
       {open ? <FillSheet clientId={clientId} id={open} onOpenChange={(v) => !v && setOpen(null)} /> : null}

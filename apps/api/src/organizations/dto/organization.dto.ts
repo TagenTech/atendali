@@ -20,9 +20,9 @@ import {
   type ValidationOptions,
 } from 'class-validator';
 import {
-  BRAND_COLOR_KEYS,
   CommissionBase,
   FEATURES,
+  isBrandColorValue,
   PAYMENT_METHODS,
   type PaymentMethod,
   type PaymentMethodConfig,
@@ -32,7 +32,7 @@ import {
   TAGLINE_MAX,
   validateBusinessHours,
   type AcceptInviteRequest,
-  type BrandColor,
+  type BrandColorValue,
   type BusinessHours,
   type CreateMemberRequest,
   type CreateOrganizationRequest,
@@ -53,6 +53,20 @@ import { EmptyToNull, IsPhone } from '../../common/validators/br.validators';
 const trim = () => Transform(({ value }) => (typeof value === 'string' ? value.trim() : value));
 const lower = () => Transform(({ value }) => (typeof value === 'string' ? value.trim().toLowerCase() : value));
 const digits = () => Transform(({ value }) => (typeof value === 'string' ? value.replace(/\D/g, '') || null : value));
+
+function IsBrandColorValue(options?: ValidationOptions) {
+  return function (target: object, propertyName: string) {
+    registerDecorator({
+      name: 'isBrandColorValue',
+      target: target.constructor,
+      propertyName,
+      options: { message: 'Escolha uma cor da paleta ou um tom em hexadecimal', ...options },
+      validator: {
+        validate: (v: unknown) => v == null || isBrandColorValue(v),
+      },
+    });
+  };
+}
 
 function IsBusinessHours(options?: ValidationOptions) {
   return function (target: object, propertyName: string) {
@@ -597,11 +611,16 @@ export class UpdateOrganizationDto implements UpdateOrganizationRequest {
   @IsBoolean()
   remindersEnabled?: boolean;
 
-  @ApiPropertyOptional({ description: 'Chave de BRAND_COLORS; null volta ao padrão' })
+  @ApiPropertyOptional({ description: 'Chave da paleta, tom #rrggbb, ou null para o padrão' })
+  @Transform(({ value }) => {
+    if (typeof value !== 'string') return value;
+    const s = value.trim().toLowerCase();
+    return s.startsWith('#') || s === '' ? (s || null) : s;
+  })
   @EmptyToNull()
   @IsOptional()
-  @IsIn(BRAND_COLOR_KEYS, { message: 'Escolha uma das cores da lista' })
-  brandColor?: BrandColor | null;
+  @IsBrandColorValue()
+  brandColor?: BrandColorValue | null;
 
   @ApiPropertyOptional({ description: 'Frase de boas-vindas da página pública' })
   @trim()
