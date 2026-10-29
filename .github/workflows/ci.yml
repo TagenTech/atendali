@@ -46,7 +46,7 @@ jobs:
         run: pnpm --filter @skedulei/web test:e2e
         env:
           E2E_WEB_DATABASE_URL: postgres://postgres:postgres@localhost:5432/skedulei_e2e_web
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: cobertura
@@ -55,7 +55,7 @@ jobs:
             apps/api/coverage
             apps/web/coverage
           retention-days: 14
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
