@@ -18,7 +18,7 @@ export default function SegurancaPage() {
   return (
     <>
       <FormTopBar onBack={back} title="Segurança da conta" />
-      <div className="space-y-5 px-5 pb-8">
+      <div className="space-y-5 px-6 pb-8 lg:px-8">
         <MfaSection />
         <Card className="flex items-center gap-3">
           <span className="grid size-12 place-items-center rounded-2xl bg-primary-soft text-primary-soft-foreground">

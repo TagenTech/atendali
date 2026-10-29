@@ -41,7 +41,7 @@ export function navItems(vocab: Vocabulary): NavItem[] {
   ];
 }
 
-/** No celular cabem 4 + "Mais": serviços, equipe e negócio ficam dentro de "Mais". */
-export const MOBILE_HREFS = ['/inicio', '/agenda', '/clientes'];
+/** No celular: até 5 destinos (Material/HIG). Caixa fica na barra; o resto em "Mais". */
+export const MOBILE_HREFS = ['/inicio', '/agenda', '/clientes', '/caixa'];
 
 export const isActive = (pathname: string, href: string) => pathname === href || pathname.startsWith(`${href}/`);

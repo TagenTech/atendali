@@ -71,15 +71,15 @@ function OrgGate({ children }: { children: React.ReactNode }) {
 
   return (
     <OrgProvider value={state.value}>
-      <div className="min-h-dvh pt-safe lg:pl-72">
+      <div className="min-h-dvh min-w-0 overflow-x-clip pt-safe lg:pl-72">
         <ConnectivityBanner />
         <Sidebar />
         <CommandPalette />
         {immersive ? (
-          <main className="mx-auto max-w-lg lg:max-w-2xl lg:py-6">{children}</main>
+          <main className="mx-auto w-full min-w-0 max-w-lg lg:max-w-2xl lg:py-6">{children}</main>
         ) : (
           <>
-            <main className="mx-auto max-w-lg pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:max-w-7xl lg:px-8 lg:pb-14">{children}</main>
+            <main className="mx-auto w-full min-w-0 max-w-lg pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:max-w-7xl lg:px-8 lg:pb-14">{children}</main>
             <BottomNav />
           </>
         )}

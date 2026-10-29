@@ -236,6 +236,7 @@
   html {
     -webkit-tap-highlight-color: transparent;
     text-size-adjust: 100%;
+    overflow-x: clip;
   }
   body {
     background: var(--background);
@@ -243,6 +244,8 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     overscroll-behavior-y: none;
+    overflow-x: clip;
+    max-width: 100%;
   }
   ::selection {
     background: var(--primary-soft);

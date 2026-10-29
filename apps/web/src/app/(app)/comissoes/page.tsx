@@ -5,7 +5,6 @@ import { HandCoins, Plus } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { Kpi, KpiStrip } from '@/components/finance/kpi';
-import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Ledger, LedgerTable, tdClass, thClass, theadClass } from '@/components/ui/ledger';
@@ -20,6 +19,7 @@ import { errorText } from '@/lib/api/client';
 import { useOrg } from '@/lib/org';
 import { useCommissions, useFinanceMutation } from '@/lib/queries/finance';
 import { useMembers } from '@/lib/queries/org';
+import { cn } from '@/lib/utils';
 
 function AdvanceSheet({ onOpenChange }: { onOpenChange: (v: boolean) => void }) {
   const pros = (useMembers().data ?? []).filter((m) => m.bookable || m.status === 'ATIVO');
@@ -45,7 +45,12 @@ function AdvanceSheet({ onOpenChange }: { onOpenChange: (v: boolean) => void }) 
         }}
       >
         <Field label="Profissional" htmlFor="adv-member" error={errors['adv-member']}>
-          <select id="adv-member" value={memberId} onChange={(e) => (setMemberId(e.target.value), clear('adv-member'))} className="h-13 w-full rounded-2xl border border-input bg-card px-3">
+          <select
+            id="adv-member"
+            value={memberId}
+            onChange={(e) => (setMemberId(e.target.value), clear('adv-member'))}
+            className="h-13 w-full rounded-2xl border border-input bg-card px-3"
+          >
             <option value="">Escolha…</option>
             {pros.map((m) => (
               <option key={m.id} value={m.id}>
@@ -84,29 +89,53 @@ export default function ComissoesPage() {
   const openComm = openBalances.reduce((s, b) => s + b.commissionsCents, 0);
   const openAdv = openBalances.reduce((s, b) => s + b.advancesCents, 0);
 
+  const payMember = async (memberId: string, memberName: string) => {
+    if (confirming !== memberId) return setConfirming(memberId);
+    try {
+      await payout.mutateAsync(memberId);
+      toast.success(`Fechamento de ${memberName} registrado`);
+    } catch (err) {
+      toast.error(errorText(err));
+    } finally {
+      setConfirming(null);
+    }
+  };
+
   return (
     <>
-      <PageHeader
-        title="Comissões"
-        subtitle={all ? 'Equipe' : 'As suas'}
-        action={
-          manage ? (
-            <Button size="sm" variant="outline" className="lg:h-11" onClick={() => setAdvancing(true)}>
+      <div className="mx-auto w-full max-w-7xl space-y-5 px-6 pb-8 pt-5 lg:space-y-6 lg:px-8 lg:pb-10 lg:pt-8">
+        <header className="flex items-end justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-muted-foreground">{all ? 'Equipe' : 'As suas'}</p>
+            <h1 className="font-display text-3xl font-extrabold tracking-tight">Comissões</h1>
+          </div>
+          {manage ? (
+            <Button size="sm" variant="outline" className="h-11 shrink-0 px-3.5" onClick={() => setAdvancing(true)}>
               <Plus /> Vale
             </Button>
-          ) : null
-        }
-      />
-      <div className="space-y-6 px-5">
+          ) : null}
+        </header>
+
         {openBalances.length ? (
-          <KpiStrip>
-            <Kpi label="A pagar" value={formatBRL(dueCents)} />
-            <Kpi label="Comissões em aberto" value={formatBRL(openComm)} />
-            <Kpi label="Vales a descontar" value={formatBRL(openAdv)} />
-          </KpiStrip>
+          <>
+            <section className="overflow-hidden rounded-3xl bg-ink-deep px-5 py-5 text-white animate-fade-up sm:px-6 sm:py-6">
+              <div className="min-w-0">
+                <p className="text-sm text-white/65">A pagar</p>
+                <p className="mt-1 font-display text-3xl font-extrabold tabular leading-none sm:text-4xl">{formatBRL(dueCents)}</p>
+                <p className="mt-2 text-sm text-white/55">
+                  {openBalances.length} {openBalances.length === 1 ? 'pessoa' : 'pessoas'} em aberto
+                </p>
+              </div>
+            </section>
+            <KpiStrip cols={2}>
+              <Kpi label="Comissões em aberto" value={formatBRL(openComm)} />
+              <Kpi label="Vales a descontar" value={formatBRL(openAdv)} />
+            </KpiStrip>
+          </>
         ) : null}
+
         <section>
-          <h2 className="mb-2 px-1 text-sm font-extrabold text-foreground">Em aberto</h2>
+          <h2 className="mb-3 font-display text-lg font-extrabold tracking-tight">Em aberto</h2>
           {balances.isLoading ? (
             <Skeleton className="h-32 rounded-3xl" />
           ) : openBalances.length ? (
@@ -138,17 +167,7 @@ export default function ComissoesPage() {
                               size="sm"
                               variant={confirming === b.memberId ? 'primary' : 'soft'}
                               loading={payout.isPending && confirming === b.memberId}
-                              onClick={async () => {
-                                if (confirming !== b.memberId) return setConfirming(b.memberId);
-                                try {
-                                  await payout.mutateAsync(b.memberId);
-                                  toast.success(`Fechamento de ${b.memberName} registrado`);
-                                } catch (err) {
-                                  toast.error(errorText(err));
-                                } finally {
-                                  setConfirming(null);
-                                }
-                              }}
+                              onClick={() => payMember(b.memberId, b.memberName)}
                             >
                               <HandCoins /> {confirming === b.memberId ? `Confirmar ${formatBRL(b.balanceCents)}` : 'Fechar e pagar'}
                             </Button>
@@ -185,19 +204,10 @@ export default function ComissoesPage() {
                         size="sm"
                         variant={confirming === b.memberId ? 'primary' : 'soft'}
                         loading={payout.isPending && confirming === b.memberId}
-                        onClick={async () => {
-                          if (confirming !== b.memberId) return setConfirming(b.memberId);
-                          try {
-                            await payout.mutateAsync(b.memberId);
-                            toast.success(`Fechamento de ${b.memberName} registrado`);
-                          } catch (err) {
-                            toast.error(errorText(err));
-                          } finally {
-                            setConfirming(null);
-                          }
-                        }}
+                        onClick={() => payMember(b.memberId, b.memberName)}
                       >
-                        <HandCoins /> {confirming === b.memberId ? `Confirmar pagamento de ${formatBRL(b.balanceCents)}` : 'Fechar e pagar'}
+                        <HandCoins />{' '}
+                        {confirming === b.memberId ? `Confirmar pagamento de ${formatBRL(b.balanceCents)}` : 'Fechar e pagar'}
                       </Button>
                     ) : null}
                   </div>
@@ -209,12 +219,12 @@ export default function ComissoesPage() {
           )}
         </section>
 
-        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-6">
           <section>
-            <h2 className="mb-2 px-1 text-sm font-extrabold text-foreground">Lançamentos</h2>
-            <Ledger className="divide-y divide-border">
-              {(entries.data ?? []).slice(0, showAllEntries ? 100 : 12).map((e) => (
-                <div key={e.id} className="flex items-center gap-3 px-4 py-3 text-sm">
+            <h2 className="mb-3 font-display text-lg font-extrabold tracking-tight">Lançamentos</h2>
+            <div className="overflow-hidden rounded-3xl border border-border bg-card">
+              {(entries.data ?? []).slice(0, showAllEntries ? 100 : 12).map((e, i) => (
+                <div key={e.id} className={cn('flex items-center gap-3 px-4 py-3.5 text-sm', i > 0 && 'border-t border-border')}>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-semibold">{e.description}</span>
                     <span className="block truncate text-muted-foreground">
@@ -222,13 +232,13 @@ export default function ComissoesPage() {
                     </span>
                   </span>
                   <span className="text-right tabular">
-                    <span className="block font-semibold">{formatBRL(e.amountCents)}</span>
+                    <span className="block font-display font-extrabold">{formatBRL(e.amountCents)}</span>
                     <span className="block text-xs text-muted-foreground">{e.payoutId ? 'paga' : 'em aberto'}</span>
                   </span>
                 </div>
               ))}
-              {!entries.data?.length ? <p className="p-4 text-center text-muted-foreground">Sem lançamentos.</p> : null}
-            </Ledger>
+              {!entries.data?.length ? <p className="p-5 text-center text-muted-foreground">Sem lançamentos.</p> : null}
+            </div>
             {(entries.data?.length ?? 0) > 12 ? (
               <Button variant="ghost" size="sm" className="mt-2 w-full" onClick={() => setShowAllEntries((v) => !v)}>
                 {showAllEntries ? 'Ver menos' : `Ver mais ${Math.min(entries.data!.length, 100) - 12}`}
@@ -236,12 +246,12 @@ export default function ComissoesPage() {
             ) : null}
           </section>
 
-          <div className="space-y-6">
+          <div className="space-y-5 lg:space-y-6">
             <section>
-              <h2 className="mb-2 px-1 text-sm font-extrabold text-foreground">Fechamentos</h2>
-              <Ledger className="divide-y divide-border">
-                {(payouts.data ?? []).map((p) => (
-                  <div key={p.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
+              <h2 className="mb-3 font-display text-lg font-extrabold tracking-tight">Fechamentos</h2>
+              <div className="overflow-hidden rounded-3xl border border-border bg-card">
+                {(payouts.data ?? []).map((p, i) => (
+                  <div key={p.id} className={cn('flex items-center justify-between gap-3 px-4 py-3.5 text-sm', i > 0 && 'border-t border-border')}>
                     <span>
                       <span className="block font-semibold">{all ? p.memberName : day(p.createdAt)}</span>
                       <span className="block text-muted-foreground">
@@ -252,14 +262,14 @@ export default function ComissoesPage() {
                     <span className="font-display font-extrabold tabular">{formatBRL(p.totalCents)}</span>
                   </div>
                 ))}
-                {!payouts.data?.length ? <p className="p-4 text-center text-muted-foreground">Nenhum fechamento ainda.</p> : null}
-              </Ledger>
+                {!payouts.data?.length ? <p className="p-5 text-center text-muted-foreground">Nenhum fechamento ainda.</p> : null}
+              </div>
             </section>
             <section>
-              <h2 className="mb-2 px-1 text-sm font-extrabold text-foreground">Vales</h2>
-              <Ledger className="divide-y divide-border">
-                {(advances.data ?? []).map((a) => (
-                  <div key={a.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
+              <h2 className="mb-3 font-display text-lg font-extrabold tracking-tight">Vales</h2>
+              <div className="overflow-hidden rounded-3xl border border-border bg-card">
+                {(advances.data ?? []).map((a, i) => (
+                  <div key={a.id} className={cn('flex items-center justify-between gap-3 px-4 py-3.5 text-sm', i > 0 && 'border-t border-border')}>
                     <span>
                       <span className="block font-semibold">{all ? a.memberName : formatDateShort(a.date, false)}</span>
                       <span className="block text-muted-foreground">
@@ -267,11 +277,11 @@ export default function ComissoesPage() {
                         {a.note ?? 'Vale'} · {a.payoutId ? 'descontado' : 'em aberto'}
                       </span>
                     </span>
-                    <span className="font-semibold tabular">{formatBRL(a.amountCents)}</span>
+                    <span className="font-display font-extrabold tabular">{formatBRL(a.amountCents)}</span>
                   </div>
                 ))}
-                {!advances.data?.length ? <p className="p-4 text-center text-muted-foreground">Nenhum vale.</p> : null}
-              </Ledger>
+                {!advances.data?.length ? <p className="p-5 text-center text-muted-foreground">Nenhum vale.</p> : null}
+              </div>
             </section>
           </div>
         </div>

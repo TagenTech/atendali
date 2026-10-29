@@ -41,11 +41,11 @@ export default function AtividadePage() {
   return (
     <>
       <PageHeader title="Atividade" subtitle="Quem fez o quê no dinheiro do negócio" />
-      <div className="space-y-4 px-5">
+      <div className="space-y-5 px-6 pb-8 lg:space-y-6 lg:px-8">
         <p className="flex items-start gap-2 rounded-2xl bg-primary-soft px-4 py-3 text-sm text-primary-soft-foreground">
           <ShieldCheck className="mt-0.5 size-4 shrink-0" /> Estornos, descontos, pagamentos desfeitos, caixa, comissões e contas ficam aqui com o nome de quem fez. Só você vê, e ninguém consegue editar ou apagar este registro.
         </p>
-        <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 scrollbar-none" role="group" aria-label="Filtros">
+        <div className="-mx-6 flex gap-2 overflow-x-auto px-6 lg:-mx-8 lg:px-8 pb-1 scrollbar-none" role="group" aria-label="Filtros">
           <Chip active={!group} onClick={() => setGroup(undefined)}>
             Tudo
           </Chip>

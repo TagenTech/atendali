@@ -8,10 +8,10 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, subtitle, action }: PageHeaderProps) {
   return (
-    <header className="flex items-end justify-between gap-4 px-5 pb-4 pt-5 lg:pb-5 lg:pt-8">
+    <header className="flex items-end justify-between gap-3 px-6 pb-4 pt-5 lg:px-8 lg:pb-5 lg:pt-8">
       <div className="min-w-0">
         {subtitle ? <p className="text-sm font-medium text-muted-foreground">{subtitle}</p> : null}
-        <h1 className="truncate text-2xl font-extrabold tracking-tight lg:text-3xl">{title}</h1>
+        <h1 className="truncate font-display text-3xl font-extrabold tracking-tight">{title}</h1>
       </div>
       {action}
     </header>

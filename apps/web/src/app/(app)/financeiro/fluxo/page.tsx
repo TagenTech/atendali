@@ -4,7 +4,6 @@ import { formatBRL, formatDateShort, PROJECTION_DAYS } from '@skedulei/contracts
 import * as React from 'react';
 import { FlowColumns } from '@/components/finance/charts';
 import { FinanceTabs } from '@/components/finance/finance-tabs';
-import { Kpi, KpiStrip } from '@/components/finance/kpi';
 import { PeriodPicker, usePeriod } from '@/components/finance/period';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card } from '@/components/ui/card';
@@ -28,7 +27,7 @@ export default function FluxoPage() {
     <>
       <PageHeader title="Fluxo de caixa" subtitle={f ? `${formatDateShort(f.from)} a ${formatDateShort(f.to)}` : 'Entradas e saídas'} />
       <FinanceTabs />
-      <div className="space-y-6 px-5">
+      <div className="space-y-6 px-6 pb-8 lg:px-8">
         <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Tipo de fluxo">
           <Chip active={!realized} onClick={() => setMode('PROJETADO')}>
             Projetado
@@ -53,13 +52,24 @@ export default function FluxoPage() {
           <Skeleton className="h-96 rounded-3xl" />
         ) : (
           <>
-            <KpiStrip>
-              <Kpi label={realized ? 'Entrou' : 'Vai entrar'} value={formatBRL(f.inCents)} />
-              <Kpi label={realized ? 'Saiu' : 'Vai sair'} value={formatBRL(f.outCents)} />
-              <Kpi label="Resultado" value={formatBRL(f.netCents)} />
-            </KpiStrip>
+            <section className="overflow-hidden rounded-3xl bg-ink-deep px-5 py-5 text-white animate-fade-up sm:px-6">
+              <div className="grid grid-cols-3 gap-3 sm:gap-6">
+                <div className="min-w-0">
+                  <p className="text-sm text-white/65">{realized ? 'Entrou' : 'Vai entrar'}</p>
+                  <p className="mt-1 font-display text-xl font-extrabold tabular leading-none sm:text-2xl">{formatBRL(f.inCents)}</p>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm text-white/65">{realized ? 'Saiu' : 'Vai sair'}</p>
+                  <p className="mt-1 font-display text-xl font-extrabold tabular leading-none sm:text-2xl">{formatBRL(f.outCents)}</p>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm text-white/65">Resultado</p>
+                  <p className="mt-1 font-display text-xl font-extrabold tabular leading-none sm:text-2xl">{formatBRL(f.netCents)}</p>
+                </div>
+              </div>
+            </section>
             <Card>
-              <h2 className="mb-4 text-lg font-extrabold">{realized ? 'Resultado por ' : 'Resultado previsto por '}{f.bucket === 'dia' ? 'dia' : 'semana'}</h2>
+              <h2 className="mb-4 font-display text-lg font-extrabold tracking-tight">{realized ? 'Resultado por ' : 'Resultado previsto por '}{f.bucket === 'dia' ? 'dia' : 'semana'}</h2>
               <FlowColumns buckets={f.buckets} label={realized ? 'Fluxo de caixa realizado' : `Fluxo de caixa previsto para ${days} dias`} />
             </Card>
             <p className="text-sm text-muted-foreground">

@@ -3,7 +3,6 @@
 import { formatBRL, Permission, PRODUCT_KIND_LABEL, STOCK_MOVEMENT_LABEL, STOCK_STATUS_LABEL, type ProductDto, type StockStatus } from '@skedulei/contracts';
 import { ArrowDownUp, Plus, Search } from 'lucide-react';
 import * as React from 'react';
-import { Kpi, KpiStrip } from '@/components/finance/kpi';
 import { PageHeader } from '@/components/layout/page-header';
 import { MovementSheet } from '@/components/org/movement-sheet';
 import { ProductSheet } from '@/components/org/product-sheet';
@@ -60,12 +59,29 @@ export default function EstoquePage() {
           ) : null
         }
       />
-      <div className="space-y-4 px-5">
-        <KpiStrip>
-          <Kpi label="Valor em estoque" value={report.data ? formatBRL(report.data.totalValueCents) : '—'} />
-          <Kpi label="Abaixo do mínimo" value={report.data ? String(report.data.belowMinimum) : '—'} />
-          <Kpi label="Zerados" value={report.data ? String(report.data.zeroed) : '—'} />
-        </KpiStrip>
+      <div className="space-y-5 px-6 pb-8 lg:space-y-6 lg:px-8">
+        <section className="overflow-hidden rounded-3xl bg-ink-deep px-5 py-5 text-white animate-fade-up sm:px-6">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <div className="min-w-0 col-span-2 sm:col-span-1">
+              <p className="text-sm text-white/65">Valor em estoque</p>
+              <p className="mt-1 font-display text-2xl font-extrabold tabular leading-none sm:text-3xl">
+                {report.data ? formatBRL(report.data.totalValueCents) : '—'}
+              </p>
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm text-white/65">Abaixo do mínimo</p>
+              <p className="mt-1 font-display text-2xl font-extrabold tabular leading-none">
+                {report.data ? String(report.data.belowMinimum) : '—'}
+              </p>
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm text-white/65">Zerados</p>
+              <p className="mt-1 font-display text-2xl font-extrabold tabular leading-none">
+                {report.data ? String(report.data.zeroed) : '—'}
+              </p>
+            </div>
+          </div>
+        </section>
 
         <div className="flex flex-wrap items-center gap-2">
           <Chip active={tab === 'produtos'} onClick={() => setTab('produtos')}>

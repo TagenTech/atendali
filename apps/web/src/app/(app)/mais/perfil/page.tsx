@@ -64,7 +64,7 @@ export default function PerfilPage() {
   return (
     <>
       <FormTopBar onBack={back} title={done ? 'Meu perfil' : 'Finalizar cadastro'} />
-      <div className="space-y-5 px-5">
+      <div className="space-y-5 px-6 pb-8 lg:space-y-6 lg:px-8">
         {done ? (
           <Card className="flex items-center gap-3 bg-success-soft">
             <BadgeCheck className="size-6 shrink-0 text-success-soft-foreground" />

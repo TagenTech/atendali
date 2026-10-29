@@ -48,7 +48,7 @@ export default function ServicosPage() {
           ) : null
         }
       />
-      <div className="space-y-4 px-5">
+      <div className="space-y-5 px-6 pb-8 lg:space-y-6 lg:px-8">
         <div className="flex flex-wrap items-center gap-2">
           <Input
             icon={<Search />}

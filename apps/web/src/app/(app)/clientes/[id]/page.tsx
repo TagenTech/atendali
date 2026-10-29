@@ -61,7 +61,7 @@ export default function ClientePage() {
           </Button>
         ) : null}
       </FormTopBar>
-      <div className="grid grid-cols-1 items-start gap-6 px-5 pb-8 lg:grid-cols-[20rem_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 items-start gap-6 px-6 pb-8 lg:px-8 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <div className="space-y-4">
           <Card className="space-y-3">
             <p className="font-display text-2xl font-extrabold">{c.name}</p>

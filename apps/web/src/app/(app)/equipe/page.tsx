@@ -52,7 +52,7 @@ export default function EquipePage() {
           ) : null
         }
       />
-      <div className="px-5">
+      <div className="px-6 pb-8 lg:px-8">
         {isLoading ? (
           <div className="space-y-2">
             {[0, 1, 2].map((i) => (

@@ -112,7 +112,7 @@ function CenterModal({
           className={cn(
             'relative z-10 flex flex-col rounded-3xl border border-border bg-card outline-none',
             expanded
-              ? 'h-[calc(100dvh-1.5rem)] w-[calc(100vw-1.5rem)] max-w-6xl lg:h-[calc(100dvh-2.5rem)] lg:w-[min(72rem,calc(100vw-2.5rem))]'
+              ? 'h-[calc(100dvh-1.5rem)] w-[calc(100%-1.5rem)] max-w-6xl lg:h-[calc(100dvh-2.5rem)] lg:w-[min(72rem,calc(100%-2.5rem))]'
               : 'max-h-[min(92dvh,52rem)] w-full max-w-xl animate-fade-up',
             className,
           )}

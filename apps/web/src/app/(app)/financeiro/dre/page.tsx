@@ -43,14 +43,34 @@ export default function DrePage() {
         subtitle={range ? `${formatDateShort(range.from)} a ${formatDateShort(range.to)}` : 'Resultado do período'}
       />
       <FinanceTabs />
-      <div className="space-y-6 px-5">
+      <div className="space-y-6 px-6 pb-8 lg:px-8">
         <PeriodPicker period={period} />
         {isLoading || !d ? (
           <Skeleton className="h-96 rounded-3xl" />
         ) : (
           <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-2">
+            <section className="overflow-hidden rounded-3xl bg-ink-deep px-5 py-5 text-white animate-fade-up sm:px-6 lg:col-span-2">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <div className="min-w-0">
+                  <p className="text-sm text-white/65">Receita líquida</p>
+                  <p className="mt-1 font-display text-xl font-extrabold tabular leading-none sm:text-2xl">{formatBRL(d.netRevenueCents)}</p>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm text-white/65">Margem</p>
+                  <p className="mt-1 font-display text-xl font-extrabold tabular leading-none sm:text-2xl">{formatBRL(d.contributionCents)}</p>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm text-white/65">Despesas</p>
+                  <p className="mt-1 font-display text-xl font-extrabold tabular leading-none sm:text-2xl">{formatBRL(d.fixedExpensesCents)}</p>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm text-white/65">Resultado</p>
+                  <p className="mt-1 font-display text-xl font-extrabold tabular leading-none sm:text-2xl">{formatBRL(d.resultCents)}</p>
+                </div>
+              </div>
+            </section>
             <Card>
-              <h2 className="mb-3 text-lg font-extrabold">Do faturamento ao resultado</h2>
+              <h2 className="mb-3 font-display text-lg font-extrabold tracking-tight">Do faturamento ao resultado</h2>
               <table className="w-full text-sm">
                 <caption className="sr-only">DRE gerencial do período</caption>
                 <tbody className="divide-y divide-border">

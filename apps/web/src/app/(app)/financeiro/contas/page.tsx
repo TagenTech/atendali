@@ -20,7 +20,6 @@ import * as React from 'react';
 import { toast } from 'sonner';
 import { CategoriesSheet, PayableFormSheet, ReceivableFormSheet, SettleSheet } from '@/components/finance/ledger-sheets';
 import { FinanceTabs } from '@/components/finance/finance-tabs';
-import { Kpi, KpiStrip } from '@/components/finance/kpi';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -265,7 +264,7 @@ export default function ContasPage() {
         }
       />
       <FinanceTabs />
-      <div className="space-y-5 px-5">
+      <div className="space-y-5 px-6 pb-8 lg:space-y-6 lg:px-8">
         <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Tipo de conta">
           <Chip active={isPay} onClick={() => setTab('pagar')}>
             A pagar
@@ -291,11 +290,18 @@ export default function ContasPage() {
             </Button>
           </div>
         )}
-        <KpiStrip>
-          {totals.map(([label, cents]) => (
-            <Kpi key={label as string} label={label as string} value={formatBRL((cents as number) ?? 0)} />
-          ))}
-        </KpiStrip>
+        <section className="overflow-hidden rounded-3xl bg-ink-deep px-5 py-5 text-white animate-fade-up sm:px-6">
+          <div className="grid grid-cols-3 gap-3 sm:gap-6">
+            {totals.map(([label, cents]) => (
+              <div key={label as string} className="min-w-0">
+                <p className="text-sm text-white/65">{label as string}</p>
+                <p className="mt-1 font-display text-xl font-extrabold tabular leading-none sm:text-2xl">
+                  {formatBRL((cents as number) ?? 0)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {loading || !m ? (
           <Skeleton className="h-64 rounded-3xl" />

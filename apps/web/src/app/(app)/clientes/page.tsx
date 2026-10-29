@@ -36,23 +36,29 @@ export default function ClientesPage() {
     <>
       <PageHeader
         title={vocab.clients}
-        subtitle={debounced ? `${clients.length} encontrado(s)` : 'Mais recentes'}
+        subtitle={
+          debounced
+            ? `${clients.length} encontrado(s)`
+            : data
+              ? `${clients.length} ${clients.length === 1 ? vocab.client.toLowerCase() : vocab.clients.toLowerCase()}`
+              : undefined
+        }
         action={
           canEdit ? (
             <div className="flex gap-2">
-              <Button asChild size="sm" variant="outline" className="lg:h-11 lg:px-4">
+              <Button asChild size="sm" variant="outline" className="h-11 max-sm:px-2.5 lg:px-4">
                 <Link href="/clientes/importar">
-                  <Upload /> Importar
+                  <Upload /> <span className="max-sm:sr-only">Importar</span>
                 </Link>
               </Button>
-              <Button size="sm" className="lg:h-11 lg:px-4" onClick={() => setCreating(true)}>
+              <Button size="sm" className="h-11 px-3.5 lg:px-4" onClick={() => setCreating(true)}>
                 <Plus /> Novo
               </Button>
             </div>
           ) : null
         }
       />
-      <div className="space-y-4 px-5">
+      <div className="space-y-5 px-6 pb-8 lg:space-y-6 lg:px-8">
         <Input
           icon={<Search />}
           type="search"

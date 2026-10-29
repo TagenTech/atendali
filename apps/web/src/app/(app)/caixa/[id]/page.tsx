@@ -115,7 +115,7 @@ export default function ComandaPage() {
         </span>
       </FormTopBar>
 
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 px-5 pb-10 xl:grid-cols-[minmax(0,1fr)_24rem]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 px-6 pb-8 lg:px-8 pb-10 xl:grid-cols-[minmax(0,1fr)_24rem]">
         <div className="space-y-6">
           {/* Cliente */}
           <Card className="space-y-3">

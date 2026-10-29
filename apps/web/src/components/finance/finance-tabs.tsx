@@ -19,7 +19,7 @@ export function FinanceTabs() {
   const pathname = usePathname();
   if (!can(Permission.FINANCE_VIEW)) return null;
   return (
-    <nav aria-label="Financeiro" className="mb-4 flex gap-2 overflow-x-auto px-5">
+    <nav aria-label="Financeiro" className="flex gap-2 overflow-x-auto px-6 scrollbar-none lg:px-8">
       {TABS.map((t) => {
         const active = pathname === t.href;
         return (

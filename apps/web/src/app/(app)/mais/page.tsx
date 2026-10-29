@@ -97,7 +97,7 @@ export default function MaisPage() {
   return (
     <>
       <PageHeader title="Mais" />
-      <div className="space-y-6 px-5 lg:max-w-3xl">
+      <div className="space-y-6 px-6 pb-8 lg:max-w-3xl lg:px-8">
         {user ? (
           <Link href="/mais/perfil" className="block">
             <Card className="flex items-center gap-4 transition-colors hover:bg-muted">

@@ -401,8 +401,8 @@ function Settings() {
   return (
     <>
       <PageHeader title="Negócio" subtitle="Configurações" />
-      <div className="px-5 lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10">
-        <nav aria-label="Seções" className="-mx-5 mb-6 border-b border-border px-5 lg:sticky lg:top-6 lg:mx-0 lg:mb-0 lg:self-start lg:border-b-0 lg:px-0">
+      <div className="px-6 pb-8 lg:grid lg:px-8 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10">
+        <nav aria-label="Seções" className="-mx-6 mb-6 border-b border-border px-6 lg:sticky lg:top-6 lg:mx-0 lg:mb-0 lg:self-start lg:border-b-0 lg:px-0">
           <ul className="no-scrollbar flex gap-1 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible lg:pb-0">
             {tabs.map((t) => {
               const active = t.key === current;

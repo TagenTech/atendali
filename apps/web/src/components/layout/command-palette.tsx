@@ -137,7 +137,7 @@ export function CommandPalette() {
       aria-label="Busca"
       onClose={close}
       onClick={(e) => e.target === ref.current && close()}
-      className="m-0 mx-auto mt-[12vh] w-[min(36rem,calc(100vw-2rem))] rounded-3xl border border-border bg-card p-0 text-foreground shadow-2xl backdrop:bg-foreground/30"
+      className="m-0 mx-auto mt-[12vh] w-[min(36rem,calc(100%-2rem))] rounded-3xl border border-border bg-card p-0 text-foreground shadow-2xl backdrop:bg-foreground/30"
     >
       {open ? <Palette onClose={close} /> : null}
     </dialog>

@@ -17,6 +17,8 @@ const nextConfig: NextConfig = {
   output: process.env.VERCEL ? undefined : 'standalone',
   // Testes de navegador compilam numa pasta própria (não atrapalha o `next dev`).
   distDir: process.env.NEXT_DIST_DIR || '.next',
+  // O selo do Next no canto inferior esquerdo cobria o ícone "Início" da barra do celular.
+  devIndicators: { position: 'top-right' },
   poweredByHeader: false,
   outputFileTracingRoot: path.join(__dirname, '../..'),
   turbopack: {

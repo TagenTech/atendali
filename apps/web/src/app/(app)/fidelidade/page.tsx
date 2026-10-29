@@ -90,7 +90,7 @@ export default function FidelidadePage() {
   return (
     <>
       <PageHeader title="Pacotes e clube" action={addButton} />
-      <div className="space-y-5 px-5">
+      <div className="space-y-5 px-6 pb-8 lg:space-y-6 lg:px-8">
         <div className="flex flex-wrap gap-2" role="tablist" aria-label="Seções">
           {tabs.map(([, t, label]) => (
             <Chip key={t} role="tab" aria-selected={tab === t} active={tab === t} onClick={() => setPicked(t)}>
@@ -102,7 +102,7 @@ export default function FidelidadePage() {
         {tab === 'pacotes' ? (
           <div className="grid gap-5 xl:grid-cols-2">
             <section className="space-y-2">
-              <h2 className="px-1 text-sm font-extrabold text-foreground">Pacotes à venda</h2>
+              <h2 className="px-1 font-display text-lg font-extrabold tracking-tight">Pacotes à venda</h2>
               <List
                 loading={packagePlans.isLoading}
                 empty={<EmptyState title="Nenhum pacote" description="Crie pacotes de sessões e venda pela comanda." action={canEdit ? <Button onClick={() => setPkgSheet({ plan: null, key: Date.now() })}>Criar pacote</Button> : undefined} />}
@@ -123,7 +123,7 @@ export default function FidelidadePage() {
               </List>
             </section>
             <section className="space-y-2">
-              <h2 className="px-1 text-sm font-extrabold text-foreground">Vendidos</h2>
+              <h2 className="px-1 font-display text-lg font-extrabold tracking-tight">Vendidos</h2>
               {soldPackages.isLoading ? (
                 <Skeleton className="h-32 rounded-3xl" />
               ) : !(soldPackages.data ?? []).length ? (
@@ -185,7 +185,7 @@ export default function FidelidadePage() {
         {tab === 'clube' ? (
           <div className="grid gap-5 xl:grid-cols-2">
             <section className="space-y-2">
-              <h2 className="px-1 text-sm font-extrabold text-foreground">Planos</h2>
+              <h2 className="px-1 font-display text-lg font-extrabold tracking-tight">Planos</h2>
               <List
                 loading={clubPlans.isLoading}
                 empty={<EmptyState title="Nenhum plano" description="Crie um plano mensal e receba a mensalidade pela comanda." action={canEdit ? <Button onClick={() => setMemSheet({ plan: null, key: Date.now() })}>Criar plano</Button> : undefined} />}
@@ -205,7 +205,7 @@ export default function FidelidadePage() {
               </List>
             </section>
             <section className="space-y-2">
-              <h2 className="px-1 text-sm font-extrabold text-foreground">Assinantes</h2>
+              <h2 className="px-1 font-display text-lg font-extrabold tracking-tight">Assinantes</h2>
               {memberships.isLoading ? (
                 <Skeleton className="h-32 rounded-3xl" />
               ) : !(memberships.data ?? []).length ? (

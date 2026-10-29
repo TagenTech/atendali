@@ -1,8 +1,9 @@
-import { devices, expect, test, type Browser, type BrowserContext, type Page } from '@playwright/test';
+import { devices, expect, test, type BrowserContext } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { nextTuesday } from '../e2e/helpers';
+import { ato, DESKTOP, legendar, limparSaida, VIDEOS } from './_helpers';
 
 /**
  * Vídeo do fluxo completo de uma clínica pediátrica, em 3 atos:
@@ -11,64 +12,17 @@ import { nextTuesday } from '../e2e/helpers';
  *   3. a clínica atende, recebe (Pix e dinheiro), fecha o caixa, paga comissão e vê o financeiro.
  * Legendas na tela explicam cada passo. Os vídeos vão para apps/web/videos/.
  */
-const OUT = path.resolve(__dirname, '../videos');
-const RAW = path.join(OUT, '.raw');
+const RAW = path.join(VIDEOS, '.raw');
 const DAY = nextTuesday();
 const [, MM, DD] = DAY.split('-');
 const stamp = Date.now().toString(36);
 const DONA = { name: 'Dra. Helena Souza', email: `helena+${stamp}@skedulei.test`, password: 'senha-forte-123' };
 const CLINICA = 'Clínica Pediátrica Pequenos Passos';
 const CONSULTA = 'Consulta pediátrica · 30 min · R$ 280,00';
-const DESKTOP = { width: 1366, height: 860 };
 
-/** Faixa de legenda que sobrevive às navegações. */
-async function legendar(page: Page, texto: string) {
-  await page.evaluate((t) => {
-    sessionStorage.setItem('__legenda', t);
-    document.getElementById('__legenda')?.remove();
-    const el = document.createElement('div');
-    el.id = '__legenda';
-    el.textContent = t;
-    el.setAttribute('style', 'position:fixed;left:50%;bottom:18px;transform:translateX(-50%);max-width:92vw;z-index:2147483647;background:rgba(17,24,39,.92);color:#fff;font:600 18px/1.35 system-ui,sans-serif;padding:12px 20px;border-radius:14px;text-align:center;pointer-events:none;box-shadow:0 6px 24px rgba(0,0,0,.35)');
-    document.body.appendChild(el);
-  }, texto);
-  await page.waitForTimeout(1400);
-}
-
-const prepararLegendas = (ctx: BrowserContext) =>
-  ctx.addInitScript(() => {
-    document.addEventListener('DOMContentLoaded', () => {
-      const t = sessionStorage.getItem('__legenda');
-      if (!t) return;
-      const el = document.createElement('div');
-      el.id = '__legenda';
-      el.textContent = t;
-      el.setAttribute('style', 'position:fixed;left:50%;bottom:18px;transform:translateX(-50%);max-width:92vw;z-index:2147483647;background:rgba(17,24,39,.92);color:#fff;font:600 18px/1.35 system-ui,sans-serif;padding:12px 20px;border-radius:14px;text-align:center;pointer-events:none;box-shadow:0 6px 24px rgba(0,0,0,.35)');
-      document.body.appendChild(el);
-    });
-  });
-
-/** Abre um contexto gravando vídeo e devolve a página + como fechar salvando o arquivo com o nome do ato. */
-async function ato(browser: Browser, nome: string, opts: Parameters<Browser['newContext']>[0]) {
-  const size = opts?.viewport ?? DESKTOP;
-  const ctx = await browser.newContext({ ...opts, locale: 'pt-BR', timezoneId: 'America/Sao_Paulo', recordVideo: { dir: RAW, size } });
-  await prepararLegendas(ctx);
-  const page = await ctx.newPage();
-  return {
-    ctx,
-    page,
-    fechar: async () => {
-      const video = page.video();
-      await ctx.close();
-      await video?.saveAs(path.join(OUT, `${nome}.webm`));
-    },
-  };
-}
-
-test.beforeAll(() => {
-  rmSync(OUT, { recursive: true, force: true });
-  mkdirSync(RAW, { recursive: true });
-});
+test.beforeAll(() =>
+  limparSaida((f) => /^(1-|2-|3-|pediatria-completo)/.test(f) || f === '.raw', RAW),
+);
 
 test('clínica pediátrica: do cadastro ao financeiro', async ({ browser }) => {
   let storage: Awaited<ReturnType<BrowserContext['storageState']>>;
@@ -76,7 +30,7 @@ test('clínica pediátrica: do cadastro ao financeiro', async ({ browser }) => {
 
   // ───────── Ato 1 · a clínica se cadastra e agenda pela recepção ─────────
   {
-    const { ctx, page, fechar } = await ato(browser, '1-clinica-cadastro-e-agenda', { viewport: DESKTOP });
+    const { ctx, page, fechar } = await ato(browser, '1-clinica-cadastro-e-agenda.webm', RAW, { viewport: DESKTOP });
     await page.goto('/cadastro');
     await legendar(page, 'Ato 1 · A Dra. Helena cria a conta da clínica');
     await page.getByLabel('Seu nome').fill(DONA.name);
@@ -123,7 +77,7 @@ test('clínica pediátrica: do cadastro ao financeiro', async ({ browser }) => {
       await page.getByRole('button', { name: `Cadastrar “${paciente}”` }).click();
       await page.getByLabel(/^(Serviço|Procedimento)$/).selectOption({ label: CONSULTA });
       await page.getByRole('button', { name: 'Agendar', exact: true }).last().click();
-      await expect(page.getByText(/(Agendamento|Consulta) marcad[oa] ✨/)).toBeVisible();
+      await expect(page.getByText('Horário marcado ✨')).toBeVisible();
     }
     await legendar(page, 'Agenda do dia com as duas consultas marcadas pela recepção');
 
@@ -139,7 +93,7 @@ test('clínica pediátrica: do cadastro ao financeiro', async ({ browser }) => {
 
   // ───────── Ato 2 · a mãe marca sozinha pelo celular ─────────
   {
-    const { page, fechar } = await ato(browser, '2-paciente-agenda-pelo-celular', { ...devices['Pixel 7'] });
+    const { page, fechar } = await ato(browser, '2-paciente-agenda-pelo-celular.webm', RAW, { ...devices['Pixel 7'] });
     await page.goto(`/${slug}`);
     await legendar(page, 'Ato 2 · Visão da paciente: Mariana abre o link da clínica no celular');
     await page.getByRole('button', { name: /^Consulta pediátrica R\$/ }).click();
@@ -177,7 +131,7 @@ test('clínica pediátrica: do cadastro ao financeiro', async ({ browser }) => {
 
   // ───────── Ato 3 · atendimento, cobrança, caixa e financeiro ─────────
   {
-    const { page, fechar } = await ato(browser, '3-clinica-atende-cobra-e-fecha', { viewport: DESKTOP, storageState: storage! });
+    const { page, fechar } = await ato(browser, '3-clinica-atende-cobra-e-fecha.webm', RAW, { viewport: DESKTOP, storageState: storage! });
     await page.goto(`/agenda?data=${DAY}`);
     await legendar(page, 'Ato 3 · A agenda da clínica já mostra a reserva online da Mariana às 11:00');
     await expect(page.getByRole('button', { name: /^11:00 Mariana Costa/ })).toBeVisible();
@@ -224,9 +178,9 @@ test('clínica pediátrica: do cadastro ao financeiro', async ({ browser }) => {
 
     await page.goto('/comissoes');
     await legendar(page, 'Comissão da Dra. Helena: 40% de R$ 560,00 = R$ 224,00');
-    await expect(page.getByText('A pagar').locator('..')).toContainText('R$ 224,00');
-    await page.getByRole('button', { name: 'Fechar e pagar' }).click();
-    await page.getByRole('button', { name: /Confirmar pagamento de R\$ 224,00/ }).click();
+    await expect(page.getByText('A pagar').filter({ visible: true }).first().locator('..')).toContainText('R$ 224,00');
+    await page.getByRole('button', { name: 'Fechar e pagar' }).first().click();
+    await page.getByRole('button', { name: /Confirmar (pagamento de )?R\$ 224,00/ }).click();
     await expect(page.getByText(/Fechamento de .* registrado/)).toBeVisible();
 
     await page.goto('/caixa');
@@ -250,13 +204,13 @@ test('clínica pediátrica: do cadastro ao financeiro', async ({ browser }) => {
 
   // Junta os 3 atos num só arquivo (mp4), se o ffmpeg estiver instalado.
   try {
-    const partes = readdirSync(OUT).filter((f) => f.endsWith('.webm')).sort();
+    const partes = readdirSync(VIDEOS).filter((f) => /^[123]-/.test(f) && f.endsWith('.webm')).sort();
     const lista = path.join(RAW, 'lista.txt');
     const filtros = partes.map((_, i) => `[${i}:v]scale=1366:860:force_original_aspect_ratio=decrease,pad=1366:860:(ow-iw)/2:(oh-ih)/2:color=white,setsar=1,fps=25[v${i}]`).join(';');
-    const entradas = partes.flatMap((f) => ['-i', path.join(OUT, f)]);
+    const entradas = partes.flatMap((f) => ['-i', path.join(VIDEOS, f)]);
     const concat = `${partes.map((_, i) => `[v${i}]`).join('')}concat=n=${partes.length}:v=1:a=0[out]`;
     writeFileSync(lista, partes.join('\n'));
-    execFileSync('ffmpeg', ['-y', ...entradas, '-filter_complex', `${filtros};${concat}`, '-map', '[out]', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '23', path.join(OUT, 'pediatria-completo.mp4')], { stdio: 'ignore' });
+    execFileSync('ffmpeg', ['-y', ...entradas, '-filter_complex', `${filtros};${concat}`, '-map', '[out]', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '23', path.join(VIDEOS, 'pediatria-completo.mp4')], { stdio: 'ignore' });
   } catch {
     /* sem ffmpeg: ficam os 3 .webm separados */
   }

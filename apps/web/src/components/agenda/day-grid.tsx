@@ -58,6 +58,7 @@ export function DayGrid({
   onOpen,
   onMove,
   today,
+  className,
 }: {
   day: AgendaDayDto;
   columns: GridColumn[];
@@ -67,6 +68,7 @@ export function DayGrid({
   /** Arrastar (mudar horário/coluna) ou esticar (mudar duração). Só com mouse/caneta. */
   onMove?: (a: AppointmentDto, to: MoveTarget) => void;
   today: string | null;
+  className?: string;
 }) {
   const tz = day.timezone;
   const place = React.useCallback(
@@ -144,7 +146,7 @@ export function DayGrid({
   };
 
   return (
-    <div className="overflow-x-auto rounded-3xl border border-border bg-card">
+    <div className={cn('overflow-x-auto rounded-3xl border border-border bg-card', className)}>
       <div className="min-w-full" style={{ width: columns.length > 1 ? `max(100%, ${3.5 + columns.length * 10}rem)` : undefined }}>
         {/* Cabeçalho das colunas */}
         <div className="sticky top-0 z-20 flex border-b border-border bg-card/95 backdrop-blur">

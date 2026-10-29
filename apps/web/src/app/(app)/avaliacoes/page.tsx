@@ -4,7 +4,6 @@ import { formatRating, Permission } from '@skedulei/contracts';
 import { Eye, EyeOff } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
-import { Kpi, KpiStrip } from '@/components/finance/kpi';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -36,19 +35,23 @@ export default function AvaliacoesPage() {
   return (
     <>
       <PageHeader title="Avaliações" subtitle={data?.summary.count ? `${data.summary.count} no total` : undefined} />
-      <div className="space-y-4 px-5">
+      <div className="space-y-5 px-6 pb-8 lg:space-y-6 lg:px-8">
         {isLoading ? (
           <Skeleton className="h-40 rounded-3xl" />
         ) : !data?.items.length ? (
           <EmptyState inline title="Nenhuma avaliação ainda" description="Depois de fechar uma comanda, peça a avaliação por ali — o link vai pronto para o WhatsApp." />
         ) : (
           <>
-            <KpiStrip cols={2}>
-              <Kpi label="Média" value={formatRating(data.summary.averageTimes10)} hint={`${data.summary.count} avaliações`} />
-              <div className="flex min-w-0 items-center bg-card px-4 py-3.5">
-                <Stars value={data.summary.averageTimes10 / 10} />
+            <section className="flex flex-wrap items-center justify-between gap-4 overflow-hidden rounded-3xl bg-ink-deep px-5 py-5 text-white animate-fade-up sm:px-6">
+              <div className="min-w-0">
+                <p className="text-sm text-white/65">Média</p>
+                <p className="mt-1 font-display text-3xl font-extrabold tabular leading-none sm:text-4xl">
+                  {formatRating(data.summary.averageTimes10)}
+                </p>
+                <p className="mt-2 text-sm text-white/55">{data.summary.count} avaliações</p>
               </div>
-            </KpiStrip>
+              <Stars value={data.summary.averageTimes10 / 10} />
+            </section>
             <Ledger>
               <div className="hidden overflow-x-auto lg:block">
                 <LedgerTable caption="Avaliações">

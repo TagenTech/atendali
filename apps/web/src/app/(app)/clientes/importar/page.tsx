@@ -91,7 +91,7 @@ export default function ImportarClientesPage() {
     return (
       <>
         <PageHeader title={`Importar ${vocab.clients.toLowerCase()}`} />
-        <div className="px-5">
+        <div className="px-6 pb-8 lg:px-8">
           <EmptyState title="Seu perfil não importa" description="Peça para o dono ou a recepção fazer a importação." />
         </div>
       </>
@@ -146,7 +146,7 @@ export default function ImportarClientesPage() {
           </Link>
         }
       />
-      <div className="space-y-5 px-5">
+      <div className="space-y-5 px-6 pb-8 lg:space-y-6 lg:px-8">
         {report ? (
           <>
             <Card className="space-y-2" role="status">
