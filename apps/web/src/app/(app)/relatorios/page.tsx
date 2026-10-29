@@ -110,7 +110,7 @@ function Inactive() {
       {isLoading ? (
         <Skeleton className="h-32 rounded-3xl" />
       ) : !data?.length ? (
-        <EmptyState title="Ninguém sumido" description={`Nenhum ${vocab.client.toLowerCase()} está há ${days} dias ou mais sem voltar.`} />
+        <EmptyState inline title="Ninguém sumido" description={`Nenhum ${vocab.client.toLowerCase()} está há ${days} dias ou mais sem voltar.`} />
       ) : (
         <Card className="divide-y divide-border p-0">
           {data.slice(0, 30).map((c) => (

@@ -1,13 +1,14 @@
 'use client';
 
 import { initials } from '@skedulei/contracts';
-import { LogOut } from 'lucide-react';
+import { LogOut, Search } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Wordmark } from '@/components/brand/logo';
 import { useAuth } from '@/lib/auth';
 import { useOrg } from '@/lib/org';
 import { cn } from '@/lib/utils';
+import { openSearch } from './command-palette';
 import { canSee, isActive, navItems } from './nav-items';
 import { OrgSwitcher } from './org-switcher';
 
@@ -26,6 +27,18 @@ export function Sidebar() {
       </div>
       <div className="px-3">
         <OrgSwitcher />
+      </div>
+
+      <div className="mt-3 px-3">
+        <button
+          type="button"
+          onClick={openSearch}
+          className="flex w-full items-center gap-2 rounded-2xl border border-border bg-background px-3 py-2 text-sm text-muted-foreground transition-colors hover:border-input hover:text-foreground"
+        >
+          <Search className="size-4" aria-hidden />
+          <span className="flex-1 text-left">Buscar</span>
+          <kbd className="rounded-md border border-border px-1.5 text-xs font-semibold">Ctrl K</kbd>
+        </button>
       </div>
 
       <nav aria-label="Navegação principal" className="mt-4 flex-1 overflow-y-auto px-3">

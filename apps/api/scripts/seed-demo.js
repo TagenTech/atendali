@@ -59,7 +59,7 @@ async function seed(segment) {
       features: FEATURES,
       loyalty: { enabled: true, pointsPerReal: 1, redeemPoints: 100, redeemValueCents: 1000 },
       brandColor: ['violeta', 'rosa', 'azul', 'verde', 'laranja', 'grafite', 'dourado'][SEGMENTS.indexOf(segment) % 7],
-      tagline: `Bem-vindo(a) ao ${preset.label.toLowerCase()} de demonstração`,
+      tagline: `Agende seu horário online — conta de demonstração (${preset.label.toLowerCase()})`,
     },
   });
   const services = await call('GET', '/org/services', o);

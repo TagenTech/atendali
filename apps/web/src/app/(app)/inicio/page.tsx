@@ -1,7 +1,7 @@
 'use client';
 
-import { APPOINTMENT_STATUS_LABEL, MemberStatus, Permission, SEGMENT_PRESETS, todayIn, zonedParts } from '@skedulei/contracts';
-import { CalendarDays, Check, ChevronRight, Copy, ExternalLink, Scissors, UsersRound, type LucideIcon } from 'lucide-react';
+import { APPOINTMENT_STATUS_LABEL, formatBRL, MemberStatus, Permission, SEGMENT_PRESETS, todayIn, zonedParts } from '@skedulei/contracts';
+import { CalendarDays, Check, ChevronRight, Copy, ExternalLink, Scissors, UsersRound, Wallet, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { STATUS_DOT } from '@/components/agenda/status';
@@ -12,6 +12,7 @@ import { useAuth } from '@/lib/auth';
 import { firstName, greeting } from '@/lib/greeting';
 import { useOrg } from '@/lib/org';
 import { useAgendaDay } from '@/lib/queries/agenda';
+import { useCash, useFinanceSummary } from '@/lib/queries/finance';
 import { useMembers, useServices, useUnits } from '@/lib/queries/org';
 import { useHydrated } from '@/lib/use-hydrated';
 import { useNow } from '@/lib/use-now';
@@ -24,7 +25,7 @@ function Step({ done, title, description, href }: { done: boolean; title: string
         {done ? <Check className="size-4" strokeWidth={3} /> : null}
       </span>
       <span className="min-w-0 flex-1">
-        <span className={cn('block font-semibold', done && 'text-muted-foreground line-through')}>{title}</span>
+        <span className={cn('block font-semibold', done && 'text-muted-foreground')}>{title}</span>
         <span className="block text-sm text-muted-foreground">{description}</span>
       </span>
       {href ? <ChevronRight className="size-5 text-muted-foreground" /> : null}
@@ -53,6 +54,35 @@ function Stat({ icon: Icon, label, value, href }: { icon: LucideIcon; label: str
   return href ? <Link href={href}>{body}</Link> : body;
 }
 
+function TodayStat() {
+  const { org } = useOrg();
+  const hydrated = useHydrated();
+  const today = hydrated ? todayIn(org.timezone) : null;
+  const { data } = useAgendaDay(today);
+  const count = (data?.appointments ?? []).filter((a) => a.status !== 'CANCELADO').length;
+  return <Stat icon={CalendarDays} label={count === 1 ? 'Horário hoje' : 'Horários hoje'} value={data ? String(count) : '…'} href="/agenda" />;
+}
+
+function RevenueStats() {
+  const { org } = useOrg();
+  const hydrated = useHydrated();
+  const today = hydrated ? todayIn(org.timezone) : null;
+  const month = useFinanceSummary(today ? `${today.slice(0, 8)}01` : null, today);
+  const day = useFinanceSummary(today, today);
+  return (
+    <>
+      <Stat icon={Wallet} label="Faturado hoje" value={day.data ? formatBRL(day.data.revenueCents) : '…'} href="/financeiro" />
+      <Stat icon={Wallet} label="Faturado no mês" value={month.data ? formatBRL(month.data.revenueCents) : '…'} href="/financeiro" />
+    </>
+  );
+}
+
+function CashStat() {
+  const { data } = useCash();
+  const label = data === undefined ? '…' : data ? 'Caixa aberto' : 'Caixa fechado';
+  return <Stat icon={Wallet} label={data ? `Na gaveta ${formatBRL(data.expected.drawerCents)}` : 'Abra para receber'} value={label} href="/caixa" />;
+}
+
 function TodayAgenda() {
   const { org } = useOrg();
   const hydrated = useHydrated();
@@ -72,11 +102,14 @@ function TodayAgenda() {
       </div>
       <Card className="divide-y divide-border p-0">
         {upcoming.length ? (
-          upcoming.slice(0, 8).map((a) => (
+          upcoming.slice(0, 8).map((a, i) => (
             <Link key={a.id} href="/agenda" className="flex items-center gap-3 px-4 py-3 hover:bg-muted/60">
               <span className="w-12 shrink-0 font-display font-extrabold tabular">{zonedParts(new Date(a.startsAt), org.timezone).time}</span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate font-semibold">{a.clientName}</span>
+                <span className="block truncate font-semibold">
+                  {a.clientName}
+                  {i === 0 ? <span className="ml-2 rounded-full bg-pink-soft px-2 py-0.5 align-middle text-xs font-bold text-pink-soft-foreground">Próximo</span> : null}
+                </span>
                 <span className="block truncate text-sm text-muted-foreground">
                   {a.serviceName} · {a.memberName}
                 </span>
@@ -139,6 +172,8 @@ export default function InicioPage() {
   const members = useMembers(canTeam);
   const units = useUnits();
   const canAgenda = can(Permission.AGENDA_OWN);
+  const canFinance = can(Permission.FINANCE_VIEW);
+  const canCash = can(Permission.CASH_OPERATE);
 
   const activeServices = services.data?.filter((s) => s.active).length ?? 0;
   const team = canTeam ? (members.data ?? []) : [];
@@ -163,10 +198,12 @@ export default function InicioPage() {
     <>
       <PageHeader title={hello ? `${hello.text}, ${name}` : `Olá, ${name}`} subtitle={org.name} />
       <div className="space-y-6 px-5">
-        <div className="grid divide-y divide-border overflow-hidden rounded-3xl border border-border bg-card sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          <Stat icon={Scissors} label={`${vocab.services} ativos`} value={services.data ? String(activeServices) : '…'} href="/servicos" />
-          {canTeam ? <Stat icon={UsersRound} label="Pessoas atendendo" value={members.data ? String(professionals) : '…'} href="/equipe" /> : null}
-          {canAgenda ? <Stat icon={CalendarDays} label="Agenda" value="Abrir" href="/agenda" /> : null}
+        <div className="grid divide-y divide-border overflow-hidden rounded-3xl border border-border bg-card sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
+          {canAgenda ? <TodayStat /> : null}
+          {canFinance ? <RevenueStats /> : null}
+          {canCash ? <CashStat /> : null}
+          {!canFinance ? <Stat icon={Scissors} label={`${vocab.services} ativos`} value={services.data ? String(activeServices) : '…'} href="/servicos" /> : null}
+          {!canFinance && canTeam ? <Stat icon={UsersRound} label="Pessoas atendendo" value={members.data ? String(professionals) : '…'} href="/equipe" /> : null}
         </div>
 
         <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">

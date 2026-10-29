@@ -205,7 +205,7 @@ export default function CaixaPage() {
             {open.data?.length ? (
               <OrderLedger orders={open.data} tz={tz} caption="Comandas abertas" />
             ) : (
-              <EmptyState title="Nenhuma comanda aberta" description='Na agenda, abra a comanda pelo atendimento ("Abrir comanda") ou crie uma aqui.' className="py-6" />
+              <EmptyState inline title="Nenhuma comanda aberta" description='Na agenda, abra a comanda pelo atendimento ("Abrir comanda") ou crie uma aqui.' />
             )}
           </section>
           <section>

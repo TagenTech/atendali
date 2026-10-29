@@ -86,10 +86,17 @@ export default function ClientesPage() {
                   {clients.map((c) => (
                     <tr key={c.id} className="cursor-pointer hover:bg-muted/60" onClick={() => router.push(`/clientes/${c.id}`)}>
                       <td className="px-5 py-3 font-semibold">
-                        <Link href={`/clientes/${c.id}`} onClick={(e) => e.stopPropagation()} className="hover:underline">
-                          {c.name}
-                        </Link>
-                        {c.guardianName ? <span className="block text-xs font-normal text-muted-foreground">Resp.: {c.guardianName}</span> : null}
+                        <span className="flex items-center gap-3">
+                          <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary-soft font-display text-xs font-extrabold text-primary-soft-foreground">
+                            {initials(c.name)}
+                          </span>
+                          <span className="min-w-0">
+                            <Link href={`/clientes/${c.id}`} onClick={(e) => e.stopPropagation()} className="hover:underline">
+                              {c.name}
+                            </Link>
+                            {c.guardianName ? <span className="block text-xs font-normal text-muted-foreground">Resp.: {c.guardianName}</span> : null}
+                          </span>
+                        </span>
                       </td>
                       <td className="px-5 py-3 tabular">{c.phone ? formatPhone(c.phone) : '—'}</td>
                       <td className="px-5 py-3 text-muted-foreground">{c.email ?? '—'}</td>

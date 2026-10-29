@@ -172,8 +172,8 @@ test('a pessoa avalia pelo link, sem login, uma vez só', async ({ browser }) =>
 
 test('avaliações aparecem para a equipe e o painel de TV abre', async () => {
   await page.goto('/avaliacoes');
-  await expect(page.getByText('Atendimento ótimo!')).toBeVisible();
-  await expect(page.getByText('Cliente R.')).toBeVisible();
+  await expect(page.getByText('Atendimento ótimo!').filter({ visible: true }).first()).toBeVisible();
+  await expect(page.getByText('Cliente R.').filter({ visible: true }).first()).toBeVisible();
 
   await page.goto('/tv');
   await expect(page.getByRole('region', { name: 'Chamando agora' })).toBeVisible();

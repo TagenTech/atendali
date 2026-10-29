@@ -24,17 +24,17 @@ test('atividade: o dono vê quem estornou, deu desconto e mexeu no caixa', async
   }
   await page.goto('/atividade');
   await expect(page.getByRole('heading', { name: 'Atividade' })).toBeVisible();
-  await expect(page.getByText(/Desconto da comanda #1: de R\$\s*0,00 para R\$\s*20,00/)).toBeVisible();
-  await expect(page.getByText(/Comanda #1 cancelada/)).toBeVisible();
-  await expect(page.getByText(/Sangria de R\$\s*10,00 — Depósito/)).toBeVisible();
+  await expect(page.getByText(/Desconto da comanda #1: de R\$\s*0,00 para R\$\s*20,00/).filter({ visible: true }).first()).toBeVisible();
+  await expect(page.getByText(/Comanda #1 cancelada/).filter({ visible: true }).first()).toBeVisible();
+  await expect(page.getByText(/Sangria de R\$\s*10,00 — Depósito/).filter({ visible: true }).first()).toBeVisible();
   await expect(page.getByText('Dono Regressão').filter({ visible: true }).first()).toBeVisible();
 
   // Filtro por grupo.
   await page.getByRole('button', { name: 'Caixa', exact: true }).click();
-  await expect(page.getByText(/Sangria de R\$\s*10,00/)).toBeVisible();
-  await expect(page.getByText(/Desconto da comanda/)).toHaveCount(0);
+  await expect(page.getByText(/Sangria de R\$\s*10,00/).filter({ visible: true }).first()).toBeVisible();
+  await expect(page.getByText(/Desconto da comanda/).filter({ visible: true })).toHaveCount(0);
   await page.getByRole('button', { name: 'Tudo', exact: true }).click();
-  await expect(page.getByText(/Desconto da comanda/)).toBeVisible();
+  await expect(page.getByText(/Desconto da comanda/).filter({ visible: true }).first()).toBeVisible();
   if (test.info().project.name === 'celular') await expectNoHorizontalScroll(page, 'atividade');
   expectClean(seen, 'atividade');
 });

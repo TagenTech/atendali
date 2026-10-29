@@ -88,9 +88,9 @@ test('recebe em dinheiro com troco e fecha a comanda', async () => {
 
 test('comissão de 40% e fechamento do profissional', async () => {
   await page.goto('/comissoes');
-  await expect(page.getByText('A pagar').locator('..')).toContainText('R$ 20,00');
+  await expect(page.getByText('A pagar').filter({ visible: true }).first().locator('..')).toContainText('R$ 20,00');
   await page.getByRole('button', { name: 'Fechar e pagar' }).click();
-  await page.getByRole('button', { name: /Confirmar pagamento de R\$ 20,00/ }).click();
+  await page.getByRole('button', { name: /Confirmar (pagamento de )?R\$ 20,00/ }).click();
   await expect(page.getByText(/Fechamento de Zé Caixa registrado/)).toBeVisible();
   await expect(page.getByText('Nada em aberto')).toBeVisible();
 });

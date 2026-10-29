@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { useAuth } from '@/lib/auth';
 import { OrgProvider, useOrgState } from '@/lib/org';
 import { BottomNav } from './bottom-nav';
+import { CommandPalette } from './command-palette';
 import { ConnectivityBanner } from './connectivity-banner';
 import { Sidebar } from './sidebar';
 
@@ -73,6 +74,7 @@ function OrgGate({ children }: { children: React.ReactNode }) {
       <div className="min-h-dvh pt-safe lg:pl-72">
         <ConnectivityBanner />
         <Sidebar />
+        <CommandPalette />
         {immersive ? (
           <main className="mx-auto max-w-lg lg:max-w-2xl lg:py-6">{children}</main>
         ) : (

@@ -13,7 +13,12 @@ export default function manifest(): MetadataRoute.Manifest {
     orientation: 'portrait',
     background_color: '#f4f7f6',
     theme_color: '#f4f7f6',
-    categories: ['education', 'productivity', 'finance'],
+    categories: ['business', 'productivity', 'health'],
+    shortcuts: [
+      { name: 'Agenda', url: '/agenda', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
+      { name: 'Clientes', url: '/clientes', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
+      { name: 'Caixa', url: '/caixa', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
+    ],
     icons: [
       { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
       { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },

@@ -40,9 +40,18 @@ import { useOrg } from '@/lib/org';
 import { useUnits, useUpdateOrganization } from '@/lib/queries/org';
 import { cn } from '@/lib/utils';
 
+function sectionId(title: string) {
+  return title
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
 function Section({ title, description, children, action }: { title: string; description?: string; children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <section className="grid grid-cols-[minmax(0,1fr)] gap-4 xl:grid-cols-[16rem_minmax(0,1fr)] xl:gap-8">
+    <section id={sectionId(title)} className="scroll-mt-28 grid grid-cols-[minmax(0,1fr)] gap-4 xl:grid-cols-[16rem_minmax(0,1fr)] xl:gap-8">
       <div className="flex items-start justify-between gap-3 xl:block">
         <div>
           <h2 className="text-lg font-extrabold">{title}</h2>
@@ -383,10 +392,25 @@ export default function ConfiguracoesPage() {
   }, [allowed, router]);
   if (!allowed) return null;
 
+  const hasLoyalty = org.features.includes(FeatureKey.FIDELIDADE);
+  const hasForms = org.features.includes(FeatureKey.ANAMNESE) || org.features.includes(FeatureKey.TERMOS);
+  const nav = ['Dados do negócio', 'Aparência da página', 'Lembretes', 'Taxa de agendamento', 'Unidades', 'Pagamentos e comissão', ...(hasLoyalty ? ['Pontos de fidelidade'] : []), ...(hasForms ? ['Fichas e termos'] : []), 'Módulos'];
+
   return (
     <>
       <PageHeader title="Negócio" subtitle="Configurações" />
-      <div className="space-y-10 px-5">
+      <nav aria-label="Seções" className="sticky top-0 z-10 -mt-1 mb-6 border-b border-border bg-background/95 backdrop-blur">
+        <ul className="no-scrollbar flex gap-1 overflow-x-auto px-5 py-2">
+          {nav.map((t) => (
+            <li key={t} className="shrink-0">
+              <a href={`#${sectionId(t)}`} className="block rounded-full px-3 py-1.5 text-sm font-semibold text-muted-foreground hover:bg-muted hover:text-foreground">
+                {t}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <div className="space-y-12 px-5">
         <Section title="Dados do negócio" description="Aparecem na página de agendamento e nos recibos.">
           <BusinessInfo />
         </Section>
