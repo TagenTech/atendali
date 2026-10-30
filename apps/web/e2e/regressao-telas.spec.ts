@@ -1,5 +1,5 @@
 import { expect, test, type BrowserContext, type Page } from '@playwright/test';
-import { addMember, createBusiness, expectClean, expectNoHorizontalScroll, nextTuesday, watch, type SeededOrg } from './helpers';
+import { EXTERNAL_RUN, addMember, createBusiness, expectClean, expectNoHorizontalScroll, nextTuesday, watch, type SeededOrg } from './helpers';
 
 /**
  * Regressão de telas e permissões (celular e desktop): toda tela abre sem erro de console, sem resposta 5xx e sem
@@ -21,6 +21,8 @@ const ALL_ROUTES = [
 ];
 
 test.beforeAll(async ({ browser }, info) => {
+  // O fluxo de convite lê o /api/v1/dev/outbox, que só existe na API de teste local.
+  test.skip(EXTERNAL_RUN, 'usa o /api/v1/dev/outbox para convidar equipe');
   const stamp = `${info.project.name}-${Date.now()}`;
   ownerCtx = await browser.newContext();
   org = await createBusiness(ownerCtx, stamp);

@@ -9,7 +9,9 @@ import { defineConfig, devices } from '@playwright/test';
 const API_PORT = 3210;
 const WEB_PORT = 3211;
 const DATABASE_URL = process.env.E2E_WEB_DATABASE_URL ?? 'postgres://postgres:postgres@localhost:5432/skedulei_e2e_web';
-const WEB_URL = `http://localhost:${WEB_PORT}`;
+/** Aponta o regressivo pra uma instância já publicada (ex.: https://app.skedulei.com.br) — não sobe API/web local. */
+const EXTERNAL_URL = process.env.E2E_BASE_URL?.replace(/\/$/, '');
+const WEB_URL = EXTERNAL_URL ?? `http://localhost:${WEB_PORT}`;
 
 export default defineConfig({
   testDir: './e2e',
@@ -32,7 +34,7 @@ export default defineConfig({
     { name: 'celular', use: { ...devices['Pixel 7'] } },
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1366, height: 860 } } },
   ],
-  webServer: [
+  webServer: EXTERNAL_URL ? [] : [
     {
       name: 'api',
       cwd: '../api',

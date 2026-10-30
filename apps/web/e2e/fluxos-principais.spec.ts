@@ -62,7 +62,7 @@ test('onboarding: barbearia com horário, serviços e uma pessoa sem acesso', as
   await page.getByRole('button', { name: 'Criar meu negócio' }).click();
 
   await expect(page).toHaveURL(/\/inicio$/);
-  await expect(page.getByRole('main').getByText('Barbearia do Zé')).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Boa (noite|tarde|dia), Zé/ })).toBeVisible();
 });
 
 test('serviços: lista os do onboarding e cadastra um novo', async () => {

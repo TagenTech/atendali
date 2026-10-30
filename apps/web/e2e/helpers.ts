@@ -2,6 +2,8 @@ import { expect, type Browser, type BrowserContext, type Page } from '@playwrigh
 import type { Permission } from '@skedulei/contracts';
 
 export const PASSWORD = 'senha-forte-123';
+/** Rodando contra uma instância publicada (E2E_BASE_URL): sem /api/v1/dev/outbox nem o JWT_SECRET de teste. */
+export const EXTERNAL_RUN = !!process.env.E2E_BASE_URL;
 export const ALL_FEATURES = ['COMISSOES', 'ESTOQUE', 'PACOTES', 'ASSINATURAS', 'VALES', 'FIDELIDADE'];
 
 /** Terça-feira 7 a 13 dias à frente, no fuso de São Paulo (dia útil com horário livre). */

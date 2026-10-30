@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { signReminderLink } from '../../api/src/agenda/reminder-link';
-import { createBusiness, nextTuesday } from './helpers';
+import { EXTERNAL_RUN, createBusiness, nextTuesday } from './helpers';
 
 const stamp = `lb${Date.now().toString(36)}`;
 const JWT_SECRET = 'playwright-secret-playwright-secret-0001'; // o mesmo do playwright.config.ts
@@ -8,6 +8,7 @@ const DAY = nextTuesday();
 
 test.describe('lembretes', () => {
   test('o link do lembrete abre a reserva e o cliente confirma a presença', async ({ page, context }) => {
+    test.skip(EXTERNAL_RUN, 'o link assinado usa o JWT_SECRET da API de teste local');
     const org = await createBusiness(context, stamp);
     const pub = await (await page.request.get(`/api/v1/public/orgs/${org.slug}`)).json();
     const serviceId = pub.services[0].id as string;

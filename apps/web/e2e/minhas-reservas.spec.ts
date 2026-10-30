@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { createBusiness, expectClean, expectNoHorizontalScroll, nextTuesday, watch, type SeededOrg } from './helpers';
+import { EXTERNAL_RUN, createBusiness, expectClean, expectNoHorizontalScroll, nextTuesday, watch, type SeededOrg } from './helpers';
 
 const stamp = `mr${Date.now().toString(36)}`;
 const DAY = nextTuesday();
@@ -34,6 +34,7 @@ test.describe('responsável × paciente e Minhas reservas', () => {
   };
 
   test('a mãe marca para a filha, revê, remarca e cancela sem ter conta', async ({ page }) => {
+    test.skip(EXTERNAL_RUN, 'usa o /api/v1/dev/outbox, que só existe na API de teste local');
     const seen = watch(page);
     await page.goto(`/${org.slug}`);
     await page.getByRole('button', { name: /^Corte R\$/ }).click();

@@ -50,7 +50,8 @@ test('sem personalização a página usa o padrão', async ({ browser }) => {
   const anon = await browser.newPage();
   await anon.goto(`/${slug}`);
   await expect(anon.getByRole('heading', { name: /Barbearia Visual/ })).toBeVisible();
-  await expect(anon.locator('img')).toHaveCount(0);
+  // Sem logo própria, a página pública mostra a logo do Skedulei.
+  await expect(anon.locator('img')).toHaveCount(1);
   await anon.close();
 });
 
@@ -114,7 +115,8 @@ test('remover o fundo e a logo volta ao padrão', async ({ browser }) => {
   await expect(page.getByRole('button', { name: 'Escolher imagem' })).toHaveCount(2);
   const anon = await browser.newPage();
   await anon.goto(`/${slug}`);
-  await expect(anon.locator('img')).toHaveCount(0);
+  // Voltou ao padrão: a logo do Skedulei reaparece no lugar da logo enviada.
+  await expect(anon.locator('img')).toHaveCount(1);
   await expect(anon.getByText('Corte e barba com hora marcada')).toBeVisible();
   await anon.close();
 });

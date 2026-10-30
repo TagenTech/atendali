@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { PASSWORD, createBusiness, signUp } from './helpers';
+import { EXTERNAL_RUN, PASSWORD, createBusiness, signUp } from './helpers';
 
 const stamp = Date.now().toString(36);
 const NOVA = 'cafe-com-leite-9';
@@ -54,6 +54,7 @@ test.describe('senhas: cadastro, recuperação e troca', () => {
   });
 
   test('esqueci a senha: e-mail inválido, link por e-mail, regras e login com a nova senha', async ({ page, context }) => {
+    test.skip(EXTERNAL_RUN, 'usa o /api/v1/dev/outbox, que só existe na API de teste local');
     const email = `senhas-rec+${stamp}@skedulei.test`;
     await signUp(context, 'Rita Recupera', email);
     await context.clearCookies();
@@ -95,6 +96,7 @@ test.describe('senhas: cadastro, recuperação e troca', () => {
   });
 
   test('o mesmo link de redefinição não funciona duas vezes', async ({ page, context }) => {
+    test.skip(EXTERNAL_RUN, 'usa o /api/v1/dev/outbox, que só existe na API de teste local');
     const email = `senhas-uso+${stamp}@skedulei.test`;
     await signUp(context, 'Uso Único', email);
     await context.clearCookies();
