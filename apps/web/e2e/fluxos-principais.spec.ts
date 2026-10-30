@@ -103,5 +103,5 @@ test('sai e entra de novo, direto no negócio', async () => {
   await page.getByLabel('Senha', { exact: true }).fill(dona.password);
   await page.getByRole('button', { name: 'Entrar', exact: true }).click();
   await expect(page).toHaveURL(/\/inicio$/);
-  await expect(page.getByRole('main').getByText('Barbearia do Zé')).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Boa (noite|tarde|dia),/ })).toBeVisible();
 });

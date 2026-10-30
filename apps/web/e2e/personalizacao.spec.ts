@@ -77,8 +77,9 @@ test('o cliente vê logo, fundo, cor e frase; agenda e cancela', async ({ browse
   await anon.goto(`/${slug}`);
   await expect(anon.getByText('Corte e barba com hora marcada')).toBeVisible();
   await expect(anon.getByRole('img', { name: /Logo de Barbearia Visual/ })).toBeVisible();
-  const loaded = await anon.locator('img').evaluateAll((imgs) => (imgs as HTMLImageElement[]).map((i) => i.complete && i.naturalWidth > 0));
-  expect(loaded).toEqual([true, true]);
+  // Capa + logo própria + selo Skedulei — todas têm que terminar de carregar.
+  await expect(anon.locator('img')).toHaveCount(3);
+  await anon.waitForFunction(() => Array.from(document.images).every((i) => i.complete && i.naturalWidth > 0));
   // A cor rosa entra nos tokens só desta página.
   const primary = await anon.locator('main').evaluate((el) => getComputedStyle(el).getPropertyValue('--primary').trim());
   expect(primary).toBe('#d6409f');

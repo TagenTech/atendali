@@ -60,9 +60,13 @@ test('liga os módulos e define a regra de pontos', async () => {
   await page.goto('/configuracoes?aba=modulos');
   for (const name of [/Pacotes de sessões/, /Vale-presente/, /Programa de fidelidade/]) {
     // Teclado: no celular a lista é longa e o clique cai sob a barra/toast.
-    await page.getByRole('switch', { name }).focus();
+    const sw = page.getByRole('switch', { name });
+    // O switch fica disabled enquanto o PATCH anterior está em voo — Space num botão
+    // desabilitado é engolido. Esperar habilitar antes de focar/apertar.
+    await expect(sw).toBeEnabled();
+    await sw.focus();
     await page.keyboard.press('Space');
-    await expect(page.getByRole('switch', { name })).toHaveAttribute('aria-checked', 'true');
+    await expect(sw).toHaveAttribute('aria-checked', 'true');
   }
   await page.getByRole('link', { name: 'Pagamentos', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Pontos de fidelidade' })).toBeVisible();
